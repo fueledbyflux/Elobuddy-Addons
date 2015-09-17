@@ -12,7 +12,11 @@ namespace VayneBuddy
     static class Condemn
     {
 
-        public static AIHeroClient _Player => ObjectManager.Player;
+        public static AIHeroClient _Player
+        {
+            get { return ObjectManager.Player; }
+        }
+
         public static long LastCheck;
         public static int CheckCount;
 

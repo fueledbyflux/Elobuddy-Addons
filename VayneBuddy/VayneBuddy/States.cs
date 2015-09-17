@@ -6,7 +6,11 @@ namespace VayneBuddy
 {
     class States
     {
-        public static AIHeroClient _Player => ObjectManager.Player;
+        public static AIHeroClient _Player
+        {
+            get { return ObjectManager.Player; }
+        }
+
         public static void Combo()
         {
             var target = (Events.AAedTarget != null && Events.AAedTarget.IsValidTarget(_Player.GetAutoAttackRange(Events.AAedTarget)) && Events.AAedTarget is AIHeroClient && Events.AaStacks == 2) ? (AIHeroClient) Events.AAedTarget : TargetSelector2.GetTarget((int)_Player.GetAutoAttackRange(), DamageType.Physical);

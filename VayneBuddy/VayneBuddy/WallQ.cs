@@ -10,8 +10,11 @@ namespace VayneBuddy
 {
     class WallQ
     {
-        public static AIHeroClient _Player => ObjectManager.Player;
-        
+        public static AIHeroClient _Player
+        {
+            get { return ObjectManager.Player; }
+        }
+
 
         public static void Drawing_OnDraw()
         {

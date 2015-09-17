@@ -15,7 +15,11 @@ namespace VayneBuddy
         public static long LastAa;
         public static int AaStacks;
 
-        public static AIHeroClient _Player => ObjectManager.Player;
+        public static AIHeroClient _Player
+        {
+            get { return ObjectManager.Player; }
+        }
+
         public static void Gapcloser_OnGapCloser(AIHeroClient sender, GapCloserEventArgs e)
         {
             if (e.End.Distance(_Player.Position) < 200 && sender.IsValidTarget())
@@ -33,6 +37,7 @@ namespace VayneBuddy
                 {
                     return;
                 }
+
                 Program.R.Cast();
             }
         }

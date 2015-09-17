@@ -18,10 +18,14 @@ namespace VayneBuddy
     {
         private static void Main(string[] args)
         {
-            Game.OnStart += Game_OnStart;
+            Loading.OnLoadingComplete += Game_OnStart;
         }
 
-        public static AIHeroClient _Player => ObjectManager.Player;
+        public static AIHeroClient _Player
+        {
+            get { return ObjectManager.Player; }
+        }
+
         public static Spell.Ranged Q;
         public static Spell.Targeted E;
         public static Spell.Active R;
@@ -36,13 +40,15 @@ namespace VayneBuddy
             GapCloserMenu,
             CondemnPriorityMenu;
         
-        public static String[] DangerSliderValues = new[] {"Low", "Medium", "High"};
+        public static string[] DangerSliderValues = {"Low", "Medium", "High"};
+        public static string[] PriorityValues = {"Very Low", "Low", "Medium", "High", "Very High"};
         public static List<Vector2> Points = new List<Vector2>();
         public static List<Vector2> CorrectPoints = new List<Vector2>();
 
         private static void Game_OnStart(EventArgs args)
         {
             if (!_Player.ChampionName.ToLower().Contains("vayne")) return;
+
             Bootstrap.Init(null);
             ItemManager.Init();
             TargetSelector2.init();
@@ -72,10 +78,21 @@ namespace VayneBuddy
             CondemnPriorityMenu.AddGroupLabel("Condemn Priority");
             foreach (var enem in ObjectManager.Get<AIHeroClient>().Where(a => a.IsEnemy))
             {
-                CondemnPriorityMenu.Add(enem.ChampionName + "priority", new Slider(enem.ChampionName, 1, 1, 5));
+                var champValue = CondemnPriorityMenu.Add(enem.ChampionName + "priority", new Slider(enem.ChampionName + ": ", 1, 1, 5));
+                var enem1 = enem;
+                champValue.OnValueChange += delegate
+                {
+                    champValue.DisplayName = enem1.ChampionName + ": " + PriorityValues[champValue.CurrentValue];
+                };
+                champValue.DisplayName = enem1.ChampionName + ": " + PriorityValues[champValue.CurrentValue];
             }
             CondemnPriorityMenu.AddSeparator();
-            CondemnPriorityMenu.Add("minSliderAutoCondemn", new Slider("Min Priority for Auto Condemn", 2, 1, 5));
+            var sliderValue = CondemnPriorityMenu.Add("minSliderAutoCondemn", new Slider("Min Priority for Auto Condemn: ", 2, 1, 5));
+            sliderValue.OnValueChange += delegate
+            {
+                sliderValue.DisplayName = "Min Priority for Auto Condemn: " + PriorityValues[sliderValue.CurrentValue];
+            };
+            sliderValue.DisplayName = "Min Priority for Auto Condemn: " + PriorityValues[sliderValue.CurrentValue];
             CondemnPriorityMenu.Add("autoCondemnToggle",
                 new KeyBind("Auto Condemn", false, KeyBind.BindTypes.PressToggle, 'H'));
             CondemnPriorityMenu.AddSeparator();

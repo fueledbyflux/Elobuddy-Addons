@@ -17,7 +17,10 @@ namespace VayneBuddy.Activator
         public static Menu DefensiveMenu;
         public static Menu Summoners;
         public static Menu Cleansers;
-        public static AIHeroClient _Player => ObjectManager.Player;
+        public static AIHeroClient _Player
+        {
+            get { return ObjectManager.Player; }
+        }
 
         public static Dictionary<BuffType, string> BuffTypes = new Dictionary<BuffType, string>()
         {
