@@ -20,7 +20,7 @@ namespace VayneBuddy
             get { return ObjectManager.Player; }
         }
 
-        public static void Gapcloser_OnGapCloser(AIHeroClient sender, GapCloserEventArgs e)
+        public static void Gapcloser_OnGapCloser(AIHeroClient sender, Gapcloser.GapCloserEventArgs e)
         {
             if (e.End.Distance(_Player.Position) < 200 && sender.IsValidTarget())
             {
