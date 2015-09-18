@@ -48,7 +48,7 @@ namespace JinxBuddy
         public static int EMana = 50;
         public static int QMana = 20;
 
-        public static Menu menu;
+        public static Menu menu, ComboMenu, HarassMenu, FarmMenu;
         public static CheckBox SmartMode;
 
         static void Main(string[] args)
@@ -67,6 +67,18 @@ namespace JinxBuddy
             SmartMode = menu.Add("smartMode", new CheckBox("Smart Mode", false));
             menu.AddLabel("Smart mode enables mana management / smarter skill usage");
 
+            ComboMenu = menu.AddSubMenu("Combo", "ComboJinx");
+            ComboMenu.Add("useQCombo", new CheckBox("Use Q"));
+            ComboMenu.Add("useWCombo", new CheckBox("Use W"));
+            ComboMenu.Add("useECombo", new CheckBox("Use E"));
+            ComboMenu.Add("useRCombo", new CheckBox("Use R"));
+
+            ComboMenu = menu.AddSubMenu("Harass", "HarassJinx");
+            ComboMenu.Add("useQHarass", new CheckBox("Use Q"));
+            ComboMenu.Add("useWHarass", new CheckBox("Use W"));
+
+            ComboMenu = menu.AddSubMenu("Farm", "FarmJinx");
+            ComboMenu.Add("useQFarm", new CheckBox("Use Q"));
 
             Events.Init();
             Game.OnTick += Game_OnTick;
@@ -82,6 +94,7 @@ namespace JinxBuddy
         {
             Orbwalker.ForcedTarget = null;
             if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo)) Combo();
+            else if(Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Harass)) Harass();
             else if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear)) WaveClear();
         }
 
@@ -103,7 +116,7 @@ namespace JinxBuddy
 
             if (Orbwalker.IsAutoAttacking) return;
 
-            if (Spells[SpellSlot.Q].IsReady())
+            if (HarassMenu["useQHarass"].Cast<CheckBox>().CurrentValue && Spells[SpellSlot.Q].IsReady())
             {
                 if (target.Distance(_Player) <= Events.MinigunRange(target) && (Events.FishBonesActive || (_Player.ManaPercent > 40 && SmartMode.CurrentValue)))
                 {
@@ -118,7 +131,7 @@ namespace JinxBuddy
                 }
             }
 
-            if (Spells[SpellSlot.W].IsReady())
+            if (HarassMenu["useWHarass"].Cast<CheckBox>().CurrentValue && Spells[SpellSlot.W].IsReady())
             {
                 var pred = Prediction.Position.PredictLinearMissile(target, Spells[SpellSlot.W].Range, 60, 600, 3300, 0);
                 if (SmartMode.CurrentValue && pred.HitChance >= HitChance.High)
@@ -149,13 +162,13 @@ namespace JinxBuddy
 
             if (Orbwalker.IsAutoAttacking) return;
 
-            if (Spells[SpellSlot.R].IsReady() && rtarget.Distance(_Player) > _Player.GetAutoAttackRange(rtarget) && rtarget.IsKillableByR() || Spells[SpellSlot.R].IsReady() && _Player.HealthPercent <= 30 && rtarget.IsKillableByR())
+            if (ComboMenu["useRCombo"].Cast<CheckBox>().CurrentValue && Spells[SpellSlot.R].IsReady() && rtarget.Distance(_Player) > _Player.GetAutoAttackRange(rtarget) && rtarget.IsKillableByR() || Spells[SpellSlot.R].IsReady() && _Player.HealthPercent <= 30 && rtarget.IsKillableByR())
             {
                 Spells[SpellSlot.R] = new Spell.Skillshot(SpellSlot.R, 2000, SkillShotType.Linear, 600, (int) UltimateHandler.UltSpeed(target.Position), 140);
                 Spells[SpellSlot.R].Cast(rtarget);
             }
 
-            if (Spells[SpellSlot.E].IsReady() && target.HasBuffOfType(BuffType.Slow)
+            if (ComboMenu["useECombo"].Cast<CheckBox>().CurrentValue && Spells[SpellSlot.E].IsReady() && target.HasBuffOfType(BuffType.Slow)
                 || target.HasBuffOfType(BuffType.Stun)
                 || target.HasBuffOfType(BuffType.Snare)
                 || target.HasBuffOfType(BuffType.Suppression))
@@ -163,7 +176,7 @@ namespace JinxBuddy
                 Spells[SpellSlot.E].Cast(target);
             }
 
-            if (Spells[SpellSlot.Q].IsReady())
+            if (ComboMenu["useQCombo"].Cast<CheckBox>().CurrentValue && Spells[SpellSlot.Q].IsReady())
             {
                 var distance = target.Distance(_Player);
                 if (Events.FishBonesActive)
@@ -183,7 +196,7 @@ namespace JinxBuddy
                 }
             }
 
-            if (Spells[SpellSlot.W].IsReady())
+            if (ComboMenu["useWCombo"].Cast<CheckBox>().CurrentValue && Spells[SpellSlot.W].IsReady())
             {
                 var pred = Prediction.Position.PredictLinearMissile(target, Spells[SpellSlot.W].Range, 60, 600, 3300, 0);
                 if (SmartMode.CurrentValue && pred.HitChance >= HitChance.High && !pred.CollisionObjects.Any())

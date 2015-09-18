@@ -7,6 +7,7 @@ using EloBuddy;
 using EloBuddy.SDK;
 using EloBuddy.SDK.Enumerations;
 using EloBuddy.SDK.Events;
+using EloBuddy.SDK.Menu.Values;
 using SharpDX;
 
 namespace JinxBuddy
@@ -56,7 +57,7 @@ namespace JinxBuddy
         {
             if (Orbwalker.ActiveModesFlags == Orbwalker.ActiveModes.None  || _lastChange + 300 > Environment.TickCount) return;
             var selectedUnit = target as AIHeroClient;
-            if (selectedUnit != null)
+            if (selectedUnit != null && (Program.HarassMenu["useQHarass"].Cast<CheckBox>().CurrentValue && Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Harass) || Program.ComboMenu["useQCombo"].Cast<CheckBox>().CurrentValue && Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo)))
             {
                 if (selectedUnit.CountEnemiesInRange(AoeRadius) > 2 || _Player.GetAutoAttackDamage(selectedUnit) * 1.1 >= target.Health + target.AttackShield && _Player.GetAutoAttackDamage(selectedUnit) < target.Health + target.AttackShield)
                 {
@@ -78,7 +79,7 @@ namespace JinxBuddy
             else
             {
                 var minion = target as Obj_AI_Base;
-                if (minion != null && minion.IsMinion)
+                if (minion != null && minion.IsMinion && Program.FarmMenu["useQFarm"].Cast<CheckBox>().CurrentValue)
                 {
                     var count =
                         ObjectManager.Get<Obj_AI_Minion>()
