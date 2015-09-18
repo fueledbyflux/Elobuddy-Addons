@@ -10,6 +10,8 @@ using EloBuddy.SDK.Events;
 using EloBuddy.SDK.Menu;
 using EloBuddy.SDK.Menu.Values;
 using EloBuddy.SDK.Rendering;
+using RengarBuddy.Activator;
+using Item = RengarBuddy.Activator.Item;
 
 namespace RengarBuddy
 {
@@ -31,7 +33,8 @@ namespace RengarBuddy
         {
             Hacks.AntiAFK = true;
             Bootstrap.Init(null);
-
+            ItemManager.Init();
+            TargetSelector2.init();
             Q = new Spell.Active(SpellSlot.Q);
             W = new Spell.Active(SpellSlot.W, 500);
             E = new Spell.Skillshot(SpellSlot.E, 1000, SkillShotType.Linear, 250, 1500, 70);
@@ -88,7 +91,7 @@ namespace RengarBuddy
             FarmMenu.Add("qWaveClear", new CheckBox("Use Q"));
             FarmMenu.Add("wWaveClear", new CheckBox("Use W"));
             FarmMenu.Add("eWaveClear", new CheckBox("Use E"));
-            JungleMenu.Add("saveStacksWC", new CheckBox("Save Stacks In WC"));
+            FarmMenu.Add("saveStacksWC", new CheckBox("Save Stacks In WC"));
             var stacks3 = FarmMenu.Add("selectedStackedSpellWC", new Slider("Selected Spell", 0, 0, 2));
             stacks3.OnValueChange += delegate
             {
@@ -124,6 +127,22 @@ namespace RengarBuddy
             if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
             {
                 StateManager.Combo();
+            }
+            if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Harass))
+            {
+                StateManager.Harass();
+            }
+            if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear))
+            {
+                StateManager.WaveClear();
+            }
+            if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.JungleClear))
+            {
+                StateManager.Jungle();
+            }
+            if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LastHit))
+            {
+                StateManager.LastHit();
             }
         }
     }

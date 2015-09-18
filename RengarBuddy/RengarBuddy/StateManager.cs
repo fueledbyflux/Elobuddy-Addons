@@ -12,9 +12,23 @@ namespace RengarBuddy
     class StateManager
     {
         public static AIHeroClient _Player { get { return ObjectManager.Player; } }
+
+        public static float GetCustomRange()
+        {
+            if (Program.E.IsReady())
+            {
+                return Program.E.Range + 50;
+            }
+            if (Program.W.IsReady())
+            {
+                return Program.W.Range + 50;
+            }
+            return _Player.GetAutoAttackRange() + 50;
+        }
+
         public static void Combo()
         {
-            var target = TargetSelector.GetTarget(1100, DamageType.Physical);
+            var target = TargetSelector2.GetTarget(GetCustomRange(), DamageType.Physical);
             switch ((int) _Player.Mana)
             {
                 case 5:
@@ -74,9 +88,9 @@ namespace RengarBuddy
             }
         }
 
-        public void Harass()
+        public static void Harass()
         {
-            var target = TargetSelector.GetTarget(1100, DamageType.Physical);
+            var target = TargetSelector2.GetTarget(GetCustomRange(), DamageType.Physical);
             switch ((int)_Player.Mana)
             {
                 case 5:
@@ -116,17 +130,22 @@ namespace RengarBuddy
             }
         }
 
-        public void LastHit()
+        public static void LastHit()
         {
             if (Orbwalker.IsAutoAttacking) return;
             Orbwalker.ForcedTarget = null;
-            foreach (var source in ObjectManager.Get<Obj_AI_Minion>().Where(a => a.IsEnemy && a.Distance(_Player) < 1000))
-            {
-                if (Program.FarmMenu["qLastHit"].Cast<CheckBox>().CurrentValue && Damage.Q1(source) > source.Health && source.Distance(_Player) < _Player.GetAutoAttackRange(source))
+            var source =
+                ObjectManager.Get<Obj_AI_Minion>()
+                    .Where(a => a.IsEnemy && a.Distance(_Player) < GetCustomRange())
+                    .OrderBy(a => a.Health)
+                    .FirstOrDefault();
+
+            if (Program.FarmMenu["saveStacksWC"].Cast<CheckBox>().CurrentValue && (int)_Player.Mana == 5 || source == null)
+                return;
+            if (Program.FarmMenu["qLastHit"].Cast<CheckBox>().CurrentValue && Damage.Q1(source) > source.Health && source.Distance(_Player) < _Player.GetAutoAttackRange(source))
                 {
                     Program.Q.Cast();
                     Orbwalker.ForcedTarget = source;
-                    Player.IssueOrder(GameObjectOrder.AttackUnit, source);
                     return;
                 }
                 if (Damage.W(source) > source.Health && source.Distance(_Player) < Program.W.Range)
@@ -139,17 +158,19 @@ namespace RengarBuddy
                     Program.E.Cast(source);
                     return;
                 }
-            }
         }
 
-        public void WaveClear()
+        public static void WaveClear()
         {
             if (Orbwalker.IsAutoAttacking) return;
             Orbwalker.ForcedTarget = null;
-            foreach (var source in ObjectManager.Get<Obj_AI_Minion>().Where(a => a.IsEnemy && a.Distance(_Player) < 1000))
-            {
+            var source =
+                ObjectManager.Get<Obj_AI_Minion>()
+                    .Where(a => a.IsEnemy && a.Distance(_Player) < GetCustomRange())
+                    .OrderBy(a => a.Health)
+                    .FirstOrDefault();
 
-                if (Program.FarmMenu["saveStacksWC"].Cast<CheckBox>().CurrentValue && (int) _Player.Mana == 5)
+                if (Program.FarmMenu["saveStacksWC"].Cast<CheckBox>().CurrentValue && (int) _Player.Mana == 5 || source == null)
                     return;
                 if((int) _Player.Mana == 5) { 
                     var ferocityMode = Program.FarmMenu["selectedStackedSpellWC"].Cast<Slider>().CurrentValue;
@@ -175,7 +196,6 @@ namespace RengarBuddy
                 {
                     Program.Q.Cast();
                     Orbwalker.ForcedTarget = source;
-                    Player.IssueOrder(GameObjectOrder.AttackUnit, source);
                     return;
                 }
                 if (Program.FarmMenu["wWaveClear"].Cast<CheckBox>().CurrentValue && Damage.W(source) > source.Health && source.Distance(_Player) < Program.W.Range)
@@ -188,16 +208,15 @@ namespace RengarBuddy
                     Program.E.Cast(source);
                     return;
                 }
-            }
         }
 
-        public void Jungle()
+        public static void Jungle()
         {
             if (Orbwalker.IsAutoAttacking) return;
             Orbwalker.ForcedTarget = null;
             var source =
                 ObjectManager.Get<Obj_AI_Minion>()
-                    .Where(a => a.Team == GameObjectTeam.Neutral && a.Distance(_Player) < 1000)
+                    .Where(a => a.Team == GameObjectTeam.Neutral && a.Distance(_Player) < GetCustomRange())
                     .OrderByDescending(a => a.MaxHealth)
                     .FirstOrDefault();
 
@@ -229,7 +248,6 @@ namespace RengarBuddy
                 {
                     Program.Q.Cast();
                     Orbwalker.ForcedTarget = source;
-                    Player.IssueOrder(GameObjectOrder.AttackUnit, source);
                     return;
                 }
                 if (Program.FarmMenu["wJng"].Cast<CheckBox>().CurrentValue && source.Distance(_Player) < Program.W.Range)

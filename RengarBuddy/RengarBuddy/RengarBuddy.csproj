@@ -8,7 +8,7 @@
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>RengarBuddy</RootNamespace>
-    <AssemblyName>EloBuddy.Testing</AssemblyName>
+    <AssemblyName>RengarBuddy</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -56,9 +56,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Damage.cs" />
+    <Compile Include="Activator\Item.cs" />
+    <Compile Include="Activator\ItemManager.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StateManager.cs" />
+    <Compile Include="TargetSelector2.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
