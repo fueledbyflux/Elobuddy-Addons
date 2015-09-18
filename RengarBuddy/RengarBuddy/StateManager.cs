@@ -28,6 +28,15 @@ namespace RengarBuddy
 
         public static void Combo()
         {
+            if (Program.ComboMenu["useYomuus"].Cast<CheckBox>().CurrentValue && Player.HasBuff("RengarR"))
+            {
+                var item = _Player.InventoryItems.FirstOrDefault(a => a.Id == ItemId.Youmuus_Ghostblade);
+                if (item != null && item.CanUseItem())
+                {
+                    item.Cast();
+                }
+                return;
+            }
             var target = TargetSelector2.GetTarget(GetCustomRange(), DamageType.Physical);
             switch ((int) _Player.Mana)
             {

@@ -70,6 +70,8 @@ namespace RengarBuddy
             ComboMenu.Add("qCombo", new CheckBox("Use Q"));
             ComboMenu.Add("wCombo", new CheckBox("Use W"));
             ComboMenu.Add("eCombo", new CheckBox("Use E"));
+            ComboMenu.AddSeparator();
+            ComboMenu.Add("useYomuus", new CheckBox("use Yomuus in R"));
 
 
             HarassMenu = menu.AddSubMenu("Harass Menu", "harassMenuRB");
