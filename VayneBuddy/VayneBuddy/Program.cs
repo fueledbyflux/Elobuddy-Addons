@@ -71,7 +71,7 @@ namespace VayneBuddy
             ComboMenu.AddGroupLabel("Combo Settings");
             ComboMenu.Add("useQCombo", new CheckBox("Use Q", true));
             ComboMenu.AddLabel("R Settings");
-            ComboMenu.Add("useRCombo", new CheckBox("Use R"));
+            ComboMenu.Add("useRCombo", new CheckBox("Use R", false));
             ComboMenu.Add("noRUnderTurret", new CheckBox("Disable R if Target is under allied turret", true));
 
             CondemnPriorityMenu = Menu.AddSubMenu("Auto Condemn", "vBuddyCondemnPriority");
@@ -125,9 +125,9 @@ namespace VayneBuddy
 
             DrawMenu = Menu.AddSubMenu("Misc Menu", "vBuddyMisc");
             DrawMenu.AddGroupLabel("Draw Settings");
-            DrawMenu.Add("drawERange", new CheckBox("Draw E Range"));
-            DrawMenu.Add("condemnVisualiser", new CheckBox("Draw Condemn"));
-            DrawMenu.Add("drawStacks", new CheckBox("Draw W Stacks"));
+            DrawMenu.Add("drawERange", new CheckBox("Draw E Range", false));
+            DrawMenu.Add("condemnVisualiser", new CheckBox("Draw Condemn", false));
+            DrawMenu.Add("drawStacks", new CheckBox("Draw W Stacks", false));
             DrawMenu.AddLabel("Misc");
             DrawMenu.Add("wallJumpKey", new KeyBind("Tumble Walls", false, KeyBind.BindTypes.HoldActive, 'Z'));
 

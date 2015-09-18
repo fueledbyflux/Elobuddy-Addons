@@ -82,11 +82,10 @@ namespace VayneBuddy
                     ? target.Position
                     : new Vector3());
 
-                if (!pos.IsValid()) return;
-                
-                Program.Q.Cast(pos);
-
-                return;
+                if (pos.IsValid())
+                {
+                    Program.Q.Cast(pos);
+                }
             }
             if (_Player.ManaPercent >= Program.FarmMenu["MinManaQLHWC"].Cast<Slider>().CurrentValue && target is Obj_AI_Minion &&
                 Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LastHit) &&
@@ -96,11 +95,13 @@ namespace VayneBuddy
             {
                 Core.DelayAction(delegate
                 {
+                    var target2 = target;
+                    if (target2 == null) return;
                     var minion =
                         ObjectManager.Get<Obj_AI_Minion>()
                             .Where(
                                 a =>
-                                    a.NetworkId != target.NetworkId && a.IsEnemy &&
+                                    a.NetworkId != target2.NetworkId && a.IsEnemy &&
                                     a.IsValidTarget(_Player.GetAutoAttackRange(a)) &&
                                     a.Health <=
                                     _Player.GetAutoAttackDamage(a, true) +
@@ -110,7 +111,7 @@ namespace VayneBuddy
                                                 _Player.Spellbook.GetSpell(SpellSlot.Q).Level - 1]) *
                                         (_Player.TotalAttackDamage))).OrderBy(a => a.Health).FirstOrDefault();
 
-                    if (target.IsDead && minion != null && minion.IsValidTarget())
+                    if (target2.IsDead && minion != null && minion.IsValidTarget())
                     {
                         Program.Q.Cast(_Player.Position.Extend(Game.CursorPos, 300).Distance(minion) <
                                _Player.GetAutoAttackRange(minion)
