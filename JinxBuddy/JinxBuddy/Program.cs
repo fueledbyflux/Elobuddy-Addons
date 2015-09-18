@@ -83,6 +83,7 @@ namespace JinxBuddy
             Events.Init();
             Game.OnTick += Game_OnTick;
             Drawing.OnDraw += Drawing_OnDraw;
+            Gapcloser.OnGapCloser += Events.Gapcloser_OnGapCloser;
         }
 
         private static void Drawing_OnDraw(EventArgs args)
