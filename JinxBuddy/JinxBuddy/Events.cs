@@ -57,7 +57,7 @@ namespace JinxBuddy
         {
             if (Orbwalker.ActiveModesFlags == Orbwalker.ActiveModes.None  || _lastChange + 300 > Environment.TickCount) return;
             var selectedUnit = target as AIHeroClient;
-            if (selectedUnit != null && (Program.HarassMenu["useQHarass"].Cast<CheckBox>().CurrentValue && Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Harass) || Program.ComboMenu["useQCombo"].Cast<CheckBox>().CurrentValue && Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo)))
+            if (selectedUnit != null)
             {
                 if (selectedUnit.CountEnemiesInRange(AoeRadius) > 2 || _Player.GetAutoAttackDamage(selectedUnit) * 1.1 >= target.Health + target.AttackShield && _Player.GetAutoAttackDamage(selectedUnit) < target.Health + target.AttackShield)
                 {

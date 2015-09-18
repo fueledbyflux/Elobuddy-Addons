@@ -68,17 +68,23 @@ namespace JinxBuddy
             menu.AddLabel("Smart mode enables mana management / smarter skill usage");
 
             ComboMenu = menu.AddSubMenu("Combo", "ComboJinx");
+            ComboMenu.AddGroupLabel("Combo Settings");
+            ComboMenu.AddSeparator();
             ComboMenu.Add("useQCombo", new CheckBox("Use Q"));
             ComboMenu.Add("useWCombo", new CheckBox("Use W"));
             ComboMenu.Add("useECombo", new CheckBox("Use E"));
             ComboMenu.Add("useRCombo", new CheckBox("Use R"));
 
-            ComboMenu = menu.AddSubMenu("Harass", "HarassJinx");
-            ComboMenu.Add("useQHarass", new CheckBox("Use Q"));
-            ComboMenu.Add("useWHarass", new CheckBox("Use W"));
+            HarassMenu = menu.AddSubMenu("Harass", "HarassJinx");
+            HarassMenu.AddGroupLabel("Harass Settings");
+            HarassMenu.AddSeparator();
+            HarassMenu.Add("useQHarass", new CheckBox("Use Q"));
+            HarassMenu.Add("useWHarass", new CheckBox("Use W"));
 
-            ComboMenu = menu.AddSubMenu("Farm", "FarmJinx");
-            ComboMenu.Add("useQFarm", new CheckBox("Use Q"));
+            FarmMenu = menu.AddSubMenu("Farm", "FarmJinx");
+            FarmMenu.AddGroupLabel("Farm Settings");
+            FarmMenu.AddSeparator();
+            FarmMenu.Add("useQFarm", new CheckBox("Use Q"));
 
             Events.Init();
             Game.OnTick += Game_OnTick;

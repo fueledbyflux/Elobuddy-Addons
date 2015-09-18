@@ -1,1 +1,6 @@
 C:\Users\Joseph\Desktop\Elobuddy\JinxBuddy.exe.config
+C:\Users\Joseph\Desktop\Elobuddy\JinxBuddy.exe
+C:\Users\Joseph\Desktop\Elobuddy\JinxBuddy.pdb
+C:\Users\Joseph\Documents\Visual Studio 2015\Projects\JinxBuddy\JinxBuddy\obj\Debug\JinxBuddy.csprojResolveAssemblyReference.cache
+C:\Users\Joseph\Documents\Visual Studio 2015\Projects\JinxBuddy\JinxBuddy\obj\Debug\JinxBuddy.exe
+C:\Users\Joseph\Documents\Visual Studio 2015\Projects\JinxBuddy\JinxBuddy\obj\Debug\JinxBuddy.pdb
