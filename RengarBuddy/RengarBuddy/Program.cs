@@ -22,6 +22,7 @@ namespace RengarBuddy
         public static Spell.Active W;
         public static Spell.Skillshot E;
         public static Spell.Active R;
+        public static bool disableAntiSkills;
         public static AIHeroClient _Player { get { return ObjectManager.Player; } }
         public static int Mana { get { return (int) _Player.Mana; } }
         private static void Main(string[] args)
@@ -116,16 +117,23 @@ namespace RengarBuddy
             JungleMenu.Add("eJng", new CheckBox("Use E"));
 
             Game.OnTick += Game_OnTick;
-            Drawing.OnDraw += Drawing_OnDraw;
+            Orbwalker.OnAttack += Orbwalker_OnAttack;
         }
 
-        private static void Drawing_OnDraw(EventArgs args)
+        private static void Orbwalker_OnAttack(AttackableUnit target, EventArgs args)
         {
-
+            if (Player.HasBuff("RengarR"))
+            {
+                disableAntiSkills = true;
+            }
         }
 
         private static void Game_OnTick(EventArgs args)
         {
+            if (!Player.HasBuff("RengarR"))
+            {
+                disableAntiSkills = false;
+            }
             if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
             {
                 StateManager.Combo();

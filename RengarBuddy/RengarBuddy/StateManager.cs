@@ -28,10 +28,10 @@ namespace RengarBuddy
 
         public static void Combo()
         {
-            if (Program.ComboMenu["useYomuus"].Cast<CheckBox>().CurrentValue && Player.HasBuff("RengarR"))
+            if (Player.HasBuff("RengarR") && !Program.disableAntiSkills)
             {
                 var item = _Player.InventoryItems.FirstOrDefault(a => a.Id == ItemId.Youmuus_Ghostblade);
-                if (item != null && item.CanUseItem())
+                if (Program.ComboMenu["useYomuus"].Cast<CheckBox>().CurrentValue && item != null && item.CanUseItem())
                 {
                     item.Cast();
                 }
