@@ -238,12 +238,6 @@ namespace TrackerBuddy
             return percent < 1 ? System.Drawing.Color.Green : System.Drawing.Color.LawnGreen;
         }
 
-        public static Color GetSharpDrawColor(float percent)
-        {
-            var color = GetDrawColor(percent);
-            return new Color(color.R, color.G, color.B, color.A);
-        }
-
         private static void OnDomainUnload(object sender, EventArgs e)
         {
             TextureLoader.Dispose();
