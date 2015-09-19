@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using EloBuddy;
+using EloBuddy.SDK;
 using EloBuddy.SDK.Events;
 using EloBuddy.SDK.Menu;
 using EloBuddy.SDK.Menu.Values;
@@ -18,30 +19,46 @@ namespace TrackerBuddy
 {
     internal static class Program
     {
-        public static readonly TextureLoader TextureLoader = new TextureLoader();
-        private static Sprite MainBar;
-        private static Line Line;
-        private static Text Text;
-
-        private const int OffsetHudX = -31;//31
-        private const int OffsetHudY = 16;//11
+        private const int OffsetHudX = -31; //31
+        private const int OffsetHudY = 16; //11
 
         private const int OffsetSpellsX = OffsetHudX + 22;
         private const int OffsetSpellsY = OffsetHudY + 23;
 
-        private const int OffsetSummonersX = OffsetHudX + 4;//9
-        private const int OffsetSummonersY = OffsetHudY + 2;//5
+        private const int OffsetSummonersX = OffsetHudX + 4; //9
+        private const int OffsetSummonersY = OffsetHudY + 2; //5
 
         private const int OffsetXpX = OffsetHudX + 40; //44
         private const int OffsetXpY = OffsetHudY + -49; //53
 
-        private static int mode;
+        public static readonly TextureLoader TextureLoader = new TextureLoader();
 
-        public static SpellSlot[] SpellSlots = {SpellSlot.Q, SpellSlot.W, SpellSlot.E, SpellSlot.R};
+        private static Sprite MainBar { get; set; }
+        private static Line Line { get; set; }
+        private static Text Text { get; set; }
+
+        public static readonly SpellSlot[] SpellSlots = { SpellSlot.Q, SpellSlot.W, SpellSlot.E, SpellSlot.R };
         private static readonly SpellSlot[] Summoners = { SpellSlot.Summoner1, SpellSlot.Summoner2 };
-        private static Dictionary<String, Sprite> SummonerSpells = new Dictionary<string, Sprite>();
+        private static readonly Dictionary<string, Sprite> SummonerSpells = new Dictionary<string, Sprite>();
 
-        public static Menu menu;
+        public static Menu Menu { get; set; }
+
+        private static int Mode
+        {
+            get { return Menu["mode"].Cast<CheckBox>().CurrentValue ? 1 : 0; }
+        }
+        private static bool DrawAllies
+        {
+            get { return Menu["drawAllies"].Cast<CheckBox>().CurrentValue; }
+        }
+        private static bool DrawEnemies
+        {
+            get { return Menu["drawEnemies"].Cast<CheckBox>().CurrentValue; }
+        }
+        private static bool DrawText
+        {
+            get { return Menu["drawText"].Cast<CheckBox>().CurrentValue; }
+        }
 
         private static void Main(string[] args)
         {
@@ -50,174 +67,154 @@ namespace TrackerBuddy
 
         private static void Loading_OnLoadingComplete(EventArgs args)
         {
-            menu = MainMenu.AddMenu("TrackerBuddy", "trackerBuddy");
-            menu.AddGroupLabel("Tracker Buddy");
-            menu.AddSeparator();
-            var mode2 = menu.Add("mode", new CheckBox("Low Profile Mode"));
-            menu.Add("drawText", new CheckBox("Draw Text"));
-            menu.Add("drawAllies", new CheckBox("Draw Allies"));
-            menu.Add("drawEnemies", new CheckBox("Draw Enemies"));
-            menu.AddSeparator();
-            menu.AddLabel("by fluxy");
+            // Create the menu
+            Menu = MainMenu.AddMenu("TrackerBuddy", "trackerBuddy");
+            Menu.AddGroupLabel("Tracker Buddy");
+            Menu.Add("mode", new CheckBox("Low Profile Mode")).OnValueChange += delegate { UpdateLine(); };
+            Menu.Add("drawText", new CheckBox("Draw Text"));
+            Menu.Add("drawAllies", new CheckBox("Draw Allies"));
+            Menu.Add("drawEnemies", new CheckBox("Draw Enemies"));
+            Menu.AddSeparator();
+            Menu.AddLabel("by fluxy");
 
-            mode2.OnValueChange += delegate
-            {
-                mode = mode2.CurrentValue ? 1 : 0;
-                Line = new Line(Drawing.Direct3DDevice) { Width = mode == 1 ? 6 : 11 };
-                MainBar = new Sprite(() => TextureLoader[mode == 1 ? "hud2" : "hud"]);
-            };
-
-            mode = mode2.CurrentValue ? 1 : 0;
-
+            // Load main hud textures
             TextureLoader.Load("hud", Resources.hud);
             TextureLoader.Load("hud2", Resources.hud2);
 
-            TextureLoader.Load("summonerheal", Resources.summonerheal);
-            TextureLoader.Load("summonerdot", Resources.summonerdot);
-            TextureLoader.Load("summonerexhaust", Resources.summonerexhaust);
-            TextureLoader.Load("summonerflash", Resources.summonerflash);
-            TextureLoader.Load("summonerhaste", Resources.summonerhaste);
-            TextureLoader.Load("summonermana", Resources.summonermana);
-            TextureLoader.Load("itemsmiteaoe", Resources.itemsmiteaoe);
-            TextureLoader.Load("s5_summonersmiteduel", Resources.s5_summonersmiteduel);
-            TextureLoader.Load("s5_summonersmiteplayerganker", Resources.s5_summonersmiteplayerganker);
-            TextureLoader.Load("s5_summonersmitequick", Resources.s5_summonersmitequick);
-            TextureLoader.Load("summonerclairvoyance", Resources.summonerclairvoyance);
+            // Initialize main drawings
+            UpdateLine();
+            Text = new Text("", new Font(FontFamily.GenericSansSerif, 8, FontStyle.Bold)) { Color = System.Drawing.Color.AntiqueWhite };
+            MainBar = new Sprite(() => Mode == 1 ? TextureLoader["hud2"] : TextureLoader["hud"]);
 
-            SummonerSpells.Add("summonerheal", new Sprite(TextureLoader["summonerheal"]));
-            SummonerSpells.Add("summonerdot", new Sprite(() => TextureLoader["summonerdot"]));
-            SummonerSpells.Add("summonerexhaust", new Sprite(() => TextureLoader["summonerexhaust"]));
-            SummonerSpells.Add("summonerflash", new Sprite(() => TextureLoader["summonerflash"]));
-            SummonerSpells.Add("summonerhaste", new Sprite(() => TextureLoader["summonerhaste"]));
-            SummonerSpells.Add("summonermana", new Sprite(() => TextureLoader["summonermana"]));
-            SummonerSpells.Add("itemsmiteaoe", new Sprite(() => TextureLoader["itemsmiteaoe"]));
-            SummonerSpells.Add("s5_summonersmiteduel", new Sprite(() => TextureLoader["s5_summonersmiteduel"]));
-            SummonerSpells.Add("s5_summonersmiteplayerganker", new Sprite(() => TextureLoader["s5_summonersmiteplayerganker"]));
-            SummonerSpells.Add("s5_summonersmitequick", new Sprite(() => TextureLoader["s5_summonersmitequick"]));
-            SummonerSpells.Add("summonerclairvoyance", new Sprite(() => TextureLoader["summonerclairvoyance"]));
+            // Load summoner spells dynamically
+            foreach (var summoner in HeroManager.AllHeroes.SelectMany(o => o.Spellbook.Spells.Where(s => Summoners.Contains(s.Slot))).Select(o => o.Name))
+            {
+                var summonerName = summoner;
+                if (SummonerSpells.ContainsKey(summonerName))
+                {
+                    continue;
+                }
 
-            Line = new Line(Drawing.Direct3DDevice) {Width = mode == 1 ? 6 : 11};
-            Text = new Text("", new Font(FontFamily.GenericSansSerif, 8, FontStyle.Bold));
-            MainBar = new Sprite(() => TextureLoader[mode == 1 ? "hud2" : "hud"]);
-            
-            Drawing.OnDraw += Drawing_OnDraw;
-            Drawing.OnPreReset += Drawing_OnPreReset;
-            Drawing.OnPostReset += Drawing_OnPostReset;
+                Bitmap bitmap = null;
+                switch (summonerName)
+                {
+                    case "summonerheal":
+                        bitmap = Resources.summonerheal;
+                        break;
+                    case "summonerdot":
+                        bitmap = Resources.summonerdot;
+                        break;
+                    case "summonerexhaust":
+                        bitmap = Resources.summonerexhaust;
+                        break;
+                    case "summonerflash":
+                        bitmap = Resources.summonerflash;
+                        break;
+                    case "summonerhaste":
+                        bitmap = Resources.summonerhaste;
+                        break;
+                    case "summonermana":
+                        bitmap = Resources.summonermana;
+                        break;
+                    case "itemsmiteaoe":
+                        bitmap = Resources.itemsmiteaoe;
+                        break;
+                    case "s5_summonersmiteduel":
+                        bitmap = Resources.s5_summonersmiteduel;
+                        break;
+                    case "s5_summonersmiteplayerganker":
+                        bitmap = Resources.s5_summonersmiteplayerganker;
+                        break;
+                    case "s5_summonersmitequick":
+                        bitmap = Resources.s5_summonersmitequick;
+                        break;
+                    case "summonerclairvoyance":
+                        bitmap = Resources.summonerclairvoyance;
+                        break;
+                }
 
-            AppDomain.CurrentDomain.DomainUnload += CurrentDomain_DomainUnload;
-            AppDomain.CurrentDomain.ProcessExit += CurrentDomain_DomainUnload;
-            Chat.Print("Loaded Trackerbuddy");
+                TextureLoader.Load(summonerName, bitmap);
+                SummonerSpells.Add(summonerName, new Sprite(() => TextureLoader[summonerName]));
+            }
+
+            // Listen to required events
+            Drawing.OnDraw += OnDraw;
+            Drawing.OnPreReset += OnPreReset;
+            Drawing.OnPostReset += OnPostReset;
+            AppDomain.CurrentDomain.DomainUnload += OnDomainUnload;
+            AppDomain.CurrentDomain.ProcessExit += OnDomainUnload;
         }
-        
 
-        private static void CurrentDomain_DomainUnload(object sender, EventArgs e)
+        private static void UpdateLine()
         {
-            Line.Dispose();
-        }
-
-        private static void Drawing_OnPostReset(EventArgs args)
-        {
-            Line.OnResetDevice();
-        }
-
-        private static void Drawing_OnPreReset(EventArgs args)
-        {
-            Line.OnLostDevice();
+            if (Line != null)
+            {
+                Line.Dispose();
+                Line = null;
+            }
+            Line = new Line(Drawing.Direct3DDevice) { Width = Mode == 1 ? 6 : 11 };
         }
 
         //private static bool draw;
-        private static void Drawing_OnDraw(EventArgs args)
+        private static void OnDraw(EventArgs args)
         {
-            int integ = 0;
-            foreach (var unit in ObjectManager.Get<AIHeroClient>().Where(a => !a.IsMe && a.IsHPBarRendered))
+            foreach (var unit in HeroManager.AllHeroes.Where(o => !o.IsMe && o.IsHPBarRendered).Where(o => o.IsAlly ? DrawAllies : DrawEnemies))
             {
-                if(!menu["drawAllies"].Cast<CheckBox>().CurrentValue && unit.IsAlly || !menu["drawEnemies"].Cast<CheckBox>().CurrentValue && unit.IsEnemy) continue;
-                    //summonerspells
-                    foreach (var summonerSpell in Summoners)
+                // Summoner spells
+                foreach (var summonerSpell in Summoners)
                 {
-                    var cd = unit.Spellbook.GetSpell(summonerSpell).CooldownExpires - Game.Time;
-                    var percent = (cd > 0 && Math.Abs(unit.Spellbook.GetSpell(summonerSpell).Cooldown) > float.Epsilon)
-                        ? 1f - (cd / unit.Spellbook.GetSpell(summonerSpell).Cooldown)
-                        : 1f;
                     var spell = unit.Spellbook.GetSpell(summonerSpell);
+                    var cooldown = spell.CooldownExpires - Game.Time;
+                    var percent = (cooldown > 0 && Math.Abs(spell.Cooldown) > float.Epsilon) ? 1f - (cooldown / spell.Cooldown) : 1f;
+                    var spellPos = unit.GetSummonerOffset(spell.Slot);
                     if (SummonerSpells.ContainsKey(spell.Name))
                     {
-                        var spellDraw = SummonerSpells[spell.Name];
-                        if (spellDraw != null)
-                        {
-                            var spellPos = unit.GetSummoneroffset(spell.Slot);
-                            spellDraw.Color = DrawColors(percent);
-                            spellDraw.Draw(new Vector2(spellPos.X, spellPos.Y));
-                        }
+                        var sprite = SummonerSpells[spell.Name];
+                        sprite.Color = GetDrawColor(percent);
+                        sprite.Draw(new Vector2(spellPos.X, spellPos.Y));
+                    }
+
+                    if (DrawText && cooldown > 0)
+                    {
+                        Text.TextValue = cooldown < 1 ? cooldown.ToString("0.0") : cooldown.ToString("0");
+                        Text.Position = new Vector2((int) spellPos.X - 30 + Text.TextValue.Length, (int) spellPos.Y - 1);
+                        Text.Draw();
                     }
                 }
 
+                // Spell cooldowns
                 Line.Begin();
-                foreach (var spellSlot in SpellSlots)
+                foreach (var slot in SpellSlots)
                 {
-                    var cd = unit.Spellbook.GetSpell(spellSlot).CooldownExpires - Game.Time;
-                    var percent = (cd > 0 && Math.Abs(unit.Spellbook.GetSpell(spellSlot).Cooldown) > float.Epsilon)
-                        ? 1f - (cd/unit.Spellbook.GetSpell(spellSlot).Cooldown)
-                        : 1f;
-                    var pos = unit.GetSpelloffset(spellSlot);
+                    var spell = unit.Spellbook.GetSpell(slot);
+                    var cooldown = spell.CooldownExpires - Game.Time;
+                    var percent = (cooldown > 0 && Math.Abs(spell.Cooldown) > float.Epsilon) ? 1f - (cooldown / spell.Cooldown) : 1f;
+                    var spellPos = unit.GetSpellOffset(slot);
                     Line.Draw(new[]
                     {
-                        new Vector2(pos.X, pos.Y + 3), 
-                        new Vector2(unit.GetSpelloffset(spellSlot).X + (int)(percent * 22), unit.GetSpelloffset(spellSlot).Y + 3), 
-                    }, unit.Spellbook.GetSpell(spellSlot).IsLearned ? DrawColor(percent) : Color.White);
-                    integ ++;
+                        new Vector2(spellPos.X, spellPos.Y + 3),
+                        new Vector2(spellPos.X + (int) (percent * 22), spellPos.Y + 3)
+                    }, spell.IsLearned ? GetSharpDrawColor(percent) : Color.White);
+
+                    if (DrawText && spell.IsLearned && cooldown > 0)
+                    {
+                        Text.TextValue = cooldown < 1 ? cooldown.ToString("0.0") : cooldown.ToString("0");
+                        Text.Position = new Vector2((int) spellPos.X + 10 - Text.TextValue.Length * 2, (int) spellPos.Y + 12);
+                        Text.Draw();
+                    }
                 }
                 Line.End();
 
-                if (menu["drawText"].Cast<CheckBox>().CurrentValue)
-                {
-                    //Ability Timers
-                    foreach (var ability in SpellSlots)
-                    {
-                        if (unit.Spellbook.CanUseSpell(ability) != SpellState.NotLearned)
-                        {
-                            var cd = unit.Spellbook.GetSpell(ability).CooldownExpires - Game.Time;
-                            var spellPos = unit.GetSpelloffset(ability);
-                            if (cd > 0)
-                            {
-                                var cdFrom = cd < 1 ? cd.ToString("0.0") : cd.ToString("0");
-                                Text.TextValue = cdFrom;
-                                Text.Position = new Vector2((int) spellPos.X + 10 - cdFrom.Length*2,
-                                    (int) spellPos.Y + 12);
-                                Text.Color = System.Drawing.Color.AntiqueWhite;
-                                Text.Draw();
-                            }
-                        }
-                    }
-
-                    //Summoner Timers
-                    foreach (var summoner in Summoners)
-                    {
-                        var cd = unit.Spellbook.GetSpell(summoner).CooldownExpires - Game.Time;
-                        var spellPos = unit.GetSummoneroffset(summoner);
-                        if (cd > 0)
-                        {
-                            var cdFrom = cd < 1 ? cd.ToString("0.0") : cd.ToString("0");
-                            Text.TextValue = cdFrom;
-                            Text.Position = new Vector2((int) spellPos.X - 30 + cdFrom.Length, (int) spellPos.Y - 1);
-                            Text.Color = System.Drawing.Color.AntiqueWhite;
-                            Text.Draw();
-                        }
-                    }
-                }
-
-                MainBar.Draw(new Vector2((unit.HPBarPosition.X + OffsetHudX), (unit.HPBarPosition.Y + OffsetHudY + mode * 2)));
+                // Draw the main hud
+                MainBar.Draw(new Vector2((unit.HPBarPosition.X + OffsetHudX), (unit.HPBarPosition.Y + OffsetHudY + Mode * 2)));
             }
         }
 
-
-        private static Vector2 GetSpelloffset(this Obj_AI_Base hero, SpellSlot slot)
+        private static Vector2 GetSpellOffset(this Obj_AI_Base hero, SpellSlot slot)
         {
             var normalPos = new Vector2(hero.HPBarPosition.X + OffsetSpellsX, hero.HPBarPosition.Y + OffsetSpellsY);
             switch (slot)
             {
-                case SpellSlot.Q:
-                    return normalPos;
                 case SpellSlot.W:
                     return new Vector2(normalPos.X + 27, normalPos.Y);
                 case SpellSlot.E:
@@ -225,24 +222,16 @@ namespace TrackerBuddy
                 case SpellSlot.R:
                     return new Vector2(normalPos.X + 3 * 27, normalPos.Y);
             }
-
             return normalPos;
         }
 
-        private static Vector2 GetSummoneroffset(this Obj_AI_Base hero, SpellSlot slot)
+        private static Vector2 GetSummonerOffset(this Obj_AI_Base hero, SpellSlot slot)
         {
             var normalPos = new Vector2(hero.HPBarPosition.X + OffsetSummonersX, hero.HPBarPosition.Y + OffsetSummonersY);
-            switch (slot)
-            {
-                case SpellSlot.Summoner1:
-                    return normalPos;
-                case SpellSlot.Summoner2:
-                    return new Vector2(normalPos.X, normalPos.Y + 17);
-            }
-
-            return normalPos;
+            return slot == SpellSlot.Summoner2 ? new Vector2(normalPos.X, normalPos.Y + 17) : normalPos;
         }
-        public static System.Drawing.Color DrawColors(float percent)
+
+        public static System.Drawing.Color GetDrawColor(float percent)
         {
             if (percent < 0.3)
             {
@@ -252,30 +241,39 @@ namespace TrackerBuddy
             {
                 return System.Drawing.Color.Orange;
             }
-            if (percent < 0.9999)
-            {
-                return System.Drawing.Color.Green;
-            }
-            return System.Drawing.Color.LawnGreen;
+            return percent < 1 ? System.Drawing.Color.Green : System.Drawing.Color.LawnGreen;
         }
 
-        public static Color DrawColor(float percent)
+        public static Color GetSharpDrawColor(float percent)
         {
-            if (percent < 0.3)
+            var color = GetDrawColor(percent);
+            return new Color(color.R, color.G, color.B, color.A);
+        }
+
+        private static void OnPreReset(EventArgs args)
+        {
+            Line.OnLostDevice();
+        }
+
+        private static void OnPostReset(EventArgs args)
+        {
+            Line.OnResetDevice();
+        }
+
+        private static void OnDomainUnload(object sender, EventArgs e)
+        {
+            TextureLoader.Dispose();
+
+            if (Line != null)
             {
-                return Color.Red;
+                Line.Dispose();
+                Line = null;
             }
-            if (percent < 0.6)
+            if (Text != null)
             {
-                return Color.Orange;
+                Text.Dispose();
+                Text = null;
             }
-            if (percent < 0.9999)
-            {
-                return Color.Green;
-            }
-            return Color.LawnGreen;
         }
     }
-
 }
-
