@@ -35,16 +35,16 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="EloBuddy">
-      <HintPath>..\..\..\..\..\Desktop\EloBuddy Loader\System\EloBuddy.dll</HintPath>
+      <HintPath>..\..\..\Hellsing.Addons\Dependencies\EloBuddy.dll</HintPath>
     </Reference>
     <Reference Include="EloBuddy.SDK">
-      <HintPath>..\..\..\..\..\Desktop\EloBuddy Loader\System\EloBuddy.SDK.dll</HintPath>
+      <HintPath>..\..\..\Hellsing.Addons\Dependencies\EloBuddy.SDK.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX">
-      <HintPath>..\..\..\..\..\Desktop\EloBuddy Loader\System\SharpDX.dll</HintPath>
+      <HintPath>..\..\..\Hellsing.Addons\Dependencies\SharpDX.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX.Direct3D9">
-      <HintPath>..\..\..\..\..\Desktop\EloBuddy Loader\System\SharpDX.Direct3D9.dll</HintPath>
+      <HintPath>..\..\..\Hellsing.Addons\Dependencies\SharpDX.Direct3D9.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />

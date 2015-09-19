@@ -9,7 +9,6 @@ using EloBuddy.SDK.Menu;
 using EloBuddy.SDK.Menu.Values;
 using EloBuddy.SDK.Rendering;
 using SharpDX;
-using SharpDX.Direct3D9;
 using TrackerBuddy.Properties;
 using Color = SharpDX.Color;
 using Font = System.Drawing.Font;
@@ -34,7 +33,6 @@ namespace TrackerBuddy
         public static readonly TextureLoader TextureLoader = new TextureLoader();
 
         private static Sprite MainBar { get; set; }
-        private static Line Line { get; set; }
         private static Text Text { get; set; }
 
         public static readonly SpellSlot[] SpellSlots = { SpellSlot.Q, SpellSlot.W, SpellSlot.E, SpellSlot.R };
@@ -70,7 +68,7 @@ namespace TrackerBuddy
             // Create the menu
             Menu = MainMenu.AddMenu("TrackerBuddy", "trackerBuddy");
             Menu.AddGroupLabel("Tracker Buddy");
-            Menu.Add("mode", new CheckBox("Low Profile Mode")).OnValueChange += delegate { UpdateLine(); };
+            Menu.Add("mode", new CheckBox("Low Profile Mode"));
             Menu.Add("drawText", new CheckBox("Draw Text"));
             Menu.Add("drawAllies", new CheckBox("Draw Allies"));
             Menu.Add("drawEnemies", new CheckBox("Draw Enemies"));
@@ -82,7 +80,6 @@ namespace TrackerBuddy
             TextureLoader.Load("hud2", Resources.hud2);
 
             // Initialize main drawings
-            UpdateLine();
             Text = new Text("", new Font(FontFamily.GenericSansSerif, 8, FontStyle.Bold)) { Color = System.Drawing.Color.AntiqueWhite };
             MainBar = new Sprite(() => Mode == 1 ? TextureLoader["hud2"] : TextureLoader["hud"]);
 
@@ -138,21 +135,9 @@ namespace TrackerBuddy
             }
 
             // Listen to required events
-            Drawing.OnDraw += OnDraw;
-            Drawing.OnPreReset += OnPreReset;
-            Drawing.OnPostReset += OnPostReset;
+            Drawing.OnEndScene += OnDraw;
             AppDomain.CurrentDomain.DomainUnload += OnDomainUnload;
             AppDomain.CurrentDomain.ProcessExit += OnDomainUnload;
-        }
-
-        private static void UpdateLine()
-        {
-            if (Line != null)
-            {
-                Line.Dispose();
-                Line = null;
-            }
-            Line = new Line(Drawing.Direct3DDevice) { Width = Mode == 1 ? 6 : 11 };
         }
 
         //private static bool draw;
@@ -183,18 +168,16 @@ namespace TrackerBuddy
                 }
 
                 // Spell cooldowns
-                Line.Begin();
                 foreach (var slot in SpellSlots)
                 {
                     var spell = unit.Spellbook.GetSpell(slot);
                     var cooldown = spell.CooldownExpires - Game.Time;
                     var percent = (cooldown > 0 && Math.Abs(spell.Cooldown) > float.Epsilon) ? 1f - (cooldown / spell.Cooldown) : 1f;
                     var spellPos = unit.GetSpellOffset(slot);
-                    Line.Draw(new[]
-                    {
-                        new Vector2(spellPos.X, spellPos.Y + 3),
-                        new Vector2(spellPos.X + (int) (percent * 22), spellPos.Y + 3)
-                    }, spell.IsLearned ? GetSharpDrawColor(percent) : Color.White);
+
+                    Drawing.DrawLine(new Vector2(spellPos.X, spellPos.Y + 3),
+                        new Vector2(spellPos.X + (int) (percent * 22), spellPos.Y + 3),
+                        Mode == 1 ? 6 : 11, GetDrawColor(percent));
 
                     if (DrawText && spell.IsLearned && cooldown > 0)
                     {
@@ -203,7 +186,6 @@ namespace TrackerBuddy
                         Text.Draw();
                     }
                 }
-                Line.End();
 
                 // Draw the main hud
                 MainBar.Draw(new Vector2((unit.HPBarPosition.X + OffsetHudX), (unit.HPBarPosition.Y + OffsetHudY + Mode * 2)));
@@ -250,25 +232,10 @@ namespace TrackerBuddy
             return new Color(color.R, color.G, color.B, color.A);
         }
 
-        private static void OnPreReset(EventArgs args)
-        {
-            Line.OnLostDevice();
-        }
-
-        private static void OnPostReset(EventArgs args)
-        {
-            Line.OnResetDevice();
-        }
-
         private static void OnDomainUnload(object sender, EventArgs e)
         {
             TextureLoader.Dispose();
 
-            if (Line != null)
-            {
-                Line.Dispose();
-                Line = null;
-            }
             if (Text != null)
             {
                 Text.Dispose();
