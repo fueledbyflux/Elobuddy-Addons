@@ -118,6 +118,9 @@ namespace TrackerBuddy
                     case "itemsmiteaoe":
                         bitmap = Resources.itemsmiteaoe;
                         break;
+                    case "summonerteleport":
+                        bitmap = Resources.summonerteleport;
+                        break;
                     case "s5_summonersmiteduel":
                         bitmap = Resources.s5_summonersmiteduel;
                         break;
