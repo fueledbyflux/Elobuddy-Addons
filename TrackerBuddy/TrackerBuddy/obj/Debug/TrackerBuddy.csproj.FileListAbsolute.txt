@@ -1,0 +1,13 @@
+c:\users\joseph\documents\visual studio 2015\Projects\TrackerBuddy\TrackerBuddy\bin\Debug\TrackerBuddy.exe.config
+c:\users\joseph\documents\visual studio 2015\Projects\TrackerBuddy\TrackerBuddy\bin\Debug\TrackerBuddy.exe
+c:\users\joseph\documents\visual studio 2015\Projects\TrackerBuddy\TrackerBuddy\bin\Debug\TrackerBuddy.pdb
+c:\users\joseph\documents\visual studio 2015\Projects\TrackerBuddy\TrackerBuddy\bin\Debug\EloBuddy.dll
+c:\users\joseph\documents\visual studio 2015\Projects\TrackerBuddy\TrackerBuddy\bin\Debug\EloBuddy.SDK.dll
+c:\users\joseph\documents\visual studio 2015\Projects\TrackerBuddy\TrackerBuddy\bin\Debug\SharpDX.Direct3D9.dll
+c:\users\joseph\documents\visual studio 2015\Projects\TrackerBuddy\TrackerBuddy\bin\Debug\SharpDX.dll
+c:\users\joseph\documents\visual studio 2015\Projects\TrackerBuddy\TrackerBuddy\bin\Debug\Newtonsoft.Json.dll
+c:\users\joseph\documents\visual studio 2015\Projects\TrackerBuddy\TrackerBuddy\obj\Debug\TrackerBuddy.Properties.Resources.resources
+c:\users\joseph\documents\visual studio 2015\Projects\TrackerBuddy\TrackerBuddy\obj\Debug\TrackerBuddy.csproj.GenerateResource.Cache
+c:\users\joseph\documents\visual studio 2015\Projects\TrackerBuddy\TrackerBuddy\obj\Debug\TrackerBuddy.exe
+c:\users\joseph\documents\visual studio 2015\Projects\TrackerBuddy\TrackerBuddy\obj\Debug\TrackerBuddy.pdb
+C:\Users\Joseph\Documents\Visual Studio 2015\Projects\TrackerBuddy\TrackerBuddy\obj\Debug\TrackerBuddy.csprojResolveAssemblyReference.cache

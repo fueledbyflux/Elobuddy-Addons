@@ -140,12 +140,15 @@ namespace TrackerBuddy
                         ? 1f - (cd / unit.Spellbook.GetSpell(summonerSpell).Cooldown)
                         : 1f;
                     var spell = unit.Spellbook.GetSpell(summonerSpell);
-                    var spellDraw = SummonerSpells[spell.Name];
-                    if (spellDraw != null)
+                    if (SummonerSpells.ContainsKey(spell.Name))
                     {
-                        var spellPos = unit.GetSummoneroffset(spell.Slot);
-                        spellDraw.Color = DrawColors(percent);
-                        spellDraw.Draw(new Vector2(spellPos.X, spellPos.Y));
+                        var spellDraw = SummonerSpells[spell.Name];
+                        if (spellDraw != null)
+                        {
+                            var spellPos = unit.GetSummoneroffset(spell.Slot);
+                            spellDraw.Color = DrawColors(percent);
+                            spellDraw.Draw(new Vector2(spellPos.X, spellPos.Y));
+                        }
                     }
                 }
 
