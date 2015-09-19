@@ -84,7 +84,7 @@ namespace TrackerBuddy
             MainBar = new Sprite(() => Mode == 1 ? TextureLoader["hud2"] : TextureLoader["hud"]);
 
             // Load summoner spells dynamically
-            foreach (var summoner in HeroManager.AllHeroes.SelectMany(o => o.Spellbook.Spells.Where(s => Summoners.Contains(s.Slot))).Select(o => o.Name))
+            foreach (var summoner in HeroManager.AllHeroes.SelectMany(o => o.Spellbook.Spells.Where(s => Summoners.Contains(s.Slot))).Select(o => o.Name.ToLower()))
             {
                 var summonerName = summoner;
                 if (SummonerSpells.ContainsKey(summonerName))
