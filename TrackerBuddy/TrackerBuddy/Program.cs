@@ -4,10 +4,12 @@ using System.Drawing;
 using System.Linq;
 using EloBuddy;
 using EloBuddy.SDK;
+using EloBuddy.SDK.Enumerations;
 using EloBuddy.SDK.Events;
 using EloBuddy.SDK.Menu;
 using EloBuddy.SDK.Menu.Values;
 using EloBuddy.SDK.Rendering;
+using EloBuddy.SDK.Utils;
 using SharpDX;
 using TrackerBuddy.Properties;
 using Color = SharpDX.Color;
@@ -128,6 +130,13 @@ namespace TrackerBuddy
                     case "summonerclairvoyance":
                         bitmap = Resources.summonerclairvoyance;
                         break;
+                }
+
+                if (bitmap == null)
+                {
+                    Logger.Log(LogLevel.Error, "Tracker does not have a summoner icon for '{0}' yet!", summoner);
+                    Logger.Log(LogLevel.Error, "Please contact Fluxy about this error, thanks.");
+                    continue;
                 }
 
                 TextureLoader.Load(summonerName, bitmap);
