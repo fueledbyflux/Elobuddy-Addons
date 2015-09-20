@@ -30,7 +30,7 @@ namespace TrackerBuddy
         private const int OffsetSummonersY = OffsetHudY + 2; //5
 
         private const int OffsetXpX = OffsetHudX + 40; //44
-        private const int OffsetXpY = OffsetHudY + -49; //53
+        private const int OffsetXpY = OffsetHudY + -36; //53
 
         public static readonly TextureLoader TextureLoader = new TextureLoader();
 
@@ -173,7 +173,7 @@ namespace TrackerBuddy
 
                     if (DrawText && cooldown > 0)
                     {
-                        Text.TextValue = cooldown < 1 ? cooldown.ToString("0.0") : cooldown.ToString("0");
+                        Text.TextValue = Math.Floor(cooldown).ToString();
                         Text.Position = new Vector2((int) spellPos.X - 30 + Text.TextValue.Length, (int) spellPos.Y - 1);
                         Text.Draw();
                     }
@@ -186,18 +186,23 @@ namespace TrackerBuddy
                     var cooldown = spell.CooldownExpires - Game.Time;
                     var percent = (cooldown > 0 && Math.Abs(spell.Cooldown) > float.Epsilon) ? 1f - (cooldown / spell.Cooldown) : 1f;
                     var spellPos = unit.GetSpellOffset(slot);
-
-                    Drawing.DrawLine(new Vector2(spellPos.X, spellPos.Y + 3),
-                        new Vector2(spellPos.X + (int) (percent * 22), spellPos.Y + 3),
-                        Mode == 1 ? 6 : 11, GetDrawColor(percent));
+                    
+                        Drawing.DrawLine(new Vector2(spellPos.X, spellPos.Y + 3),
+                            new Vector2(spellPos.X + (int) (percent*22), spellPos.Y + 3),
+                            Mode == 1 ? 6 : 11, spell.IsLearned ? GetDrawColor(percent) : System.Drawing.Color.SlateGray);
 
                     if (DrawText && spell.IsLearned && cooldown > 0)
                     {
-                        Text.TextValue = cooldown < 1 ? cooldown.ToString("0.0") : cooldown.ToString("0");
-                        Text.Position = new Vector2((int) spellPos.X + 10 - Text.TextValue.Length * 2, (int) spellPos.Y + 12);
+                        Text.TextValue = Math.Floor(cooldown).ToString();
+                        Text.Position = new Vector2((int) spellPos.X + 10 - Text.TextValue.Length * 2, (int) spellPos.Y + 28);
                         Text.Draw();
                     }
                 }
+
+                //Cooldowns
+
+                Drawing.DrawLine(new Vector2(unit.HPBarPosition.X - OffsetXpX, unit.HPBarPosition.Y - OffsetXpY),
+                    new Vector2(unit.HPBarPosition.X - OffsetXpX + 104 * (unit.Experience.XPPercentage/100), unit.HPBarPosition.Y - OffsetXpY), 3, System.Drawing.Color.DarkOrange);
 
                 // Draw the main hud
                 MainBar.Draw(new Vector2((unit.HPBarPosition.X + OffsetHudX), (unit.HPBarPosition.Y + OffsetHudY + Mode * 2)));
