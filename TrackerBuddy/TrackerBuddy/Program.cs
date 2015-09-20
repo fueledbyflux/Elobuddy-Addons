@@ -47,6 +47,10 @@ namespace TrackerBuddy
         {
             get { return Menu["mode"].Cast<CheckBox>().CurrentValue ? 1 : 0; }
         }
+        private static bool Exp
+        {
+            get { return Menu["drawExp"].Cast<CheckBox>().CurrentValue; }
+        }
         private static bool DrawAllies
         {
             get { return Menu["drawAllies"].Cast<CheckBox>().CurrentValue; }
@@ -74,6 +78,7 @@ namespace TrackerBuddy
             Menu.Add("drawText", new CheckBox("Draw Text"));
             Menu.Add("drawAllies", new CheckBox("Draw Allies"));
             Menu.Add("drawEnemies", new CheckBox("Draw Enemies"));
+            Menu.Add("drawExp", new CheckBox("Draw Exp"));
             Menu.AddSeparator();
             Menu.AddLabel("by fluxy");
 
@@ -209,9 +214,12 @@ namespace TrackerBuddy
                 }
 
                 //Cooldowns
-
-                Drawing.DrawLine(new Vector2(unit.HPBarPosition.X - OffsetXpX, unit.HPBarPosition.Y - OffsetXpY),
-                    new Vector2(unit.HPBarPosition.X - OffsetXpX + 104 * (unit.Experience.XPPercentage/100), unit.HPBarPosition.Y - OffsetXpY), 3, System.Drawing.Color.DarkOrange);
+                if (Exp)
+                {
+                    Drawing.DrawLine(new Vector2(unit.HPBarPosition.X - OffsetXpX, unit.HPBarPosition.Y - OffsetXpY),
+                        new Vector2(unit.HPBarPosition.X - OffsetXpX + 104*(unit.Experience.XPPercentage/100),
+                            unit.HPBarPosition.Y - OffsetXpY), 3, System.Drawing.Color.DarkOrange);
+                }
 
                 // Draw the main hud
                 MainBar.Draw(new Vector2((unit.HPBarPosition.X + OffsetHudX), (unit.HPBarPosition.Y + OffsetHudY + Mode * 2)));
