@@ -15,12 +15,10 @@ namespace JinxBuddy
         {
             get { return ObjectManager.Player; }
         }
-
         public static bool IsKillableByR(this AIHeroClient target)
         {
             return RDamage(target) > target.Health + target.AttackShield;
         }
-
         public static float RDamage(AIHeroClient target)
         {
             if (!Program.Spells[SpellSlot.R].IsLearned) return 0;

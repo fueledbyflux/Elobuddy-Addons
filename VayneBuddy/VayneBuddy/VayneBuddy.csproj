@@ -58,8 +58,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Activator\Item.cs" />
-    <Compile Include="Activator\ItemManager.cs" />
     <Compile Include="Condemn.cs" />
     <Compile Include="Events.cs" />
     <Compile Include="Program.cs" />

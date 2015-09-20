@@ -10,8 +10,6 @@ using EloBuddy.SDK.Events;
 using EloBuddy.SDK.Menu;
 using EloBuddy.SDK.Menu.Values;
 using EloBuddy.SDK.Rendering;
-using RengarBuddy.Activator;
-using Item = RengarBuddy.Activator.Item;
 
 namespace RengarBuddy
 {
@@ -34,7 +32,6 @@ namespace RengarBuddy
         {
             Hacks.AntiAFK = true;
             Bootstrap.Init(null);
-            ItemManager.Init();
             TargetSelector2.init();
             Q = new Spell.Active(SpellSlot.Q);
             W = new Spell.Active(SpellSlot.W, 500);

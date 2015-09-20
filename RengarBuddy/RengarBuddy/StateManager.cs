@@ -154,7 +154,6 @@ namespace RengarBuddy
             if (Program.FarmMenu["qLastHit"].Cast<CheckBox>().CurrentValue && Damage.Q1(source) > source.Health && source.Distance(_Player) < _Player.GetAutoAttackRange(source))
                 {
                     Program.Q.Cast();
-                    Orbwalker.ForcedTarget = source;
                     return;
                 }
                 if (Damage.W(source) > source.Health && source.Distance(_Player) < Program.W.Range)
@@ -204,7 +203,6 @@ namespace RengarBuddy
                 if (Program.FarmMenu["qWaveClear"].Cast<CheckBox>().CurrentValue && Damage.Q1(source) > source.Health && source.Distance(_Player) < _Player.GetAutoAttackRange(source))
                 {
                     Program.Q.Cast();
-                    Orbwalker.ForcedTarget = source;
                     return;
                 }
                 if (Program.FarmMenu["wWaveClear"].Cast<CheckBox>().CurrentValue && Damage.W(source) > source.Health && source.Distance(_Player) < Program.W.Range)

@@ -23,7 +23,7 @@ namespace JinxBuddy
         public static Dictionary<SpellSlot, Spell.SpellBase> Spells = new Dictionary<SpellSlot, Spell.SpellBase>()
         {
             {SpellSlot.Q, new Spell.Active(SpellSlot.Q)},
-            {SpellSlot.W, new Spell.Skillshot(SpellSlot.W, 1450, SkillShotType.Linear, 600, 3300, 120)},
+            {SpellSlot.W, new Spell.Skillshot(SpellSlot.W, 1450, SkillShotType.Linear, 600, 3300, 240)},
             {SpellSlot.E, new Spell.Skillshot(SpellSlot.E, 900, SkillShotType.Circular, 1200, 1750, 1)},
             {SpellSlot.R, new Spell.Skillshot(SpellSlot.R, 3000, SkillShotType.Linear, 600, 1700, 140)}
         };
@@ -88,13 +88,7 @@ namespace JinxBuddy
 
             Events.Init();
             Game.OnTick += Game_OnTick;
-            Drawing.OnDraw += Drawing_OnDraw;
             Gapcloser.OnGapCloser += Events.Gapcloser_OnGapCloser;
-        }
-
-        private static void Drawing_OnDraw(EventArgs args)
-        {
-
         }
 
         private static void Game_OnTick(EventArgs args)
@@ -125,16 +119,21 @@ namespace JinxBuddy
 
             if (HarassMenu["useQHarass"].Cast<CheckBox>().CurrentValue && Spells[SpellSlot.Q].IsReady())
             {
-                if (target.Distance(_Player) <= Events.MinigunRange(target) && (Events.FishBonesActive || (_Player.ManaPercent > 40 && SmartMode.CurrentValue)))
+                var distance = target.Distance(_Player);
+                if (Events.FishBonesActive)
                 {
-                    Spells[SpellSlot.Q].Cast();
-                    return;
+                    if (distance < Events.MinigunRange(target) + target.BoundingRadius)
+                    {
+                        Spells[SpellSlot.Q].Cast();
+                    }
                 }
-                else if ((target.Distance(_Player) <= Events.MinigunRange(target) + Events.FishBonesBonus) &&
-                         !Events.FishBonesActive)
+                else
                 {
-                    Spells[SpellSlot.Q].Cast();
-                    return;
+                    if (distance > Events.MinigunRange(target) + target.BoundingRadius &&
+                        distance <= Events.MinigunRange(target) + Events.FishBonesBonus + target.BoundingRadius + 200)
+                    {
+                        Spells[SpellSlot.Q].Cast();
+                    }
                 }
             }
 
@@ -146,13 +145,11 @@ namespace JinxBuddy
                     if (_Player.Mana > RMana + EMana + WMana)
                     {
                         Spells[SpellSlot.W].Cast(pred.CastPosition);
-                        return;
                     }
                 }
                 else
                 {
                     Spells[SpellSlot.W].Cast(pred.CastPosition);
-                    return;
                 }
             }
 
@@ -188,15 +185,15 @@ namespace JinxBuddy
                 var distance = target.Distance(_Player);
                 if (Events.FishBonesActive)
                 {
-                    if (distance < Events.MinigunRange(target))
+                    if (distance < Events.MinigunRange(target) + target.BoundingRadius)
                     {
                         Spells[SpellSlot.Q].Cast();
                     }
                 }
                 else
                 {
-                    if (distance > Events.MinigunRange(target) &&
-                        distance <= Events.MinigunRange(target) + Events.FishBonesBonus)
+                    if (distance > Events.MinigunRange(target) + target.BoundingRadius &&
+                        distance <= Events.MinigunRange(target) + Events.FishBonesBonus + target.BoundingRadius + 200)
                     {
                         Spells[SpellSlot.Q].Cast();
                     }

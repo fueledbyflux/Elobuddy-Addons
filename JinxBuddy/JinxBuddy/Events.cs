@@ -41,8 +41,6 @@ namespace JinxBuddy
             Orbwalker.OnPreAttack += Orbwalker_OnPreAttack;
         }
 
-
-
         private static long _lastChange = Environment.TickCount;
 
         public static void Gapcloser_OnGapCloser(AIHeroClient sender, Gapcloser.GapCloserEventArgs e)
@@ -69,7 +67,7 @@ namespace JinxBuddy
                 }
                 else
                 {
-                    if (FishBonesActive && target.Distance(_Player) < MinigunRange(selectedUnit))
+                    if (FishBonesActive && target.Distance(_Player) < MinigunRange(selectedUnit) + target.BoundingRadius)
                     {
                         Program.Spells[SpellSlot.Q].Cast();
                         _lastChange = Environment.TickCount;

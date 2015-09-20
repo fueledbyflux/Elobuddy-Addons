@@ -9,7 +9,6 @@ using EloBuddy.SDK.Menu;
 using EloBuddy.SDK.Menu.Values;
 using EloBuddy.SDK.Rendering;
 using SharpDX;
-using VayneBuddy.Activator;
 using Color = System.Drawing.Color;
 
 namespace VayneBuddy
@@ -50,7 +49,6 @@ namespace VayneBuddy
             if (!_Player.ChampionName.ToLower().Contains("vayne")) return;
 
             Bootstrap.Init(null);
-            ItemManager.Init();
             TargetSelector2.init();
 
             Q = new Spell.Skillshot(SpellSlot.Q, (uint) _Player.GetAutoAttackRange(), SkillShotType.Circular);
