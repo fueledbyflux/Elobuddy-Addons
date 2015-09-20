@@ -121,8 +121,17 @@ namespace TrackerBuddy
                     case "summonerteleport":
                         bitmap = Resources.summonerteleport;
                         break;
+                    case "summonersmite":
+                        bitmap = Resources.summonersmite;
+                        break;
+                    case "summonerboost":
+                        bitmap = Resources.summonerboost;
+                        break;
                     case "s5_summonersmiteduel":
                         bitmap = Resources.s5_summonersmiteduel;
+                        break;
+                    case "summonerodingarrison":
+                        bitmap = Resources.summonerodingarrison;
                         break;
                     case "s5_summonersmiteplayerganker":
                         bitmap = Resources.s5_summonersmiteplayerganker;
@@ -166,7 +175,7 @@ namespace TrackerBuddy
                     var spellPos = unit.GetSummonerOffset(spell.Slot);
                     if (SummonerSpells.ContainsKey(spell.Name))
                     {
-                        var sprite = SummonerSpells[spell.Name];
+                        var sprite = spell.Name.Contains("smite") ? SummonerSpells["summonersmite"] : SummonerSpells[spell.Name];
                         sprite.Color = GetDrawColor(percent);
                         sprite.Draw(new Vector2(spellPos.X, spellPos.Y));
                     }
