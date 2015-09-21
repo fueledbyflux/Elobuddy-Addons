@@ -16,14 +16,7 @@ namespace VayneBuddy
             var target = (Events.AAedTarget != null && Events.AAedTarget.IsValidTarget(_Player.GetAutoAttackRange(Events.AAedTarget)) && Events.AAedTarget is AIHeroClient && Events.AaStacks == 2) ? (AIHeroClient) Events.AAedTarget : TargetSelector2.GetTarget((int)_Player.GetAutoAttackRange(), DamageType.Physical);
             var condemnTarget = TargetSelector2.GetTarget((int)_Player.GetAutoAttackRange() + 300, DamageType.Physical);
             Orbwalker.ForcedTarget = target;
-            if (!target.IsValidTarget()) return;
-
-            if (Program.Q.IsReady() && target.Distance(_Player) > _Player.GetAutoAttackRange(target) &&
-                target.Distance(_Player) < _Player.GetAutoAttackRange(target) + 300 &&
-                target.Distance(_Player) < _Player.Position.Extend(Game.CursorPos, 300).Distance(target))
-            {
-                Program.Q.Cast(Game.CursorPos);
-            }
+            if (!target.IsValidTarget() || Orbwalker.IsAutoAttacking) return;
 
             if (Program.E.IsReady() && target.IsValidTarget(Program.E.Range) && target.IsCondemable() &&
                 Program.CondemnMenu["condemnCombo"].Cast<CheckBox>().CurrentValue)
@@ -61,6 +54,11 @@ namespace VayneBuddy
                 return;
             }
 
+            if (Program.Q.IsReady() && _Player.Position.Extend(Game.CursorPos, 300).Distance(target) > 100)
+            {
+                Program.Q.Cast(Game.CursorPos);
+            }
+
             if (Program.E.IsReady())
             {
                 var direction = ObjectManager.Player.Direction.To2D().Perpendicular();
@@ -83,9 +81,7 @@ namespace VayneBuddy
             Orbwalker.ForcedTarget = target;
             if (!target.IsValidTarget()) return;
 
-            if (Program.Q.IsReady() && target.Distance(_Player) > _Player.GetAutoAttackRange(target) &&
-                target.Distance(_Player) < _Player.GetAutoAttackRange(target) + 300 &&
-                target.Distance(_Player) < _Player.Position.Extend(Game.CursorPos, 300).Distance(target))
+            if (Program.Q.IsReady() && _Player.Position.Extend(Game.CursorPos, 300).Distance(target) > 100)
             {
                 Program.Q.Cast(Game.CursorPos);
             }

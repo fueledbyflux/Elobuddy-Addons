@@ -93,6 +93,7 @@ namespace VayneBuddy
                 Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear) &&
                 Program.FarmMenu["useQWaveClear"].Cast<CheckBox>().CurrentValue)
             {
+                return;
                 Core.DelayAction(delegate
                 {
                     var target2 = target;
@@ -122,8 +123,6 @@ namespace VayneBuddy
                 }, 300);
             }
         }
-
-
 
         public static void Interrupter_OnInterruptableSpell(Obj_AI_Base sender, InterruptableSpellEventArgs e)
         {

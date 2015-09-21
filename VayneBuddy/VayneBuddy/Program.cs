@@ -42,8 +42,6 @@ namespace VayneBuddy
         public static string[] DangerSliderValues = {"Low", "Medium", "High"};
         public static string[] PriorityValues = {"Very Low", "Low", "Medium", "High", "Very High"};
         public static List<Vector2> Points = new List<Vector2>();
-        public static List<Vector2> CorrectPoints = new List<Vector2>();
-
         private static void Game_OnStart(EventArgs args)
         {
             if (!_Player.ChampionName.ToLower().Contains("vayne")) return;
@@ -52,7 +50,8 @@ namespace VayneBuddy
             TargetSelector2.init();
 
             Q = new Spell.Skillshot(SpellSlot.Q, (uint) _Player.GetAutoAttackRange(), SkillShotType.Circular);
-            E = new Spell.Targeted(SpellSlot.E, (uint) _Player.GetAutoAttackRange());
+            E = new Spell.Targeted(SpellSlot.E, 590);
+            Condemn.ESpell = new Spell.Skillshot(SpellSlot.E, 590, SkillShotType.Linear, 250, 1250);
             R = new Spell.Active(SpellSlot.R);
             
 
@@ -99,6 +98,7 @@ namespace VayneBuddy
             CondemnMenu.AddGroupLabel("Condemn Settings");
             CondemnMenu.AddSeparator();
             CondemnMenu.Add("pushDistance", new Slider("Push Distance", 410, 350, 420));
+            CondemnMenu.Add("condemnPercent", new Slider("Condemn Percent", 33, 1));
             CondemnMenu.AddSeparator();
             CondemnMenu.AddLabel("Active Mode Settings");
             CondemnMenu.Add("smartVsCheap",
@@ -214,23 +214,14 @@ namespace VayneBuddy
             {
                 foreach (var point in Points)
                 {
-                    new Circle() {Color = Color.Red, Radius = 10}.Draw(point.To3D());
-                }
-                foreach (var point in CorrectPoints)
-                {
-                    new Circle()
-                    {
-                        Color = CorrectPoints.Count > 3 ? Color.DeepSkyBlue : Color.Green,
-                        Radius = 10
-                    }.Draw(point.To3D());
+                    new Circle() {Color = (point.To3D().ToNavMeshCell().CollFlags.HasFlag(CollisionFlags.Wall) || point.To3D().ToNavMeshCell().CollFlags.HasFlag(CollisionFlags.Building)) ? Color.Blue : Color.Red, Radius = 10}.Draw(point.To3D());
                 }
             }
         }
 
         private static void Game_OnUpdate(EventArgs args)
         {
-
-            Orbwalker.ForcedTarget = null;
+            Orbwalker.ForcedTarget = Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo) ? TargetSelector2.GetTarget(_Player.GetAutoAttackRange(), DamageType.Physical) : null;
 
             if (Events.AAedTarget == null || Events.LastAa + 3500 + 400 <= Environment.TickCount || Events.AAedTarget.IsDead || !Events.AAedTarget.HasBuff("vaynesilvereddebuff") && (Events.LastAa + 1000 < Environment.TickCount))
             {

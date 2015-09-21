@@ -11,7 +11,6 @@ namespace VayneBuddy
 {
     static class Condemn
     {
-
         public static AIHeroClient _Player
         {
             get { return ObjectManager.Player; }
@@ -19,47 +18,40 @@ namespace VayneBuddy
 
         public static long LastCheck;
         public static int CheckCount;
+        public static Spell.Skillshot ESpell;
 
         public static bool IsCondemable(this AIHeroClient unit, Vector2 pos = new Vector2())
         {
             if (unit.HasBuffOfType(BuffType.SpellImmunity) || unit.HasBuffOfType(BuffType.SpellShield) || LastCheck + 50 > Environment.TickCount || _Player.IsDashing()) return false;
-            Program.CorrectPoints = new List<Vector2>();
-            Program.Points = new List<Vector2>();
-            if (!pos.IsValid()) pos = ObjectManager.Player.Position.To2D();
-            int wallCount = 0;
-            int pushDistance = Program.CondemnMenu["pushDistance"].Cast<Slider>().CurrentValue;
+            var prediction = ESpell.GetPrediction(unit);
+            var predictionsList = pos.IsValid() ? new List<Vector3>() {pos.To3D()} :  new List<Vector3>
+                        {
+                            unit.ServerPosition,
+                            unit.Position,
+                            prediction.CastPosition,
+                            prediction.UnitPosition
+                        };
 
-            for (int i = 0; i < pushDistance; i += 20)
+            var wallsFound = 0;
+            Program.Points = new List<Vector2>();
+            foreach (var position in predictionsList)
             {
-                var unitPos = Prediction.Position.PredictUnitPosition(unit, 250);
-                var cell = pos.Extend(unitPos, unitPos.Distance(pos) + i);
-                if (cell.ToNavMeshCell().CollFlags.HasFlag(CollisionFlags.Wall))
+                for (var i = 0; i < Program.CondemnMenu["pushDistance"].Cast<Slider>().CurrentValue; i += (int) unit.BoundingRadius)
                 {
-                    Program.CorrectPoints.Add(cell);
-                    wallCount++;
-                }
-                else
-                {
-                    Program.Points.Add(cell);
+                    var cPos = _Player.Position.Extend(position, _Player.Distance(position) + i).To3D();
+                    Program.Points.Add(cPos.To2D());
+                    if (cPos.ToNavMeshCell().CollFlags.HasFlag(CollisionFlags.Wall) || cPos.ToNavMeshCell().CollFlags.HasFlag(CollisionFlags.Building))
+                    {
+                        wallsFound++;
+                        break;
+                    }
                 }
             }
-
-            if (CheckCount >= 2 && wallCount > 2)
+            if ((wallsFound/ predictionsList.Count) >= Program.CondemnMenu["condemnPercent"].Cast<Slider>().CurrentValue/100f)
             {
-                CheckCount = 0;
-                LastCheck = Environment.TickCount;
                 return true;
             }
-
-            if (wallCount > 2)
-            {
-                CheckCount++;
-            }
-            else
-            {
-                CheckCount = 0;
-            }
-            LastCheck = Environment.TickCount;
+            
             return false;
         }
 
