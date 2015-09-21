@@ -86,11 +86,6 @@ namespace VayneBuddy
                 Program.Q.Cast(Game.CursorPos);
             }
         }
-
-        public static bool HasBuff(this Obj_AI_Base b, string s)
-        {
-            return b.Buffs.Any(a => a.Name.ToLower().Contains(s.ToLower()) && a.DisplayName.ToLower().Contains(s.ToLower()));
-        }
     }
 
 }
