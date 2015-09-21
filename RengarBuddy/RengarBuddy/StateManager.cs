@@ -84,14 +84,17 @@ namespace RengarBuddy
                     if (Program.W.IsReady() && target.IsValidTarget(Program.W.Range) && Program.ComboMenu["wCombo"].Cast<CheckBox>().CurrentValue)
                     {
                         Program.W.Cast();
+                        return;
                     }
                     if (Program.Q.IsReady() && Program.ComboMenu["qCombo"].Cast<CheckBox>().CurrentValue && !Orbwalker.IsAutoAttacking && target.IsValidTarget(_Player.GetAutoAttackRange(target)))
                     {
                         Program.Q.Cast();
+                        return;
                     }
                     if (Program.E.IsReady() && Program.ComboMenu["eCombo"].Cast<CheckBox>().CurrentValue && target.IsValidTarget(Program.E.Range))
                     {
                         Program.E.Cast(target);
+                        return;
                     }
                     break;
             }
@@ -254,7 +257,6 @@ namespace RengarBuddy
             if (Program.FarmMenu["qJng"].Cast<CheckBox>().CurrentValue && source.Distance(_Player) < _Player.GetAutoAttackRange(source))
                 {
                     Program.Q.Cast();
-                    Orbwalker.ForcedTarget = source;
                     return;
                 }
                 if (Program.FarmMenu["wJng"].Cast<CheckBox>().CurrentValue && source.Distance(_Player) < Program.W.Range)

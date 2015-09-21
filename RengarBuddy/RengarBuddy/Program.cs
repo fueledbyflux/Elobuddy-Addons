@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using EloBuddy;
 using EloBuddy.SDK;
+using EloBuddy.SDK.Constants;
 using EloBuddy.SDK.Enumerations;
 using EloBuddy.SDK.Events;
 using EloBuddy.SDK.Menu;
@@ -33,6 +34,7 @@ namespace RengarBuddy
             Hacks.AntiAFK = true;
             Bootstrap.Init(null);
             TargetSelector2.init();
+
             Q = new Spell.Active(SpellSlot.Q);
             W = new Spell.Active(SpellSlot.W, 500);
             E = new Spell.Skillshot(SpellSlot.E, 1000, SkillShotType.Linear, 250, 1500, 70);
@@ -112,14 +114,15 @@ namespace RengarBuddy
             JungleMenu.Add("qJng", new CheckBox("Use Q"));
             JungleMenu.Add("wJng", new CheckBox("Use W"));
             JungleMenu.Add("eJng", new CheckBox("Use E"));
-
+            
+            //MeleeOrbwalker.Init();
             Game.OnTick += Game_OnTick;
-            Orbwalker.OnAttack += Orbwalker_OnAttack;
+            AIHeroClient.OnProcessSpellCast += AIHeroClient_OnProcessSpellCast;
         }
 
-        private static void Orbwalker_OnAttack(AttackableUnit target, EventArgs args)
+        private static void AIHeroClient_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
-            if (Player.HasBuff("RengarR"))
+            if (sender.IsMe && args.SData.IsAutoAttack() && Player.HasBuff("RengarR"))
             {
                 disableAntiSkills = true;
             }
