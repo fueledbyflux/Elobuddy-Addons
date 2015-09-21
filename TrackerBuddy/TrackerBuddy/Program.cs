@@ -97,6 +97,7 @@ namespace TrackerBuddy
             // Load summoner spells dynamically
             foreach (var summoner in HeroManager.AllHeroes.SelectMany(o => o.Spellbook.Spells.Where(s => Summoners.Contains(s.Slot))).Select(o => o.Name.ToLower()))
             {
+
                 var summonerName = summoner;
                 if (SummonerSpells.ContainsKey(summonerName))
                 {
@@ -185,7 +186,7 @@ namespace TrackerBuddy
                     var cooldown = spell.CooldownExpires - Game.Time;
                     var percent = (cooldown > 0 && Math.Abs(spell.Cooldown) > float.Epsilon) ? 1f - (cooldown / spell.Cooldown) : 1f;
                     var spellPos = unit.GetSummonerOffset(spell.Slot);
-                    if (SummonerSpells.ContainsKey(spell.Name))
+                    if (SummonerSpells.ContainsKey(spell.Name) || spell.Name.Contains("smite"))
                     {
                         var sprite = spell.Name.Contains("smite") ? SummonerSpells["summonersmite"] : SummonerSpells[spell.Name];
                         sprite.Color = GetDrawColor(percent);
