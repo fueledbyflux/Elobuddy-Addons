@@ -1,4 +1,5 @@
-﻿using EloBuddy;
+﻿using System.Linq;
+using EloBuddy;
 using EloBuddy.SDK;
 using EloBuddy.SDK.Menu.Values;
 
@@ -51,7 +52,6 @@ namespace VayneBuddy
                         Program.Q.Cast(condemnTarget.Position);
                     }
                 }
-                return;
             }
 
             if (Program.Q.IsReady() && _Player.Position.Extend(Game.CursorPos, 300).Distance(target) > 100)
@@ -85,6 +85,11 @@ namespace VayneBuddy
             {
                 Program.Q.Cast(Game.CursorPos);
             }
+        }
+
+        public static bool HasBuff(this Obj_AI_Base b, string s)
+        {
+            return b.Buffs.Any(a => a.Name.ToLower().Contains(s.ToLower()) && a.DisplayName.ToLower().Contains(s.ToLower()));
         }
     }
 
