@@ -17,6 +17,7 @@ namespace VayneBuddy
             var target = (Events.AAedTarget != null && Events.AAedTarget.IsValidTarget(_Player.GetAutoAttackRange(Events.AAedTarget)) && Events.AAedTarget is AIHeroClient && Events.AaStacks == 2) ? (AIHeroClient) Events.AAedTarget : TargetSelector2.GetTarget((int)_Player.GetAutoAttackRange(), DamageType.Physical);
             var condemnTarget = TargetSelector2.GetTarget((int)_Player.GetAutoAttackRange() + 300, DamageType.Physical);
             Orbwalker.ForcedTarget = target;
+
             if (!target.IsValidTarget() || Orbwalker.IsAutoAttacking) return;
 
             if (Program.E.IsReady() && target.IsValidTarget(Program.E.Range) && target.IsCondemable() &&
@@ -31,9 +32,11 @@ namespace VayneBuddy
                         if (Program.CondemnMenu["condemnComboTrinket"].Cast<CheckBox>().CurrentValue)
                         {
                             var pos = Condemn.GetFirstNonWallPos(_Player.Position.To2D(), target.Position.To2D());
-                            if (!pos.ToNavMeshCell().CollFlags.HasFlag(CollisionFlags.Grass)) return;
-                            Player.CastSpell(SpellSlot.Trinket,
-                                pos.To3D());
+                            if (pos.ToNavMeshCell().CollFlags.HasFlag(CollisionFlags.Grass))
+                            {
+                                Player.CastSpell(SpellSlot.Trinket,
+                                    pos.To3D());
+                            }
                         }
                     }, 200);
                 }
@@ -46,10 +49,12 @@ namespace VayneBuddy
                     if (condemnTarget.IsCondemable(_Player.Position.Extend(Game.CursorPos, 300)))
                     {
                         Program.Q.Cast(Game.CursorPos);
+                        return;
                     }
                     if (condemnTarget.IsCondemable(_Player.Position.Extend(target.Position, 300)))
                     {
                         Program.Q.Cast(condemnTarget.Position);
+                        return;
                     }
                 }
             }
@@ -57,6 +62,7 @@ namespace VayneBuddy
             if (Program.Q.IsReady() && _Player.Position.Extend(Game.CursorPos, 300).Distance(target) > 100)
             {
                 Program.Q.Cast(Game.CursorPos);
+                return;
             }
 
             if (Program.E.IsReady())
@@ -69,7 +75,7 @@ namespace VayneBuddy
                     if (condemnTarget.IsCondemable(rotatedPosition))
                     {
                         Program.Q.Cast(rotatedPosition.To3D());
-                        break;
+                        return;
                     }
                 }
             }
