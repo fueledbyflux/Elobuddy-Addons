@@ -74,7 +74,11 @@ namespace TrackerBuddy
             // Create the menu
             Menu = MainMenu.AddMenu("TrackerBuddy", "trackerBuddy");
             Menu.AddGroupLabel("Tracker Buddy");
-            Menu.Add("mode", new CheckBox("Low Profile Mode"));
+            var mode = Menu.Add("mode", new CheckBox("Low Profile Mode"));
+            mode.OnValueChange += delegate
+            {
+                MainBar = new Sprite(() => Mode == 1 ? TextureLoader["hud2"] : TextureLoader["hud"]);
+            };
             Menu.Add("drawText", new CheckBox("Draw Text"));
             Menu.Add("drawAllies", new CheckBox("Draw Allies"));
             Menu.Add("drawEnemies", new CheckBox("Draw Enemies"));
@@ -123,6 +127,9 @@ namespace TrackerBuddy
                     case "itemsmiteaoe":
                         bitmap = Resources.itemsmiteaoe;
                         break;
+                    case "summonerbarrier":
+                        bitmap = Resources.summonerbarrier;
+                        break;
                     case "summonerteleport":
                         bitmap = Resources.summonerteleport;
                         break;
@@ -151,8 +158,8 @@ namespace TrackerBuddy
 
                 if (bitmap == null)
                 {
-                    Logger.Log(LogLevel.Error, "Tracker does not have a summoner icon for '{0}' yet!", summoner);
-                    Logger.Log(LogLevel.Error, "Please contact Fluxy about this error, thanks.");
+                    Chat.Print("TRACKER : Tracker does not have a summoner icon for '{0}' yet!", Color.Cyan, summoner);
+                    Chat.Print("TRACKER : Please contact Fluxy about this error, thanks.", Color.Cyan);
                     continue;
                 }
 
@@ -201,9 +208,9 @@ namespace TrackerBuddy
                     var percent = (cooldown > 0 && Math.Abs(spell.Cooldown) > float.Epsilon) ? 1f - (cooldown / spell.Cooldown) : 1f;
                     var spellPos = unit.GetSpellOffset(slot);
                     
-                        Drawing.DrawLine(new Vector2(spellPos.X, spellPos.Y + 3),
-                            new Vector2(spellPos.X + (int) (percent*22), spellPos.Y + 3),
-                            Mode == 1 ? 6 : 11, spell.IsLearned ? GetDrawColor(percent) : System.Drawing.Color.SlateGray);
+                        Drawing.DrawLine(new Vector2(spellPos.X, spellPos.Y + 2),
+                            new Vector2(spellPos.X + (int) (percent*22), spellPos.Y + 2),
+                            Mode == 1 ? 5 : 11, spell.IsLearned ? GetDrawColor(percent) : System.Drawing.Color.SlateGray);
 
                     if (DrawText && spell.IsLearned && cooldown > 0)
                     {
@@ -222,13 +229,13 @@ namespace TrackerBuddy
                 }
 
                 // Draw the main hud
-                MainBar.Draw(new Vector2((unit.HPBarPosition.X + OffsetHudX), (unit.HPBarPosition.Y + OffsetHudY + Mode * 2)));
+                MainBar.Draw(new Vector2((unit.HPBarPosition.X + OffsetHudX), (unit.HPBarPosition.Y + OffsetHudY + Mode * 2 - (Exp ? 0 : 3))));
             }
         }
 
         private static Vector2 GetSpellOffset(this Obj_AI_Base hero, SpellSlot slot)
         {
-            var normalPos = new Vector2(hero.HPBarPosition.X + OffsetSpellsX, hero.HPBarPosition.Y + OffsetSpellsY);
+            var normalPos = new Vector2(hero.HPBarPosition.X + OffsetSpellsX, hero.HPBarPosition.Y + OffsetSpellsY + Mode * 2 - (Exp ? 0 : 3));
             switch (slot)
             {
                 case SpellSlot.W:
@@ -243,7 +250,7 @@ namespace TrackerBuddy
 
         private static Vector2 GetSummonerOffset(this Obj_AI_Base hero, SpellSlot slot)
         {
-            var normalPos = new Vector2(hero.HPBarPosition.X + OffsetSummonersX, hero.HPBarPosition.Y + OffsetSummonersY);
+            var normalPos = new Vector2(hero.HPBarPosition.X + OffsetSummonersX, hero.HPBarPosition.Y + OffsetSummonersY + Mode * 2 - (Exp ? 0 : 3));
             return slot == SpellSlot.Summoner2 ? new Vector2(normalPos.X, normalPos.Y + 17) : normalPos;
         }
 
