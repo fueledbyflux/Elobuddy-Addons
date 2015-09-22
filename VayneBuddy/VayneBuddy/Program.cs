@@ -151,7 +151,7 @@ namespace VayneBuddy
             Orbwalker.OnPreAttack += Events.Orbwalker_OnPreAttack;
             Game.OnUpdate += Game_OnUpdate;
             Drawing.OnDraw += Drawing_OnDraw;
-            Gapcloser.OnGapCloser += Events.Gapcloser_OnGapCloser;
+            Gapcloser.OnGapcloser += Events.Gapcloser_OnGapCloser;
             Interrupter.OnInterruptableSpell += Events.Interrupter_OnInterruptableSpell;
             AIHeroClient.OnProcessSpellCast += AIHeroClient_OnProcessSpellCast;
 

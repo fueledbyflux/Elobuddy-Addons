@@ -20,9 +20,9 @@ namespace VayneBuddy
             get { return ObjectManager.Player; }
         }
 
-        public static void Gapcloser_OnGapCloser(AIHeroClient sender, Gapcloser.GapCloserEventArgs e)
+        public static void Gapcloser_OnGapCloser(AIHeroClient sender, Gapcloser.GapcloserEventArgs e)
         {
-            if (e.End.Distance(_Player.Position) < 200 && sender.IsValidTarget())
+            if (e.End.Distance(_Player) < 200 && sender.IsValidTarget())
             {
                 Program.E.Cast(sender);
             }
@@ -124,7 +124,7 @@ namespace VayneBuddy
             }
         }
 
-        public static void Interrupter_OnInterruptableSpell(Obj_AI_Base sender, InterruptableSpellEventArgs e)
+        public static void Interrupter_OnInterruptableSpell(Obj_AI_Base sender, Interrupter.InterruptableSpellEventArgs e)
         {
             var dangerLevel =
                 new[]

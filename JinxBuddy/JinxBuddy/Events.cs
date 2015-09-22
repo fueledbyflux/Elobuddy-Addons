@@ -43,7 +43,7 @@ namespace JinxBuddy
 
         private static long _lastChange = Environment.TickCount;
 
-        public static void Gapcloser_OnGapCloser(AIHeroClient sender, Gapcloser.GapCloserEventArgs e)
+        public static void Gapcloser_OnGapCloser(AIHeroClient sender, Gapcloser.GapcloserEventArgs e)
         {
             if (sender.IsEnemy && e.End.Distance(_Player) < 200)
             {
