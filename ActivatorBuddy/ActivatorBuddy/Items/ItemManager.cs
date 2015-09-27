@@ -236,10 +236,10 @@ namespace ActivatorBuddy.Items
                     {
                         if (!Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo)) return;
 
-                        foreach (var buffInstance in _Player.Buffs)
+                        foreach (var buffHandle in _Player.Buffs)
                         {
-                            if (BuffTypes.ContainsKey(buffInstance.Type) &&
-                                Cleansers[BuffTypes[buffInstance.Type]].Cast<CheckBox>().CurrentValue)
+                            if (BuffTypes.ContainsKey(buffHandle.Type) &&
+                                Cleansers[BuffTypes[buffHandle.Type]].Cast<CheckBox>().CurrentValue)
                             {
                                 var spellSlot = _Player.InventoryItems.FirstOrDefault(a => a.Id == item.Id);
                                 if (spellSlot != null && Player.GetSpell(spellSlot.SpellSlot).IsReady)

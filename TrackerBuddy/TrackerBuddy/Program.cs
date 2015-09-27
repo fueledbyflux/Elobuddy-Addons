@@ -24,10 +24,10 @@ namespace TrackerBuddy
         private const int OffsetHudY = 16; //11
 
         private const int OffsetSpellsX = OffsetHudX + 22;
-        private const int OffsetSpellsY = OffsetHudY + 9;
+        private const int OffsetSpellsY = OffsetHudY + 27;
 
         private const int OffsetSummonersX = OffsetHudX + 4; //9
-        private const int OffsetSummonersY = OffsetHudY + 2; //5
+        private const int OffsetSummonersY = OffsetHudY + 18; //5
 
         private const int OffsetXpX = OffsetHudX + 40; //44
         private const int OffsetXpY = OffsetHudY + -36; //53
@@ -179,6 +179,7 @@ namespace TrackerBuddy
         {
             foreach (var unit in HeroManager.AllHeroes.Where(o => !o.IsMe && o.IsHPBarRendered).Where(o => o.IsAlly ? DrawAllies : DrawEnemies))
             {
+                var HPBarPos = new Vector2(unit.HPBarPosition.X, unit.HPBarPosition.Y + 16);
                 // Summoner spells
                 foreach (var summonerSpell in Summoners)
                 {
@@ -224,13 +225,13 @@ namespace TrackerBuddy
                 //Cooldowns
                 if (Exp)
                 {
-                    Drawing.DrawLine(new Vector2(unit.HPBarPosition.X - OffsetXpX, unit.HPBarPosition.Y - OffsetXpY),
-                        new Vector2(unit.HPBarPosition.X - OffsetXpX + 104*(unit.Experience.XPPercentage/100),
-                            unit.HPBarPosition.Y - OffsetXpY), 3, System.Drawing.Color.DarkOrange);
+                    Drawing.DrawLine(new Vector2(HPBarPos.X - OffsetXpX, HPBarPos.Y - OffsetXpY),
+                        new Vector2(HPBarPos.X - OffsetXpX + 104*(unit.Experience.XPPercentage/100),
+                            HPBarPos.Y - OffsetXpY), 3, System.Drawing.Color.DarkOrange);
                 }
 
                 // Draw the main hud
-                MainBar.Draw(new Vector2((unit.HPBarPosition.X + OffsetHudX), (unit.HPBarPosition.Y + OffsetHudY + Mode * 2 - (Exp ? 0 : 3))));
+                MainBar.Draw(new Vector2((HPBarPos.X + OffsetHudX), (HPBarPos.Y + OffsetHudY + Mode * 2 - (Exp ? 0 : 3))));
             }
         }
 
