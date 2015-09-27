@@ -24,10 +24,10 @@ namespace TrackerBuddy
         private const int OffsetHudY = 16; //11
 
         private const int OffsetSpellsX = OffsetHudX + 22;
-        private const int OffsetSpellsY = OffsetHudY + 27;
+        private const int OffsetSpellsY = OffsetHudY + 11;
 
         private const int OffsetSummonersX = OffsetHudX + 4; //9
-        private const int OffsetSummonersY = OffsetHudY + 18; //5
+        private const int OffsetSummonersY = OffsetHudY + 2; //5
 
         private const int OffsetXpX = OffsetHudX + 40; //44
         private const int OffsetXpY = OffsetHudY + -36; //53
@@ -179,7 +179,7 @@ namespace TrackerBuddy
         {
             foreach (var unit in HeroManager.AllHeroes.Where(o => !o.IsMe && o.IsHPBarRendered).Where(o => o.IsAlly ? DrawAllies : DrawEnemies))
             {
-                var HPBarPos = new Vector2(unit.HPBarPosition.X, unit.HPBarPosition.Y + 16);
+                var HPBarPos = new Vector2(unit.HPBarPosition.X, unit.HPBarPosition.Y);
                 // Summoner spells
                 foreach (var summonerSpell in Summoners)
                 {
