@@ -24,13 +24,13 @@ namespace TrackerBuddy
         private const int OffsetHudY = 16; //11
 
         private const int OffsetSpellsX = OffsetHudX + 22;
-        private const int OffsetSpellsY = OffsetHudY + 11;
+        private const int OffsetSpellsY = OffsetHudY + 25;
 
         private const int OffsetSummonersX = OffsetHudX + 4; //9
         private const int OffsetSummonersY = OffsetHudY + 2; //5
 
         private const int OffsetXpX = OffsetHudX + 40; //44
-        private const int OffsetXpY = OffsetHudY + -36; //53
+        private const int OffsetXpY = OffsetHudY + -51; //53
 
         public static readonly TextureLoader TextureLoader = new TextureLoader();
 
@@ -231,7 +231,7 @@ namespace TrackerBuddy
                 }
 
                 // Draw the main hud
-                MainBar.Draw(new Vector2((HPBarPos.X + OffsetHudX), (HPBarPos.Y + OffsetHudY + Mode * 2 - (Exp ? 0 : 3))));
+                MainBar.Draw(new Vector2((HPBarPos.X + OffsetHudX), (HPBarPos.Y + OffsetHudY + Mode * 2 - (Exp ? 0 : 1))));
             }
         }
 
