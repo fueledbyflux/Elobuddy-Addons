@@ -117,10 +117,8 @@ namespace RivenBuddy
 
         public static void UpdateSpells()
         {
-            Chat.Print(LastCast["Q"] + 3450 < Environment.TickCount);
             if (LastCast["Q"] + 3450 < Environment.TickCount && Program.ComboMenu["combo.keepQAlive"].Cast<CheckBox>().CurrentValue && QCount != 0)
             {
-                Chat.Print("casted");
                 Player.CastSpell(SpellSlot.Q, Game.CursorPos);
             }
 
