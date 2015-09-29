@@ -18,6 +18,7 @@ namespace VayneBuddy
 
         public static void Drawing_OnDraw()
         {
+            if (Game.MapId != GameMapId.SummonersRift) return;
             Vector2 drakeWallQPos = new Vector2(12050, 4827);
             Vector2 midWallQPos = new Vector2(6962, 8952);
             if (drakeWallQPos.Distance(_Player) < 3000)
@@ -31,6 +32,7 @@ namespace VayneBuddy
 
         public static void WallTumble()
         {
+            if (Game.MapId != GameMapId.SummonersRift) return;
             foreach (var delayedAction in DelayedActions)
             {
                 if (delayedAction.Value <= Environment.TickCount)
