@@ -80,7 +80,7 @@ namespace RivenBuddy
                     ObjectManager.Player.Spellbook.CastSpell(SpellSlot.Q, target.ServerPosition);
                     break;
                 case SpellSlot.W:
-                    ObjectManager.Player.Spellbook.CastSpell(SpellSlot.W);
+                    if(target.IsValidTarget(SpellManager.Spells[SpellSlot.W].Range)) ObjectManager.Player.Spellbook.CastSpell(SpellSlot.W);
                     break;
                 case SpellSlot.E:
                     if (target == null) break;
