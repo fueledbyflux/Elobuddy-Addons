@@ -1,35 +1,35 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using System.Net.Sockets;
-using System.Text;
-using System.Threading.Tasks;
 using EloBuddy;
 using EloBuddy.SDK;
-using EloBuddy.SDK.Constants;
 using EloBuddy.SDK.Events;
 using EloBuddy.SDK.Menu;
 using EloBuddy.SDK.Menu.Values;
 using EloBuddy.SDK.Rendering;
-using RivenBuddy.DamageIndicator;
-using SharpDX;
-using Color = SharpDX.Color;
 using SpellData = RivenBuddy.DamageIndicator.SpellData;
 
 namespace RivenBuddy
 {
-    class Program
+    internal class Program
     {
-        
         public static Menu Menu, ComboMenu, HarassMenu, MinionClear, Jungle, DrawMenu;
-        public static bool IsRActive { get { return ComboMenu["useR"].Cast<KeyBind>().CurrentValue; } }
-        public static bool BurstActive { get { return ComboMenu["burst"].Cast<KeyBind>().CurrentValue; } }
         public static bool checkAA = false;
         public static bool FastQ;
         public static Text text = new Text("", new Font(FontFamily.GenericSansSerif, 9));
         public static DamageIndicator.DamageIndicator Indicator;
-        static void Main(string[] args)
+
+        public static bool IsRActive
+        {
+            get { return ComboMenu["useR"].Cast<KeyBind>().CurrentValue; }
+        }
+
+        public static bool BurstActive
+        {
+            get { return ComboMenu["burst"].Cast<KeyBind>().CurrentValue; }
+        }
+
+        private static void Main(string[] args)
         {
             Loading.OnLoadingComplete += Loading_OnLoadingComplete;
         }
@@ -85,7 +85,7 @@ namespace RivenBuddy
             DrawMenu.Add("draw.rState", new CheckBox("Write R State"));
 
             Indicator = new DamageIndicator.DamageIndicator();
-            Indicator.Add("Combo", new SpellData(0, DamageType.True, System.Drawing.Color.Aqua));
+            Indicator.Add("Combo", new SpellData(0, DamageType.True, Color.Aqua));
 
             TargetSelector2.Init();
             SpellEvents.Init();
@@ -95,43 +95,47 @@ namespace RivenBuddy
 
             Chat.Print("RivenBuddy : Fully Loaded. by fluxy");
         }
-        
 
         private static void Drawing_OnDraw(EventArgs args)
         {
-            if(DrawMenu["draw.rState"].Cast<CheckBox>().CurrentValue) text.Draw("Forced R: " + IsRActive, System.Drawing.Color.AliceBlue, (int) Player.Instance.HPBarPosition.X - 8, (int) Player.Instance.HPBarPosition.Y);
+            if (DrawMenu["draw.rState"].Cast<CheckBox>().CurrentValue)
+                text.Draw("Forced R: " + IsRActive, Color.AliceBlue, (int) Player.Instance.HPBarPosition.X - 8,
+                    (int) Player.Instance.HPBarPosition.Y);
             if (DrawMenu["draw.Combo"].Cast<CheckBox>().CurrentValue)
             {
                 var s = Queuer.Queue.Aggregate("", (current, VARIABLE) => current + (" " + VARIABLE));
-                Drawing.DrawText(100, 100, System.Drawing.Color.Wheat, s);
+                Drawing.DrawText(100, 100, Color.Wheat, s);
             }
             if (DrawMenu["draw.Q"].Cast<CheckBox>().CurrentValue)
             {
-                Circle.Draw(SpellManager.Spells[SpellSlot.Q].IsReady() ? Color.Cyan : Color.OrangeRed, SpellManager.Spells[SpellSlot.Q].Range, Player.Instance.Position);
+                Circle.Draw(SpellManager.Spells[SpellSlot.Q].IsReady() ? SharpDX.Color.Cyan : SharpDX.Color.OrangeRed,
+                    SpellManager.Spells[SpellSlot.Q].Range, Player.Instance.Position);
             }
             if (DrawMenu["draw.W"].Cast<CheckBox>().CurrentValue)
             {
-                Circle.Draw(SpellManager.Spells[SpellSlot.W].IsReady() ? Color.Cyan : Color.OrangeRed, SpellManager.Spells[SpellSlot.W].Range, Player.Instance.Position);
+                Circle.Draw(SpellManager.Spells[SpellSlot.W].IsReady() ? SharpDX.Color.Cyan : SharpDX.Color.OrangeRed,
+                    SpellManager.Spells[SpellSlot.W].Range, Player.Instance.Position);
             }
             if (DrawMenu["draw.E"].Cast<CheckBox>().CurrentValue)
             {
-                Circle.Draw(SpellManager.Spells[SpellSlot.E].IsReady() ? Color.Cyan : Color.OrangeRed, SpellManager.Spells[SpellSlot.E].Range, Player.Instance.Position);
+                Circle.Draw(SpellManager.Spells[SpellSlot.E].IsReady() ? SharpDX.Color.Cyan : SharpDX.Color.OrangeRed,
+                    SpellManager.Spells[SpellSlot.E].Range, Player.Instance.Position);
             }
             if (DrawMenu["draw.R"].Cast<CheckBox>().CurrentValue)
             {
-                Circle.Draw(SpellManager.Spells[SpellSlot.R].IsReady() ? Color.Cyan : Color.OrangeRed, SpellManager.Spells[SpellSlot.R].Range, Player.Instance.Position);
+                Circle.Draw(SpellManager.Spells[SpellSlot.R].IsReady() ? SharpDX.Color.Cyan : SharpDX.Color.OrangeRed,
+                    SpellManager.Spells[SpellSlot.R].Range, Player.Instance.Position);
             }
-
         }
-        
+
         private static void Game_OnUpdate(EventArgs args)
         {
             Orbwalker.ForcedTarget = null;
             Queuer.tiamat =
                 ObjectManager.Player.InventoryItems.FirstOrDefault(
                     a => a.Id == ItemId.Tiamat_Melee_Only || a.Id == ItemId.Ravenous_Hydra_Melee_Only);
-            Indicator.Update("Combo", new SpellData((int) DamageHandler.ComboDamage(), DamageType.Physical, System.Drawing.Color.Aqua));
-            
+            Indicator.Update("Combo", new SpellData((int) DamageHandler.ComboDamage(), DamageType.Physical, Color.Aqua));
+
             if (BurstActive)
             {
                 States.Burst();
@@ -144,14 +148,14 @@ namespace RivenBuddy
             {
                 States.Harass();
             }
-            if(Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.JungleClear))
+            if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.JungleClear))
             {
                 States.Jungle();
             }
             if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear))
             {
                 var target = EntityManager.GetJungleMonsters(Player.Instance.Position.To2D(),
-                   SpellManager.Spells[SpellSlot.Q].Range + 300).OrderByDescending(a => a.MaxHealth).FirstOrDefault();
+                    SpellManager.Spells[SpellSlot.Q].Range + 300).OrderByDescending(a => a.MaxHealth).FirstOrDefault();
                 if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.JungleClear) && target == null)
                 {
                     States.WaveClear();

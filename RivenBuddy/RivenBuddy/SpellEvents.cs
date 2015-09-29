@@ -14,9 +14,7 @@ namespace RivenBuddy
         public static int PassiveStacks;
         public static bool HasR;
         public static bool HasR2;
-        public static bool Cancel;
         public static bool FastQ;
-        public static bool CanCastAnimation;
 
         public static void Init()
         {
@@ -40,7 +38,7 @@ namespace RivenBuddy
             {
                 return;
             }
-            int t = 0;
+            var t = 0;
             switch (args.Animation)
             {
                 case "Spell1a":
@@ -68,11 +66,9 @@ namespace RivenBuddy
                     break;
             }
             if (t != 0)
-            if (t != 0)
             {
                 Core.DelayAction(CancelAnimation, t - Game.Ping);
             }
-
         }
 
         private static void Obj_AI_Base_OnSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
@@ -129,7 +125,8 @@ namespace RivenBuddy
                 return;
             }
 
-            if (HasR && LastCast["R1"] + 15000 < Environment.TickCount) {
+            if (HasR && LastCast["R1"] + 15000 < Environment.TickCount)
+            {
                 HasR = false; // Reset R
                 HasR2 = false; // Reset R2
             }
@@ -152,7 +149,7 @@ namespace RivenBuddy
                     break;
 
                 case "riventricleave": //Q
-                    
+
                     LastCast["Q"] = Environment.TickCount;
                     Queuer.Remove("Q");
                     if (PassiveStacks <= 2) PassiveStacks++;

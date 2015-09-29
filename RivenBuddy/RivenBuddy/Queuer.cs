@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using EloBuddy;
 using EloBuddy.SDK;
 using EloBuddy.SDK.Enumerations;
@@ -10,7 +8,7 @@ using SharpDX;
 
 namespace RivenBuddy
 {
-    class Queuer
+    internal class Queuer
     {
         public static List<string> Queue = new List<string>();
         public static InventorySlot tiamat;
@@ -35,8 +33,8 @@ namespace RivenBuddy
         {
             if (Orbwalker.IsAutoAttacking || SpellEvents.FastQ) return;
 
-            SpellSlot spellSlot = SpellSlot.Unknown;
-            bool isR2 = false;
+            var spellSlot = SpellSlot.Unknown;
+            var isR2 = false;
             switch (s)
             {
                 case "AA":
@@ -91,9 +89,9 @@ namespace RivenBuddy
                 case SpellSlot.R:
                     if (isR2 && target.IsValidTarget())
                     {
-                        var r2 = new Spell.Skillshot(spellSlot, 900, SkillShotType.Cone, 250, 1200, (int)(45 * 0.5));
+                        var r2 = new Spell.Skillshot(spellSlot, 900, SkillShotType.Cone, 250, 1200, (int) (45*0.5));
                         var pred = r2.GetPrediction(target);
-                        if(pred.UnitPosition.Distance(ObjectManager.Player) < 900) r2.Cast(pred.CastPosition);
+                        if (pred.UnitPosition.Distance(ObjectManager.Player) < 900) r2.Cast(pred.CastPosition);
                     }
                     else
                     {
@@ -101,7 +99,6 @@ namespace RivenBuddy
                     }
                     break;
             }
-
         }
 
         public static void CastFlash(Vector3 position)
