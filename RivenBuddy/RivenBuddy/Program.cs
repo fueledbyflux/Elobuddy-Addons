@@ -51,8 +51,18 @@ namespace RivenBuddy
             ComboMenu.Add("combo.useR", new CheckBox("Use R"));
             ComboMenu.Add("combo.useR2", new CheckBox("Use R2"));
             ComboMenu.Add("useR", new KeyBind("Force R", false, KeyBind.BindTypes.PressToggle, 'T'));
+            ComboMenu.AddLabel("R1 Combos");
+            ComboMenu.Add("combo.eR1", new CheckBox("E -> R1"));
+            ComboMenu.Add("combo.R1", new CheckBox("R1"));
+            ComboMenu.AddLabel("R2 Combos");
+            ComboMenu.Add("combo.eR2", new CheckBox("E -> R2"));
+            ComboMenu.Add("combo.qR2", new CheckBox("R2 -> Q"));
+            ComboMenu.Add("combo.R2", new CheckBox("R2"));
             ComboMenu.AddGroupLabel("Burst Combo");
             ComboMenu.Add("burst", new KeyBind("Burst", false, KeyBind.BindTypes.HoldActive, 'Y'));
+            ComboMenu.AddGroupLabel("Misc");
+            ComboMenu.Add("combo.keepQAlive", new CheckBox("Keep Q Alive"));
+            ComboMenu.Add("combo.useRBeforeExpire", new CheckBox("Use R Before Expire"));
 
             HarassMenu = Menu.AddSubMenu("Harass Settings", "harasssettingsRiven");
             HarassMenu.AddGroupLabel("Harass Settings");

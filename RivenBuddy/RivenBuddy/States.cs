@@ -121,13 +121,13 @@ namespace RivenBuddy
                  Player.Instance.CalculateDamageOnUnit(target, DamageType.Physical,
                      (int) DamageHandler.RDamage(target, comboDmg)) >= target.Health && !SpellEvents.HasR))
             {
-                if (SpellManager.Spells[SpellSlot.E].IsReady() && SpellManager.Spells[SpellSlot.R].IsReady())
+                if (Program.ComboMenu["combo.eR1"].Cast<CheckBox>().CurrentValue && SpellManager.Spells[SpellSlot.E].IsReady() && SpellManager.Spells[SpellSlot.R].IsReady())
                 {
                     Queuer.Queue.Add("E");
                     Queuer.Queue.Add("R1");
                     return;
                 }
-                if (SpellManager.Spells[SpellSlot.R].IsReady())
+                if (Program.ComboMenu["combo.R1"].Cast<CheckBox>().CurrentValue && SpellManager.Spells[SpellSlot.R].IsReady())
                 {
                     Queuer.Queue.Add("R1");
                     return;
@@ -139,19 +139,19 @@ namespace RivenBuddy
                     (int) DamageHandler.RDamage(target)) >= target.Health && SpellEvents.HasR2 &&
                 Program.ComboMenu["combo.useR2"].Cast<CheckBox>().CurrentValue)
             {
-                if (SpellManager.Spells[SpellSlot.E].IsReady() && SpellManager.Spells[SpellSlot.R].IsReady())
+                if (Program.ComboMenu["combo.eR2"].Cast<CheckBox>().CurrentValue && SpellManager.Spells[SpellSlot.E].IsReady() && SpellManager.Spells[SpellSlot.R].IsReady())
                 {
                     Queuer.Queue.Add("E");
                     Queuer.Queue.Add("R2");
                     return;
                 }
-                if (SpellManager.Spells[SpellSlot.R].IsReady() && SpellManager.Spells[SpellSlot.Q].IsReady())
+                if (Program.ComboMenu["combo.qR2"].Cast<CheckBox>().CurrentValue && SpellManager.Spells[SpellSlot.R].IsReady() && SpellManager.Spells[SpellSlot.Q].IsReady())
                 {
                     Queuer.Queue.Add("R2");
                     Queuer.Queue.Add("Q");
                     return;
                 }
-                if (SpellManager.Spells[SpellSlot.R].IsReady())
+                if (Program.ComboMenu["combo.R2"].Cast<CheckBox>().CurrentValue && SpellManager.Spells[SpellSlot.R].IsReady())
                 {
                     Queuer.Queue.Add("R2");
                     return;

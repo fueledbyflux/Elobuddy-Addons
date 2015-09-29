@@ -4,6 +4,8 @@ using System.Linq;
 using EloBuddy;
 using EloBuddy.SDK;
 using EloBuddy.SDK.Constants;
+using EloBuddy.SDK.Enumerations;
+using EloBuddy.SDK.Menu.Values;
 
 namespace RivenBuddy
 {
@@ -115,6 +117,25 @@ namespace RivenBuddy
 
         public static void UpdateSpells()
         {
+            if (LastCast["Q"] + 4900 < Environment.TickCount && Program.ComboMenu["combo.keepQAlive"].Cast<CheckBox>().CurrentValue)
+            {
+                SpellManager.Spells[SpellSlot.Q].Cast(Game.CursorPos);
+            }
+
+            if (HasR && LastCast["R1"] + 14800 < Environment.TickCount && Program.ComboMenu["combo.useRBeforeExpire"].Cast<CheckBox>().CurrentValue)
+            {
+                foreach (var target in HeroManager.Enemies)
+                {
+                    var r2 = new Spell.Skillshot(SpellSlot.R, 900, SkillShotType.Cone, 250, 1200, 45);
+                    var pred = r2.GetPrediction(target);
+                    if (pred.UnitPosition.Distance(ObjectManager.Player) < 900 && pred.HitChance >= HitChance.Medium)
+                    {
+                        r2.Cast(pred.CastPosition);
+                        break;
+                    }
+                }
+            }
+
             if (LastCast["Q"] + 1000 < Environment.TickCount && Orbwalker.DisableMovement)
                 Orbwalker.DisableMovement = false;
 
