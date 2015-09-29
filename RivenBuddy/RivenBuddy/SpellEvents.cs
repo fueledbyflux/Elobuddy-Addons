@@ -117,9 +117,11 @@ namespace RivenBuddy
 
         public static void UpdateSpells()
         {
-            if (LastCast["Q"] + 4900 < Environment.TickCount && Program.ComboMenu["combo.keepQAlive"].Cast<CheckBox>().CurrentValue)
+            Chat.Print(LastCast["Q"] + 3450 < Environment.TickCount);
+            if (LastCast["Q"] + 3450 < Environment.TickCount && Program.ComboMenu["combo.keepQAlive"].Cast<CheckBox>().CurrentValue && QCount != 0)
             {
-                SpellManager.Spells[SpellSlot.Q].Cast(Game.CursorPos);
+                Chat.Print("casted");
+                Player.CastSpell(SpellSlot.Q, Game.CursorPos);
             }
 
             if (HasR && LastCast["R1"] + 14800 < Environment.TickCount && Program.ComboMenu["combo.useRBeforeExpire"].Cast<CheckBox>().CurrentValue)
@@ -151,8 +153,8 @@ namespace RivenBuddy
                 HasR = false; // Reset R
                 HasR2 = false; // Reset R2
             }
-            if (QCount != 0 && LastCast["Q"] + 5000 < Environment.TickCount) PassiveStacks = 0; // Reset Passive
-            if (PassiveStacks != 0 && LastCast["PAS"] + 4000 < Environment.TickCount) QCount = 0; // Reset Passive
+            if (PassiveStacks != 0 && LastCast["PAS"] + 4000 < Environment.TickCount) PassiveStacks = 0; // Reset Passive
+            if (QCount != 0 && LastCast["Q"] + 3500 < Environment.TickCount) QCount = 0; // Reset Passive
         }
 
         private static void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)

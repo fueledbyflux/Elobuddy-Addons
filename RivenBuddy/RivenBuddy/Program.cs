@@ -42,7 +42,6 @@ namespace RivenBuddy
             Menu.AddLabel("By Fluxy");
             Menu.AddLabel("nixi waz here");
 
-
             ComboMenu = Menu.AddSubMenu("Combo Settings", "combosettingsRiven");
             ComboMenu.AddGroupLabel("Combo Settings");
             ComboMenu.Add("combo.useQ", new CheckBox("Use Q"));
