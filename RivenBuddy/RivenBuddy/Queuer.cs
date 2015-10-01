@@ -89,9 +89,9 @@ namespace RivenBuddy
                 case SpellSlot.R:
                     if (isR2 && target.IsValidTarget())
                     {
-                        var r2 = new Spell.Skillshot(spellSlot, 900, SkillShotType.Cone, 250, 1200, 45);
-                        var pred = r2.GetPrediction(target);
-                        if (pred.UnitPosition.Distance(ObjectManager.Player) < 900 && pred.HitChance >= HitChance.Medium) r2.Cast(pred.CastPosition);
+                        var r2 = new Spell.Skillshot(SpellSlot.R, 900, SkillShotType.Cone, 250, 1600, 125)
+                        { MinimumHitChance = HitChance.Medium };
+                        r2.Cast(target);
                     }
                     else
                     {

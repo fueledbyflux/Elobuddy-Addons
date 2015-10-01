@@ -210,7 +210,7 @@ namespace RivenBuddy
                 return;
             }
             if (Program.ComboMenu["combo.useQ"].Cast<CheckBox>().CurrentValue &&
-                SpellManager.Spells[SpellSlot.Q].IsReady())
+                SpellManager.Spells[SpellSlot.Q].IsReady() && Orbwalker.CanAutoAttack)
             {
                 if (SpellManager.Spells[SpellSlot.Q].IsInRange(target))
                 {
@@ -306,7 +306,7 @@ namespace RivenBuddy
                 return;
             }
             if (Program.HarassMenu["harass.useQ"].Cast<CheckBox>().CurrentValue &&
-                SpellManager.Spells[SpellSlot.Q].IsReady())
+                SpellManager.Spells[SpellSlot.Q].IsReady() && Orbwalker.CanAutoAttack)
             {
                 if (SpellManager.Spells[SpellSlot.Q].IsInRange(target))
                 {
@@ -381,7 +381,7 @@ namespace RivenBuddy
             if (Program.MinionClear["waveclear.useQ"].Cast<CheckBox>().CurrentValue &&
                 Player.Instance.GetSpellDamage(target, SpellSlot.Q) + Player.Instance.GetAutoAttackDamage(target) >
                 target.Health && SpellManager.Spells[SpellSlot.Q].IsReady() &&
-                SpellManager.Spells[SpellSlot.Q].IsInRange(target))
+                SpellManager.Spells[SpellSlot.Q].IsInRange(target) && Orbwalker.CanAutoAttack)
             {
                 Queuer.Queue.Add("AA");
                 Queuer.Queue.Add("Q");
@@ -435,7 +435,7 @@ namespace RivenBuddy
             if (Program.MinionClear["lasthit.useQ"].Cast<CheckBox>().CurrentValue &&
                 Player.Instance.GetSpellDamage(target, SpellSlot.Q) + Player.Instance.GetAutoAttackDamage(target) >
                 target.Health && SpellManager.Spells[SpellSlot.Q].IsReady() &&
-                SpellManager.Spells[SpellSlot.Q].IsInRange(target))
+                SpellManager.Spells[SpellSlot.Q].IsInRange(target) && Orbwalker.CanAutoAttack)
             {
                 Queuer.Queue.Add("AA");
                 Queuer.Queue.Add("Q");
@@ -473,7 +473,7 @@ namespace RivenBuddy
             }
 
             if (Program.Jungle["jungle.useQ"].Cast<CheckBox>().CurrentValue &&
-                SpellManager.Spells[SpellSlot.Q].IsReady() && SpellManager.Spells[SpellSlot.Q].IsInRange(target))
+                SpellManager.Spells[SpellSlot.Q].IsReady() && SpellManager.Spells[SpellSlot.Q].IsInRange(target) && Orbwalker.CanAutoAttack)
             {
                 for (var i = 0; i < 3 - SpellEvents.QCount; i++)
                 {
