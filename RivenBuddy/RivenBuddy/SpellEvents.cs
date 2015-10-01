@@ -16,7 +16,6 @@ namespace RivenBuddy
         public static int PassiveStacks;
         public static bool HasR;
         public static bool HasR2;
-        public static bool FastQ;
 
         public static void Init()
         {
@@ -81,6 +80,15 @@ namespace RivenBuddy
                 Queuer.Remove("AA");
                 if (Queuer.Queue.Any() && Queuer.Queue[0] == "Q")
                 {
+                    var target = args.Target as Obj_AI_Base;
+                    if (target != null && (SpellManager.Spells[SpellSlot.R].IsReady() &&
+                    Player.Instance.CalculateDamageOnUnit(target, DamageType.Physical,
+                    (int) DamageHandler.RDamage(target)) >= target.Health && SpellEvents.HasR2 &&
+                    Program.ComboMenu["combo.useR2"].Cast<CheckBox>().CurrentValue))
+                    {
+                        Queuer.Queue = new List<string>();
+                        return;
+                    }
                     Player.CastSpell(SpellSlot.Q, args.Target.Position);
                     Queuer.Remove("Q");
                     Orbwalker.ResetAutoAttack();
@@ -117,7 +125,7 @@ namespace RivenBuddy
                 Orbwalker.DisableMovement = false;
 
             if ((Queuer.Queue.Any() && Queuer.Queue[0] == "Q" || Queuer.Queue.Count > 1 && Queuer.Queue[1] == "Q" && Orbwalker.CanAutoAttack) &&
-                (Player.GetSpell(SpellSlot.Q).IsReady || Player.GetSpell(SpellSlot.Q).Cooldown <= 0.25))
+                (Player.GetSpell(SpellSlot.Q).IsReady || Player.GetSpell(SpellSlot.Q).Cooldown <= 0.25) && QCount > 0 && States.Target != null && States.Target.IsValidTarget())
             {
                 Orbwalker.ResetAutoAttack();
                 Orbwalker.DisableMovement = true;

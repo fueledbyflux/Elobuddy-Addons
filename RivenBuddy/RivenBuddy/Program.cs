@@ -17,7 +17,6 @@ namespace RivenBuddy
     {
         public static Menu Menu, ComboMenu, HarassMenu, MinionClear, Jungle, DrawMenu;
         public static bool checkAA = false;
-        public static bool FastQ;
         public static Text text = new Text("", new Font(FontFamily.GenericSansSerif, 9));
         public static DamageIndicator.DamageIndicator Indicator;
         public static Spell.Skillshot R2;
@@ -50,6 +49,7 @@ namespace RivenBuddy
             ComboMenu = Menu.AddSubMenu("Combo Settings", "combosettingsRiven");
             ComboMenu.AddGroupLabel("Combo Settings");
             ComboMenu.Add("combo.useQ", new CheckBox("Use Q"));
+            ComboMenu.Add("combo.useQGapClose", new CheckBox("Use Q to Gapclose", false));
             ComboMenu.Add("combo.useW", new CheckBox("Use W"));
             ComboMenu.Add("combo.useE", new CheckBox("Use E"));
             ComboMenu.Add("combo.useR", new CheckBox("Use R"));
@@ -101,8 +101,7 @@ namespace RivenBuddy
             Indicator = new DamageIndicator.DamageIndicator();
             Indicator.Add("Combo", new SpellData(0, DamageType.True, Color.Aqua));
 
-            R2 = new Spell.Skillshot(SpellSlot.R, 900, SkillShotType.Cone, 250, 1600, 45)
-            { MinimumHitChance = HitChance.Medium };
+            R2 = new Spell.Skillshot(SpellSlot.R, 900, SkillShotType.Cone, 250, 1600, 125);
 
             TargetSelector2.Init();
             SpellEvents.Init();

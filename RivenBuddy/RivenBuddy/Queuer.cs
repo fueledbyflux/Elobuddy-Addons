@@ -31,7 +31,7 @@ namespace RivenBuddy
 
         private static void DoTask(string s, Obj_AI_Base target)
         {
-            if (Orbwalker.IsAutoAttacking || SpellEvents.FastQ) return;
+            if (Orbwalker.IsAutoAttacking) return;
 
             var spellSlot = SpellSlot.Unknown;
             var isR2 = false;
@@ -39,6 +39,7 @@ namespace RivenBuddy
             {
                 case "AA":
                     Orbwalker.ResetAutoAttack();
+                    Player.IssueOrder(GameObjectOrder.AttackUnit, target);
                     return;
                 case "Q":
                     spellSlot = SpellSlot.Q;

@@ -115,7 +115,7 @@ namespace RivenBuddy
                  comboDmg < target.Health &&
                  comboDmg +
                  Player.Instance.CalculateDamageOnUnit(target, DamageType.Physical,
-                     (int) DamageHandler.RDamage(target, comboDmg)) >= target.Health && !SpellEvents.HasR))
+                     (int) DamageHandler.RDamage(target, comboDmg)) >= target.Health) && !SpellEvents.HasR)
             {
                 if (Program.ComboMenu["combo.eR1"].Cast<CheckBox>().CurrentValue && SpellManager.Spells[SpellSlot.E].IsReady() && SpellManager.Spells[SpellSlot.R].IsReady())
                 {
@@ -216,9 +216,14 @@ namespace RivenBuddy
                         Queuer.Queue.Add("Q");
                     }
                     Queuer.Queue.Add("AA");
-                    Program.FastQ = true;
                     return;
                 }
+            }
+            if (!target.IsValidTarget(Player.Instance.GetAutoAttackRange(target)) &&
+                target.IsValidTarget(Player.Instance.GetAutoAttackRange(target) + SpellManager.Spells[SpellSlot.Q].Range) && Program.ComboMenu["combo.useQGapClose"].Cast<CheckBox>().CurrentValue)
+            {
+                Queuer.Queue.Add("Q");
+                return;
             }
             if (SpellManager.Spells[SpellSlot.W].IsReady() && SpellManager.Spells[SpellSlot.W].inRange(target))
             {
@@ -312,7 +317,6 @@ namespace RivenBuddy
                         Queuer.Queue.Add("Q");
                     }
                     Queuer.Queue.Add("AA");
-                    Program.FastQ = true;
                     return;
                 }
             }
@@ -477,7 +481,6 @@ namespace RivenBuddy
                     Queuer.Queue.Add("Q");
                 }
                 Queuer.Queue.Add("AA");
-                Program.FastQ = true;
                 return;
             }
 
