@@ -12,7 +12,7 @@ namespace RivenBuddy
 
         public static void Burst()
         {
-            var target = TargetSelector2.GetTarget(750, DamageType.Physical);
+            var target = TargetSelector2.GetTarget(SpellManager.Spells[SpellSlot.E].Range + SpellManager.Spells[SpellSlot.W].Range + 400, DamageType.Physical);
 
             Orbwalker.ForcedTarget = target;
             Orbwalker.OrbwalkTo(Game.CursorPos);
@@ -33,8 +33,6 @@ namespace RivenBuddy
                 Queuer.DoQueue(target);
                 return;
             }
-
-
             if (SpellManager.Spells[SpellSlot.Q].IsReady() &&
                 SpellManager.Spells[SpellSlot.W].IsReady() &&
                 SpellManager.Spells[SpellSlot.E].IsReady() &&

@@ -79,24 +79,7 @@ namespace RivenBuddy
             if (args.SData.IsAutoAttack())
             {
                 Queuer.Remove("AA");
-                if ((Player.GetSpell(SpellSlot.Q).IsReady || Player.GetSpell(SpellSlot.Q).Cooldown <= 0.25) && FastQ)
-                {
-                    Player.CastSpell(SpellSlot.Q, args.Target.Position);
-                    Orbwalker.ResetAutoAttack();
-                    if (QCount == 0) QCount = 1;
-                    if (QCount == 2 || QCount == 0)
-                    {
-                        FastQ = false;
-                        Orbwalker.DisableMovement = false;
-                    }
-                    else
-                    {
-                        FastQ = true;
-                        Orbwalker.DisableMovement = true;
-                    }
-                    return;
-                }
-                if (!FastQ && Queuer.Queue.Any() && Queuer.Queue[0] == "Q")
+                if (Queuer.Queue.Any() && Queuer.Queue[0] == "Q")
                 {
                     Player.CastSpell(SpellSlot.Q, args.Target.Position);
                     Queuer.Remove("Q");
@@ -122,28 +105,26 @@ namespace RivenBuddy
                 Player.CastSpell(SpellSlot.Q, Game.CursorPos);
             }
 
-            if (HasR && LastCast["R1"] + 14800 < Environment.TickCount && Program.ComboMenu["combo.useRBeforeExpire"].Cast<CheckBox>().CurrentValue)
+            if (HasR2 && LastCast["R1"] + 14800 < Environment.TickCount && Program.ComboMenu["combo.useRBeforeExpire"].Cast<CheckBox>().CurrentValue)
             {
-                foreach (var target in HeroManager.Enemies)
+                foreach (var target in HeroManager.Enemies.Where(a => a.Distance(Player.Instance) < 1000))
                 {
-                    var r2 = new Spell.Skillshot(SpellSlot.R, 900, SkillShotType.Cone, 250, 1200, 45);
-                    var pred = r2.GetPrediction(target);
-                    if (pred.UnitPosition.Distance(ObjectManager.Player) < 900 && pred.HitChance >= HitChance.Medium)
-                    {
-                        r2.Cast(pred.CastPosition);
-                        break;
-                    }
+                    Program.R2.Cast(target);
                 }
             }
 
             if (LastCast["Q"] + 1000 < Environment.TickCount && Orbwalker.DisableMovement)
                 Orbwalker.DisableMovement = false;
 
-            if (FastQ)
+            if ((Queuer.Queue.Any() && Queuer.Queue[0] == "Q" || Queuer.Queue.Count > 1 && Queuer.Queue[1] == "Q" && Orbwalker.CanAutoAttack) &&
+                (Player.GetSpell(SpellSlot.Q).IsReady || Player.GetSpell(SpellSlot.Q).Cooldown <= 0.25))
             {
                 Orbwalker.ResetAutoAttack();
                 Orbwalker.DisableMovement = true;
-                return;
+            }
+            else
+            {
+                Orbwalker.DisableMovement = false;
             }
 
             if (HasR && LastCast["R1"] + 15000 < Environment.TickCount)
@@ -198,7 +179,7 @@ namespace RivenBuddy
                 case "rivenfengshuiengine": //R1
                     LastCast["R1"] = Environment.TickCount;
                     if (PassiveStacks <= 2) PassiveStacks++;
-                    Queuer.Remove("R");
+                    Queuer.Remove("R1");
                     HasR = true;
                     HasR2 = true;
                     break;

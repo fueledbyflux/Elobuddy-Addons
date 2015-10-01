@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using EloBuddy;
@@ -38,6 +39,8 @@ namespace RivenBuddy
 
         private static void Loading_OnLoadingComplete(EventArgs args)
         {
+            if (Player.Instance.ChampionName != Champion.Riven.ToString()) return;
+
             Menu = MainMenu.AddMenu("RivenBuddy", "rivenbuddy");
             Menu.AddGroupLabel("Riven Buddy");
             Menu.AddSeparator();
@@ -98,7 +101,7 @@ namespace RivenBuddy
             Indicator = new DamageIndicator.DamageIndicator();
             Indicator.Add("Combo", new SpellData(0, DamageType.True, Color.Aqua));
 
-            R2 = new Spell.Skillshot(SpellSlot.R, 900, SkillShotType.Linear, 250, 1600, 70)
+            R2 = new Spell.Skillshot(SpellSlot.R, 900, SkillShotType.Cone, 250, 1600, 45)
             { MinimumHitChance = HitChance.Medium };
 
             TargetSelector2.Init();
@@ -179,6 +182,10 @@ namespace RivenBuddy
             if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LastHit))
             {
                 States.LastHit();
+            }
+            if (Orbwalker.ActiveModesFlags == Orbwalker.ActiveModes.None && !BurstActive)
+            {
+                Queuer.Queue = new List<string>();
             }
         }
     }

@@ -88,11 +88,11 @@ namespace RivenBuddy
                     Player.CastSpell(SpellSlot.E, target.Position);
                     break;
                 case SpellSlot.R:
-                    if (isR2 && target.IsValidTarget())
+                    if (isR2 && target.IsValidTarget() && SpellEvents.HasR2)
                     {
                         Program.R2.Cast(target);
                     }
-                    else
+                    else if(!SpellEvents.HasR)
                     {
                         SpellManager.Spells[SpellSlot.R].Cast();
                     }
