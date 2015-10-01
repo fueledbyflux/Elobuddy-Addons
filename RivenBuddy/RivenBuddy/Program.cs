@@ -98,7 +98,7 @@ namespace RivenBuddy
             Indicator = new DamageIndicator.DamageIndicator();
             Indicator.Add("Combo", new SpellData(0, DamageType.True, Color.Aqua));
 
-            R2 = new Spell.Skillshot(SpellSlot.R, 900, SkillShotType.Cone, 250, 1600, 125)
+            R2 = new Spell.Skillshot(SpellSlot.R, 900, SkillShotType.Linear, 250, 1600, 70)
             { MinimumHitChance = HitChance.Medium };
 
             TargetSelector2.Init();
