@@ -77,10 +77,11 @@ namespace RivenBuddy
             {
                 case SpellSlot.Q:
                     if (target == null) break;
-                    ObjectManager.Player.Spellbook.CastSpell(SpellSlot.Q, target.ServerPosition);
+                    Player.CastSpell(SpellSlot.Q, target.ServerPosition);
                     break;
                 case SpellSlot.W:
-                    if(target.IsValidTarget(SpellManager.Spells[SpellSlot.W].Range)) ObjectManager.Player.Spellbook.CastSpell(SpellSlot.W);
+                    if(target.IsValidTarget(SpellManager.Spells[SpellSlot.W].Range))
+                        Player.CastSpell(SpellSlot.W);
                     break;
                 case SpellSlot.E:
                     if (target == null) break;
@@ -89,9 +90,7 @@ namespace RivenBuddy
                 case SpellSlot.R:
                     if (isR2 && target.IsValidTarget())
                     {
-                        var r2 = new Spell.Skillshot(SpellSlot.R, 900, SkillShotType.Cone, 250, 1600, 125)
-                        { MinimumHitChance = HitChance.Medium };
-                        r2.Cast(target);
+                        Program.R2.Cast(target);
                     }
                     else
                     {

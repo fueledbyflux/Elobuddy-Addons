@@ -107,9 +107,6 @@ namespace RivenBuddy
                 Queuer.Queue.Add("Q");
                 Queuer.Queue.Add("AA");
                 Queuer.Queue.Add("Q");
-                Queuer.Queue.Add("R2");
-                Queuer.Queue.Add("Q");
-                Queuer.Queue.Add("AA");
                 return;
             }
 

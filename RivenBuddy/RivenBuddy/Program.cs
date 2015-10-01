@@ -3,6 +3,7 @@ using System.Drawing;
 using System.Linq;
 using EloBuddy;
 using EloBuddy.SDK;
+using EloBuddy.SDK.Enumerations;
 using EloBuddy.SDK.Events;
 using EloBuddy.SDK.Menu;
 using EloBuddy.SDK.Menu.Values;
@@ -18,6 +19,7 @@ namespace RivenBuddy
         public static bool FastQ;
         public static Text text = new Text("", new Font(FontFamily.GenericSansSerif, 9));
         public static DamageIndicator.DamageIndicator Indicator;
+        public static Spell.Skillshot R2;
 
         public static bool IsRActive
         {
@@ -96,6 +98,9 @@ namespace RivenBuddy
             Indicator = new DamageIndicator.DamageIndicator();
             Indicator.Add("Combo", new SpellData(0, DamageType.True, Color.Aqua));
 
+            R2 = new Spell.Skillshot(SpellSlot.R, 900, SkillShotType.Cone, 250, 1600, 125)
+            { MinimumHitChance = HitChance.Medium };
+
             TargetSelector2.Init();
             SpellEvents.Init();
             Game.OnUpdate += Game_OnUpdate;
@@ -143,6 +148,7 @@ namespace RivenBuddy
             Queuer.tiamat =
                 ObjectManager.Player.InventoryItems.FirstOrDefault(
                     a => a.Id == ItemId.Tiamat_Melee_Only || a.Id == ItemId.Ravenous_Hydra_Melee_Only);
+
             Indicator.Update("Combo", new SpellData((int) DamageHandler.ComboDamage(), DamageType.Physical, Color.Aqua));
 
             if (BurstActive)
