@@ -89,7 +89,8 @@ namespace RivenBuddy
                 SpellManager.Spells[SpellSlot.W].IsReady() &&
                 SpellManager.Spells[SpellSlot.E].IsReady() &&
                 SpellManager.Spells[SpellSlot.R].IsReady() &&
-                SpellEvents.QCount == 0
+                SpellEvents.QCount == 0 &&
+                !SpellEvents.HasR2
                 &&
                 (Program.IsRActive ||
                  target.IsValidTarget(SpellManager.Spells[SpellSlot.E].Range + SpellManager.Spells[SpellSlot.W].Range)
