@@ -57,7 +57,7 @@ namespace JinxBuddy
             var selectedUnit = target as AIHeroClient;
             if (selectedUnit != null)
             {
-                if (selectedUnit.CountEnemiesInRange(AoeRadius) > 2 || _Player.GetAutoAttackDamage(selectedUnit) * 1.1 >= target.Health + target.AttackShield && _Player.GetAutoAttackDamage(selectedUnit) < target.Health + target.AttackShield)
+                if (selectedUnit.CountEnemiesInRange(AoeRadius) > 2 && Program.ComboMenu["useQSplash"].Cast<CheckBox>().CurrentValue)
                 {
                     if (!FishBonesActive)
                     {
@@ -67,7 +67,7 @@ namespace JinxBuddy
                 }
                 else
                 {
-                    if (FishBonesActive && target.Distance(_Player) < MinigunRange(selectedUnit) + target.BoundingRadius)
+                    if (FishBonesActive && target.Distance(_Player) < MinigunRange(selectedUnit) + target.BoundingRadius && Program.ComboMenu["useQRange"].Cast<CheckBox>().CurrentValue)
                     {
                         Program.Spells[SpellSlot.Q].Cast();
                         _lastChange = Environment.TickCount;
@@ -85,7 +85,7 @@ namespace JinxBuddy
                                 a =>
                                     a.Health < _Player.GetAutoAttackDamage(a) * 1.1 && a.Distance(target) < AoeRadius &&
                                     a.IsValidTarget());
-                    if (FishBonesActive && count < 2 && target.Distance(_Player) < MinigunRange(minion))
+                    if (FishBonesActive && (count < 2 || minion.Health <= Player.Instance.GetAutoAttackDamage(minion)) && target.Distance(_Player) < MinigunRange(minion))
                     {
                         Program.Spells[SpellSlot.Q].Cast();
                         _lastChange = Environment.TickCount;

@@ -23,7 +23,7 @@ namespace JinxBuddy
         public static Dictionary<SpellSlot, Spell.SpellBase> Spells = new Dictionary<SpellSlot, Spell.SpellBase>()
         {
             {SpellSlot.Q, new Spell.Active(SpellSlot.Q)},
-            {SpellSlot.W, new Spell.Skillshot(SpellSlot.W, 1450, SkillShotType.Linear, 600, 3300, 240)},
+            {SpellSlot.W, new Spell.Skillshot(SpellSlot.W, 1450, SkillShotType.Linear, 600, 3300, 120) {MinimumHitChance = HitChance.Medium} },
             {SpellSlot.E, new Spell.Skillshot(SpellSlot.E, 900, SkillShotType.Circular, 1200, 1750, 1)},
             {SpellSlot.R, new Spell.Skillshot(SpellSlot.R, 3000, SkillShotType.Linear, 600, 1700, 140)}
         };
@@ -71,6 +71,8 @@ namespace JinxBuddy
             ComboMenu.AddGroupLabel("Combo Settings");
             ComboMenu.AddSeparator();
             ComboMenu.Add("useQCombo", new CheckBox("Use Q"));
+            ComboMenu.Add("useQSplash", new CheckBox("Use Q Splash"));
+            ComboMenu.Add("useQRange", new CheckBox("Use Q Range"));
             ComboMenu.Add("useWCombo", new CheckBox("Use W"));
             ComboMenu.Add("useECombo", new CheckBox("Use E"));
             ComboMenu.Add("useRCombo", new CheckBox("Use R"));
@@ -158,7 +160,7 @@ namespace JinxBuddy
 
         public static void Combo()
         {
-            var target = TargetSelector.GetTarget(1550, DamageType.Physical);
+            var target = TargetSelector.GetTarget(1700, DamageType.Physical);
             var rtarget = TargetSelector.GetTarget(3000, DamageType.Physical);
 
 
@@ -166,13 +168,31 @@ namespace JinxBuddy
 
             if (Orbwalker.IsAutoAttacking) return;
 
-            if (ComboMenu["useRCombo"].Cast<CheckBox>().CurrentValue && Spells[SpellSlot.R].IsReady() && rtarget.Distance(_Player) > _Player.GetAutoAttackRange(rtarget) && rtarget.IsKillableByR() || Spells[SpellSlot.R].IsReady() && _Player.HealthPercent <= 30 && rtarget.IsKillableByR())
+            if (ComboMenu["useWCombo"].Cast<CheckBox>().CurrentValue && Spells[SpellSlot.W].IsReady())
+            {
+                if (SmartMode.CurrentValue)
+                {
+                    if (_Player.Mana > RMana + EMana)
+                    {
+                        Spells[SpellSlot.W].Cast(target);
+                        return;
+                    }
+                }
+                else
+                {
+                    Spells[SpellSlot.W].Cast(target);
+                    return;
+                }
+            }
+
+            if (ComboMenu["useRCombo"].Cast<CheckBox>().CurrentValue && Spells[SpellSlot.R].IsReady() && rtarget.Distance(_Player) > _Player.GetAutoAttackRange(rtarget) && rtarget.IsKillableByR())
             {
                 Spells[SpellSlot.R] = new Spell.Skillshot(SpellSlot.R, 2000, SkillShotType.Linear, 600, (int) UltimateHandler.UltSpeed(target.Position), 140);
                 Spells[SpellSlot.R].Cast(rtarget);
             }
 
-            if (ComboMenu["useECombo"].Cast<CheckBox>().CurrentValue && Spells[SpellSlot.E].IsReady() && target.HasBuffOfType(BuffType.Slow)
+            if (ComboMenu["useECombo"].Cast<CheckBox>().CurrentValue && Spells[SpellSlot.E].IsReady() 
+                && target.HasBuffOfType(BuffType.Slow)
                 || target.HasBuffOfType(BuffType.Stun)
                 || target.HasBuffOfType(BuffType.Snare)
                 || target.HasBuffOfType(BuffType.Suppression))
@@ -185,37 +205,20 @@ namespace JinxBuddy
                 var distance = target.Distance(_Player);
                 if (Events.FishBonesActive)
                 {
-                    if (distance < Events.MinigunRange(target) + target.BoundingRadius)
+                    if (distance < Events.MinigunRange(target) + target.BoundingRadius && ComboMenu["useQRange"].Cast<CheckBox>().CurrentValue)
                     {
                         Spells[SpellSlot.Q].Cast();
                     }
                 }
                 else
                 {
-                    if (distance > Events.MinigunRange(target) + target.BoundingRadius &&
-                        distance <= Events.MinigunRange(target) + Events.FishBonesBonus + target.BoundingRadius + 200)
+                    if (distance > Events.MinigunRange(target) + target.BoundingRadius && ComboMenu["useQRange"].Cast<CheckBox>().CurrentValue &&
+                        distance <= Events.MinigunRange(target) + Events.FishBonesBonus + target.BoundingRadius + 200 && ComboMenu["useQRange"].Cast<CheckBox>().CurrentValue)
                     {
                         Spells[SpellSlot.Q].Cast();
                     }
                 }
             }
-
-            if (ComboMenu["useWCombo"].Cast<CheckBox>().CurrentValue && Spells[SpellSlot.W].IsReady())
-            {
-                var pred = Prediction.Position.PredictLinearMissile(target, Spells[SpellSlot.W].Range, 60, 600, 3300, 0);
-                if (SmartMode.CurrentValue && pred.HitChance >= HitChance.High && !pred.CollisionObjects.Any())
-                {
-                    if (_Player.Mana > RMana + EMana)
-                    {
-                        Spells[SpellSlot.W].Cast(pred.CastPosition);
-                    }
-                }
-                else
-                {
-                    Spells[SpellSlot.W].Cast(pred.CastPosition);
-                }
-            }
-
         }
     }
 }
