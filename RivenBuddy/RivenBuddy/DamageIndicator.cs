@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using EloBuddy;
 using EloBuddy.SDK;
 using EloBuddy.SDK.Enumerations;
+using EloBuddy.SDK.Menu.Values;
 using EloBuddy.SDK.Rendering;
 using EloBuddy.SDK.Utils;
 using SharpDX;
@@ -100,6 +101,8 @@ namespace RivenBuddy
 
             private void Drawing_OnDraw(EventArgs args)
             {
+                if (!Program.DrawMenu["draw.Damage"].Cast<CheckBox>().CurrentValue) return;
+
                 foreach (var aiHeroClient in HeroManager.Enemies)
                 {
                     if (!aiHeroClient.IsHPBarRendered) continue;

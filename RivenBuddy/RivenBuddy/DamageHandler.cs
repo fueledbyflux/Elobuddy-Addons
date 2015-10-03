@@ -30,6 +30,11 @@ namespace RivenBuddy
             dmg += PassiveDamage()*passiveStacks;
             dmg += Player.Instance.TotalAttackDamage*passiveStacks;
 
+            if (dmg < 10)
+            {
+                return 3*Player.Instance.TotalAttackDamage;
+            }
+
             return dmg;
         }
 

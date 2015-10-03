@@ -227,8 +227,8 @@ namespace RivenBuddy
             }
             if (SpellManager.Spells[SpellSlot.W].IsReady() && SpellManager.Spells[SpellSlot.W].inRange(target))
             {
+                if(Program.ComboMenu["combo.hydra"].Cast<CheckBox>().CurrentValue) Queuer.Queue.Add("H");
                 Queuer.Queue.Add("W");
-                Queuer.Queue.Add("H");
                 return;
             }
             if (Program.ComboMenu["combo.useW"].Cast<CheckBox>().CurrentValue &&
@@ -238,8 +238,8 @@ namespace RivenBuddy
                                      SpellManager.Spells[SpellSlot.E].Range))
             {
                 Queuer.Queue.Add("E");
+                if (Program.ComboMenu["combo.hydra"].Cast<CheckBox>().CurrentValue) Queuer.Queue.Add("H");
                 Queuer.Queue.Add("W");
-                Queuer.Queue.Add("H");
                 return;
             }
             if (Program.ComboMenu["combo.useE"].Cast<CheckBox>().CurrentValue &&
@@ -323,6 +323,7 @@ namespace RivenBuddy
             if (Program.HarassMenu["harass.useW"].Cast<CheckBox>().CurrentValue &&
                 SpellManager.Spells[SpellSlot.W].IsReady() && SpellManager.Spells[SpellSlot.W].inRange(target))
             {
+                if(Program.HarassMenu["harass.hydra"].Cast<CheckBox>().CurrentValue) Queuer.Queue.Add("H");
                 Queuer.Queue.Add("W");
                 return;
             }
@@ -355,7 +356,7 @@ namespace RivenBuddy
 
             if (target == null)
             {
-                Target = target;
+                Target = null;
                 Queuer.Queue = new List<string>();
                 return;
             }
@@ -371,7 +372,6 @@ namespace RivenBuddy
             }
 
             if (Program.MinionClear["waveclear.useQ"].Cast<CheckBox>().CurrentValue &&
-                Player.Instance.GetSpellDamage(target, SpellSlot.Q) > target.Health &&
                 SpellManager.Spells[SpellSlot.Q].IsReady() && SpellManager.Spells[SpellSlot.Q].IsInRange(target))
             {
                 Queuer.Queue.Add("Q");
@@ -379,8 +379,6 @@ namespace RivenBuddy
             }
 
             if (Program.MinionClear["waveclear.useQ"].Cast<CheckBox>().CurrentValue &&
-                Player.Instance.GetSpellDamage(target, SpellSlot.Q) + Player.Instance.GetAutoAttackDamage(target) >
-                target.Health && SpellManager.Spells[SpellSlot.Q].IsReady() &&
                 SpellManager.Spells[SpellSlot.Q].IsInRange(target) && Orbwalker.CanAutoAttack)
             {
                 Queuer.Queue.Add("AA");
@@ -389,14 +387,13 @@ namespace RivenBuddy
             }
 
             if (Program.MinionClear["waveclear.useW"].Cast<CheckBox>().CurrentValue &&
-                Player.Instance.GetSpellDamage(target, SpellSlot.W) > target.Health &&
-                SpellManager.Spells[SpellSlot.W].IsReady() && SpellManager.Spells[SpellSlot.W].IsInRange(target))
+                SpellManager.Spells[SpellSlot.W].IsReady() && target.IsValidTarget(SpellManager.Spells[SpellSlot.W].Range))
             {
-                Queuer.Queue.Add("W");
+                SpellManager.Spells[SpellSlot.W].Cast();
                 return;
             }
-            if (Queuer.tiamat != null && Queuer.tiamat.CanUseItem() && target.IsValidTarget(300) &&
-                Player.Instance.GetItemDamage(target, ItemId.Ravenous_Hydra_Melee_Only) > target.Health)
+
+            if (Queuer.tiamat != null && Queuer.tiamat.CanUseItem() && target.IsValidTarget(300) && Program.MinionClear["waveclear.hydra"].Cast<CheckBox>().CurrentValue)
             {
                 Queuer.tiamat.Cast();
             }
@@ -444,7 +441,7 @@ namespace RivenBuddy
 
             if (Program.MinionClear["lasthit.useW"].Cast<CheckBox>().CurrentValue &&
                 Player.Instance.GetSpellDamage(target, SpellSlot.W) > target.Health &&
-                SpellManager.Spells[SpellSlot.W].IsReady() && SpellManager.Spells[SpellSlot.W].IsInRange(target))
+                SpellManager.Spells[SpellSlot.W].IsReady() && target.IsValidTarget(SpellManager.Spells[SpellSlot.W].Range))
             {
                 Queuer.Queue.Add("W");
             }
@@ -485,7 +482,7 @@ namespace RivenBuddy
             }
 
             if (Program.Jungle["jungle.useW"].Cast<CheckBox>().CurrentValue &&
-                SpellManager.Spells[SpellSlot.W].IsReady() && SpellManager.Spells[SpellSlot.W].IsInRange(target))
+                SpellManager.Spells[SpellSlot.W].IsReady() && target.IsValidTarget(SpellManager.Spells[SpellSlot.W].Range))
             {
                 Queuer.Queue.Add("W");
                 return;
@@ -497,8 +494,8 @@ namespace RivenBuddy
                 Queuer.Queue.Add("E");
                 return;
             }
-
-            if (Queuer.tiamat != null && target.IsValidTarget(300) && Queuer.tiamat.CanUseItem())
+            
+            if (Queuer.tiamat != null && target.IsValidTarget(300) && Queuer.tiamat.CanUseItem() && Program.Jungle["jungle.hydra"].Cast<CheckBox>().CurrentValue)
             {
                 Queuer.tiamat.Cast();
             }

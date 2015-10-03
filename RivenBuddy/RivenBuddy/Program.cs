@@ -17,7 +17,7 @@ namespace RivenBuddy
     {
         public static Menu Menu, ComboMenu, HarassMenu, MinionClear, Jungle, DrawMenu;
         public static bool checkAA = false;
-        public static Text text = new Text("", new Font(FontFamily.GenericSansSerif, 9));
+        public static Text text = new Text("", new Font(FontFamily.GenericSansSerif, 9, FontStyle.Bold));
         public static DamageIndicator.DamageIndicator Indicator;
         public static Spell.Skillshot R2;
 
@@ -54,6 +54,7 @@ namespace RivenBuddy
             ComboMenu.Add("combo.useE", new CheckBox("Use E"));
             ComboMenu.Add("combo.useR", new CheckBox("Use R"));
             ComboMenu.Add("combo.useR2", new CheckBox("Use R2"));
+            ComboMenu.Add("combo.hydra", new CheckBox("Use Hydra/Tiamat"));
             ComboMenu.Add("useR", new KeyBind("Force R", false, KeyBind.BindTypes.PressToggle, 'T'));
             ComboMenu.AddLabel("R1 Combos");
             ComboMenu.Add("combo.eR1", new CheckBox("E -> R1"));
@@ -67,9 +68,11 @@ namespace RivenBuddy
             ComboMenu.AddGroupLabel("Misc");
             ComboMenu.Add("combo.keepQAlive", new CheckBox("Keep Q Alive"));
             ComboMenu.Add("combo.useRBeforeExpire", new CheckBox("Use R Before Expire"));
+            ComboMenu.Add("combo.alwaysCancelQ", new CheckBox("Always Cancel Q", false));
 
             HarassMenu = Menu.AddSubMenu("Harass Settings", "harasssettingsRiven");
             HarassMenu.AddGroupLabel("Harass Settings");
+            HarassMenu.Add("harass.hydra", new CheckBox("Use Hydra/Tiamat"));
             HarassMenu.Add("harass.useQ", new CheckBox("Use Q"));
             HarassMenu.Add("harass.useW", new CheckBox("Use W"));
             HarassMenu.Add("harass.useE", new CheckBox("Use E"));
@@ -80,11 +83,13 @@ namespace RivenBuddy
             MinionClear.Add("lasthit.useW", new CheckBox("Use W"));
             MinionClear.AddSeparator();
             MinionClear.AddGroupLabel("Wave Clear Settings");
+            MinionClear.Add("waveclear.hydra", new CheckBox("Use Hydra/Tiamat"));
             MinionClear.Add("waveclear.useQ", new CheckBox("Use Q"));
             MinionClear.Add("waveclear.useW", new CheckBox("Use W"));
 
             Jungle = Menu.AddSubMenu("Jungle Settings", "jungleettingsRiven");
             Jungle.AddGroupLabel("Jungle Clear Settings");
+            Jungle.Add("jungle.hydra", new CheckBox("Use Hydra/Tiamat"));
             Jungle.Add("jungle.useQ", new CheckBox("Use Q"));
             Jungle.Add("jungle.useW", new CheckBox("Use W"));
             Jungle.Add("jungle.useE", new CheckBox("Use E"));
@@ -95,6 +100,7 @@ namespace RivenBuddy
             DrawMenu.Add("draw.W", new CheckBox("Draw W", false));
             DrawMenu.Add("draw.E", new CheckBox("Draw E", false));
             DrawMenu.Add("draw.R", new CheckBox("Draw R", false));
+            DrawMenu.Add("draw.Damage", new CheckBox("Draw Damage"));
             DrawMenu.Add("draw.Combo", new CheckBox("Write Current Combo", false));
             DrawMenu.Add("draw.rState", new CheckBox("Write R State"));
 
@@ -114,9 +120,10 @@ namespace RivenBuddy
 
         private static void Drawing_OnDraw(EventArgs args)
         {
+            var pos = Drawing.WorldToScreen(Player.Instance.Position);
             if (DrawMenu["draw.rState"].Cast<CheckBox>().CurrentValue)
-                text.Draw("Forced R: " + IsRActive, Color.AliceBlue, (int) Player.Instance.HPBarPosition.X - 8,
-                    (int) Player.Instance.HPBarPosition.Y);
+                text.Draw("Forced R: " + IsRActive, Color.AliceBlue, (int) pos.X - 45,
+                    (int) pos.Y + 40);
             if (DrawMenu["draw.Combo"].Cast<CheckBox>().CurrentValue)
             {
                 var s = Queuer.Queue.Aggregate("", (current, VARIABLE) => current + (" " + VARIABLE));

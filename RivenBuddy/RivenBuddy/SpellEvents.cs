@@ -35,7 +35,7 @@ namespace RivenBuddy
 
         private static void Obj_AI_Base_OnPlayAnimation(Obj_AI_Base sender, GameObjectPlayAnimationEventArgs args)
         {
-            if (!sender.IsMe || Orbwalker.ActiveModesFlags == Orbwalker.ActiveModes.None)
+            if (!sender.IsMe || Orbwalker.ActiveModesFlags == Orbwalker.ActiveModes.None && !Program.ComboMenu["combo.alwaysCancelQ"].Cast<CheckBox>().CurrentValue)
             {
                 return;
             }
@@ -93,6 +93,10 @@ namespace RivenBuddy
                     Queuer.Remove("Q");
                     Orbwalker.ResetAutoAttack();
                 }
+                else if (!Queuer.Queue.Any() && Queuer.tiamat != null && Queuer.tiamat.CanUseItem() && Program.ComboMenu["combo.hydra"].Cast<CheckBox>().CurrentValue && Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo) && args.Target is AIHeroClient)
+                {
+                    Queuer.tiamat.Cast();
+                }
             }
         }
 
@@ -108,7 +112,7 @@ namespace RivenBuddy
 
         public static void UpdateSpells()
         {
-            if (LastCast["Q"] + 3450 < Environment.TickCount && Program.ComboMenu["combo.keepQAlive"].Cast<CheckBox>().CurrentValue && QCount != 0)
+            if (LastCast["Q"] + 3450 < Environment.TickCount && Program.ComboMenu["combo.keepQAlive"].Cast<CheckBox>().CurrentValue && QCount > 0)
             {
                 Player.CastSpell(SpellSlot.Q, Game.CursorPos);
             }
@@ -141,7 +145,7 @@ namespace RivenBuddy
                 HasR2 = false; // Reset R2
             }
             if (PassiveStacks != 0 && LastCast["PAS"] + 4000 < Environment.TickCount) PassiveStacks = 0; // Reset Passive
-            if (QCount != 0 && LastCast["Q"] + 3500 < Environment.TickCount) QCount = 0; // Reset Passive
+            if (LastCast["Q"] + 3470 < Environment.TickCount) QCount = 0; // Reset Passive
         }
 
         private static void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
