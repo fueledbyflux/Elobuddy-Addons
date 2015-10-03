@@ -9,6 +9,8 @@ using EloBuddy.SDK.Events;
 using EloBuddy.SDK.Menu;
 using EloBuddy.SDK.Menu.Values;
 using EloBuddy.SDK.Rendering;
+using SharpDX;
+using Color = System.Drawing.Color;
 using SpellData = RivenBuddy.DamageIndicator.SpellData;
 
 namespace RivenBuddy
@@ -119,8 +121,35 @@ namespace RivenBuddy
             Game.OnUpdate += Game_OnUpdate;
             Drawing.OnDraw += Drawing_OnDraw;
             Game.OnUpdate += delegate { SpellManager.UpdateSpells(); };
+            Player.OnIssueOrder += Player_OnIssueOrder;
 
             Chat.Print("RivenBuddy : Fully Loaded. by fluxy");
+        }
+
+        public static Obj_AI_Base OrderTarget;
+        public static Vector3 OrderPosition;
+        public static GameObjectOrder Order;
+
+        private static void Player_OnIssueOrder(Obj_AI_Base sender, PlayerIssueOrderEventArgs args)
+        {
+            if (!sender.IsMe) return;
+            Order = args.Order;
+            OrderPosition = args.TargetPosition;
+            OrderTarget = (Obj_AI_Base) args.Target;
+        }
+
+        public static void IssueLastOrder()
+        {
+            switch (Order)
+            {
+                    case GameObjectOrder.AttackUnit:
+                    if (OrderTarget != null) Player.IssueOrder(Order, OrderTarget);
+                    break;
+
+                case GameObjectOrder.MoveTo:
+                    Player.IssueOrder(Order, OrderPosition);
+                    break;
+            }
         }
 
         private static void Drawing_OnDraw(EventArgs args)

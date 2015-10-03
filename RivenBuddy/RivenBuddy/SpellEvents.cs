@@ -115,6 +115,7 @@ namespace RivenBuddy
             if (LastCast["Q"] + 3450 < Environment.TickCount && Program.ComboMenu["combo.keepQAlive"].Cast<CheckBox>().CurrentValue && QCount > 0 && !Player.Instance.IsRecalling)
             {
                 Player.CastSpell(SpellSlot.Q, Game.CursorPos);
+                Core.DelayAction(Program.IssueLastOrder, 291);
             }
 
             if (HasR2 && LastCast["R1"] + 14800 < Environment.TickCount && Program.ComboMenu["combo.useRBeforeExpire"].Cast<CheckBox>().CurrentValue && !Player.Instance.IsRecalling)
