@@ -45,7 +45,7 @@ namespace JinxBuddy
 
         public static void Gapcloser_OnGapCloser(AIHeroClient sender, Gapcloser.GapcloserEventArgs e)
         {
-            if (sender.IsEnemy && e.End.Distance(_Player) < 200)
+            if (Program.MiscMenu["gapcloser"].Cast<CheckBox>().CurrentValue && sender.IsEnemy && e.End.Distance(_Player) < 200)
             {
                 Program.Spells[SpellSlot.E].Cast(e.End);
             }

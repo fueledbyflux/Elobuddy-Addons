@@ -48,7 +48,7 @@ namespace JinxBuddy
         public static int EMana = 50;
         public static int QMana = 20;
 
-        public static Menu menu, ComboMenu, HarassMenu, FarmMenu;
+        public static Menu menu, ComboMenu, HarassMenu, FarmMenu, MiscMenu;
         public static CheckBox SmartMode;
 
         static void Main(string[] args)
@@ -88,9 +88,24 @@ namespace JinxBuddy
             FarmMenu.AddSeparator();
             FarmMenu.Add("useQFarm", new CheckBox("Use Q"));
 
+
+            MiscMenu = menu.AddSubMenu("Misc", "MiscMenuJinx");
+            MiscMenu.Add("gapcloser", new CheckBox("Gapcloser E"));
+            MiscMenu.Add("interruptor", new CheckBox("Interruptor E"));
+            MiscMenu.Add("CCE", new CheckBox("On CC'd E"));
+
             Events.Init();
             Game.OnTick += Game_OnTick;
             Gapcloser.OnGapcloser += Events.Gapcloser_OnGapCloser;
+            Interrupter.OnInterruptableSpell += Interrupter_OnInterruptableSpell;
+        }
+
+        private static void Interrupter_OnInterruptableSpell(Obj_AI_Base sender, Interrupter.InterruptableSpellEventArgs e)
+        {
+            if (MiscMenu["interruptor"].Cast<CheckBox>().CurrentValue && sender.IsEnemy && e.DangerLevel == DangerLevel.High && sender.IsValidTarget(900))
+            {
+                Spells[SpellSlot.E].Cast(sender);
+            }
         }
 
         private static void Game_OnTick(EventArgs args)
@@ -99,6 +114,20 @@ namespace JinxBuddy
             if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo)) Combo();
             else if(Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Harass)) Harass();
             else if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear)) WaveClear();
+
+            if (MiscMenu["CCE"].Cast<CheckBox>().CurrentValue)
+            {
+                foreach (var enemy in HeroManager.Enemies)
+                {
+                    if (enemy.Distance(Player.Instance) < Spells[SpellSlot.E].Range &&
+                        (enemy.HasBuffOfType(BuffType.Stun)
+                         || enemy.HasBuffOfType(BuffType.Snare)
+                         || enemy.HasBuffOfType(BuffType.Suppression)))
+                    {
+                        Spells[SpellSlot.E].Cast(enemy);
+                    }
+                }
+            }
         }
 
         public static void WaveClear()
