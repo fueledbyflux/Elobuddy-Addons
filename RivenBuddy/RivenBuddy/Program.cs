@@ -56,15 +56,20 @@ namespace RivenBuddy
             ComboMenu.Add("combo.useR2", new CheckBox("Use R2"));
             ComboMenu.Add("combo.hydra", new CheckBox("Use Hydra/Tiamat"));
             ComboMenu.Add("useR", new KeyBind("Force R", false, KeyBind.BindTypes.PressToggle, 'T'));
+            ComboMenu.AddSeparator();
             ComboMenu.AddLabel("R1 Combos");
             ComboMenu.Add("combo.eR1", new CheckBox("E -> R1"));
             ComboMenu.Add("combo.R1", new CheckBox("R1"));
+            ComboMenu.AddSeparator();
             ComboMenu.AddLabel("R2 Combos");
             ComboMenu.Add("combo.eR2", new CheckBox("E -> R2"));
             ComboMenu.Add("combo.qR2", new CheckBox("R2 -> Q"));
             ComboMenu.Add("combo.R2", new CheckBox("R2"));
+            ComboMenu.AddSeparator();
             ComboMenu.AddGroupLabel("Burst Combo");
+            ComboMenu.Add("burst.flash", new CheckBox("Use Flash in Burst"));
             ComboMenu.Add("burst", new KeyBind("Burst", false, KeyBind.BindTypes.HoldActive, 'Y'));
+            ComboMenu.AddSeparator();
             ComboMenu.AddGroupLabel("Misc");
             ComboMenu.Add("combo.keepQAlive", new CheckBox("Keep Q Alive"));
             ComboMenu.Add("combo.useRBeforeExpire", new CheckBox("Use R Before Expire"));
@@ -108,7 +113,7 @@ namespace RivenBuddy
             Indicator.Add("Combo", new SpellData(0, DamageType.True, Color.Aqua));
 
             R2 = new Spell.Skillshot(SpellSlot.R, 900, SkillShotType.Cone, 250, 1600, 125);
-
+            new WallJump();
             TargetSelector2.Init();
             SpellEvents.Init();
             Game.OnUpdate += Game_OnUpdate;
@@ -124,6 +129,15 @@ namespace RivenBuddy
             if (DrawMenu["draw.rState"].Cast<CheckBox>().CurrentValue)
                 text.Draw("Forced R: " + IsRActive, Color.AliceBlue, (int) pos.X - 45,
                     (int) pos.Y + 40);
+
+            foreach (var position in WallJump.Spots.Where(a => a.Start.Distance(Player.Instance) < 400))
+            {
+                Circle.Draw(SharpDX.Color.OrangeRed,
+                    100, position.Start);
+                Circle.Draw(SharpDX.Color.DarkCyan,
+                     100, position.End);
+            }
+
             if (DrawMenu["draw.Combo"].Cast<CheckBox>().CurrentValue)
             {
                 var s = Queuer.Queue.Aggregate("", (current, VARIABLE) => current + (" " + VARIABLE));
@@ -159,7 +173,6 @@ namespace RivenBuddy
                     a => a.Id == ItemId.Tiamat_Melee_Only || a.Id == ItemId.Ravenous_Hydra_Melee_Only);
 
             Indicator.Update("Combo", new SpellData((int) DamageHandler.ComboDamage(), DamageType.Physical, Color.Aqua));
-
             if (BurstActive)
             {
                 States.Burst();
@@ -188,6 +201,10 @@ namespace RivenBuddy
             if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LastHit))
             {
                 States.LastHit();
+            }
+            if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Flee))
+            {
+                States.Flee();
             }
             if (Orbwalker.ActiveModesFlags == Orbwalker.ActiveModes.None && !BurstActive)
             {

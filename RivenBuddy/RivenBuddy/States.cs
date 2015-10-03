@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using EloBuddy;
 using EloBuddy.SDK;
@@ -17,6 +18,8 @@ namespace RivenBuddy
             Orbwalker.ForcedTarget = target;
             Orbwalker.OrbwalkTo(Game.CursorPos);
 
+            var flash = Player.Spells.FirstOrDefault(a => a.SData.Name == "summonerflash");
+
             if (target == null)
             {
                 Target = null;
@@ -33,10 +36,11 @@ namespace RivenBuddy
                 Queuer.DoQueue(target);
                 return;
             }
-            if (SpellManager.Spells[SpellSlot.Q].IsReady() &&
+            if (Program.ComboMenu["burst.flash"].Cast<CheckBox>().CurrentValue && SpellManager.Spells[SpellSlot.Q].IsReady() &&
                 SpellManager.Spells[SpellSlot.W].IsReady() &&
                 SpellManager.Spells[SpellSlot.E].IsReady() &&
-                SpellManager.Spells[SpellSlot.R].IsReady())
+                SpellManager.Spells[SpellSlot.R].IsReady() &&
+                !SpellEvents.HasR && flash != null && flash.IsReady)
             {
                 Queuer.Queue.Add("E");
                 Queuer.Queue.Add("R1");
@@ -47,6 +51,21 @@ namespace RivenBuddy
                 Queuer.Queue.Add("R2");
                 Queuer.Queue.Add("Q");
                 return;
+            }
+            if (target.IsValidTarget(SpellManager.Spells[SpellSlot.E].Range + SpellManager.Spells[SpellSlot.W].Range) && (!Program.ComboMenu["burst.flash"].Cast<CheckBox>().CurrentValue || flash == null || !flash.IsReady) &&
+                SpellManager.Spells[SpellSlot.Q].IsReady() &&
+                SpellManager.Spells[SpellSlot.W].IsReady() &&
+                SpellManager.Spells[SpellSlot.E].IsReady() &&
+                SpellManager.Spells[SpellSlot.R].IsReady() &&
+                SpellEvents.QCount <= 1 && !SpellEvents.HasR)
+            {
+                Queuer.Queue.Add("E");
+                Queuer.Queue.Add("R1");
+                Queuer.Queue.Add("Q");
+                Queuer.Queue.Add("W");
+                Queuer.Queue.Add("H");
+                Queuer.Queue.Add("Q");
+                Queuer.Queue.Add("R2");
             }
             Combo();
         }
@@ -498,6 +517,19 @@ namespace RivenBuddy
             if (Queuer.tiamat != null && target.IsValidTarget(300) && Queuer.tiamat.CanUseItem() && Program.Jungle["jungle.hydra"].Cast<CheckBox>().CurrentValue)
             {
                 Queuer.tiamat.Cast();
+            }
+        }
+
+        public static void Flee()
+        {
+            if (SpellEvents.LastCast["Q"] + 400 < Environment.TickCount && Player.GetSpell(SpellSlot.Q).State == SpellState.Ready)
+            {
+                Player.CastSpell(SpellSlot.Q, Game.CursorPos);
+                SpellEvents.LastCast["Q"] = Environment.TickCount;
+            }
+            if (SpellEvents.LastCast["Q"] + 400 < Environment.TickCount && Player.GetSpell(SpellSlot.E).State == SpellState.Ready)
+            {
+                Player.CastSpell(SpellSlot.E, Game.CursorPos);
             }
         }
     }
