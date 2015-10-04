@@ -48,7 +48,6 @@ namespace LeeSinBuddy
             {
                 if (wj.CurrentValue)
                 {
-                    if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Flee)) Chat.Print("LeeSinBuddy - Flee Is Active! Change the WardJump or Flee Keybind or it will not go well.", Color.BlueViolet);
                     WardjumpActive = true;
                     WardJump(Game.CursorPos, a.CurrentValue, b.CurrentValue);
                     return;
