@@ -18,6 +18,7 @@ namespace LeeSinBuddy
         public static AIHeroClient EnemyTarget;
         public static Vector3 InsecPos;
         public static bool InsecActive;
+        public static bool WtfSecActive;
         public static long LastUpdate;
         public static Menu InsecMenu;
         public static bool ShouldFlash;
@@ -59,15 +60,19 @@ namespace LeeSinBuddy
                 }
 
                 InsecActive = false;
+                WtfSecActive = false;
 
                 if (insec.CurrentValue)
                 {
+                    if(Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Flee)) Chat.Print("LeeSinBuddy - Flee Is Active! Change the Insec or Flee Keybind or it will not go well.", Color.BlueViolet);
                     InsecActive = true;
                     Insec();
                 }
                 else if (wtfsec.CurrentValue)
                 {
+                    if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Flee)) Chat.Print("LeeSinBuddy - Flee Is Active! Change the WTFSec or Flee Keybind or it will not go well.", Color.BlueViolet);
                     InsecActive = true;
+                    WtfSecActive = true;
                     WtfSec();
                 }
             };
@@ -98,7 +103,7 @@ namespace LeeSinBuddy
             }
             if (InsecPos.IsValid() && (InsecActive) && GetTargetForInsec() != null)
             {
-                var p1 = Drawing.WorldToScreen(GetBestInsecPos());
+                var p1 = Drawing.WorldToScreen(WtfSecActive ? Game.CursorPos : GetBestInsecPos());
                 Circle.Draw(SharpDX.Color.DodgerBlue, 100, InsecPos);
                 Drawing.DrawLine(p1, Drawing.WorldToScreen(InsecPos), 3, Color.Green);
             }
@@ -108,14 +113,14 @@ namespace LeeSinBuddy
         {
             var target = EnemyTarget;
 
-            Orbwalker.OrbwalkTo(InsecMenu["insecPosMode"].Cast<Slider>().CurrentValue == 1 && target != null ? target.Position : Game.CursorPos);
+            Orbwalker.OrbwalkTo(target.Position);
 
             if (target == null || !target.IsValidTarget())
                 return;
-            var allyPos = GetBestInsecPos();
+            var allyPos = Game.CursorPos;
             if (InsecPos == new Vector3())
             {
-                var insecPos = allyPos.Extend(target.Position, target.Distance(allyPos) + 120);
+                var insecPos = allyPos.Extend(target.Position, target.Distance(allyPos) + 250);
                 InsecPos = insecPos.To3D();
                 LastUpdate = Environment.TickCount;
             }
@@ -164,7 +169,7 @@ namespace LeeSinBuddy
             var allyPos = GetBestInsecPos();
             if (InsecPos == new Vector3())
             {
-                var insecPos = allyPos.Extend(target.Position, target.Distance(allyPos) + 200).To3D();
+                var insecPos = allyPos.Extend(target.Position, target.Distance(allyPos) + 250).To3D();
                 InsecPos = insecPos;
                 LastUpdate = Environment.TickCount;
             }
@@ -174,7 +179,7 @@ namespace LeeSinBuddy
                 return;
             }
 
-            if (_Player.Distance(InsecPos) < 150)
+            if (_Player.Distance(InsecPos) < 200)
             {
                 Program.R.Cast(target);
                 return;
