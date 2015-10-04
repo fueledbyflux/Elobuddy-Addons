@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -28,7 +29,7 @@ namespace RengarBuddy
 
         public static void Combo()
         {
-            if (Player.HasBuff("RengarR") && !Program.disableAntiSkills)
+            if (Player.HasBuff("RengarR") && Program.DisableAntiSkills)
             {
                 var item = _Player.InventoryItems.FirstOrDefault(a => a.Id == ItemId.Youmuus_Ghostblade);
                 if (Program.ComboMenu["useYomuus"].Cast<CheckBox>().CurrentValue && item != null && item.CanUseItem())
@@ -146,11 +147,7 @@ namespace RengarBuddy
         {
             if (Orbwalker.IsAutoAttacking) return;
             Orbwalker.ForcedTarget = null;
-            var source =
-                ObjectManager.Get<Obj_AI_Minion>()
-                    .Where(a => a.IsEnemy && a.Distance(_Player) < GetCustomRange())
-                    .OrderBy(a => a.Health)
-                    .FirstOrDefault();
+            var source = EntityManager.GetLaneMinions(EntityManager.UnitTeam.Enemy, Player.Instance.Position.To2D(), GetCustomRange()).OrderBy(a => a.Health).FirstOrDefault();
 
             if (Program.FarmMenu["saveStacksWC"].Cast<CheckBox>().CurrentValue && (int)_Player.Mana == 5 || source == null)
                 return;
@@ -175,13 +172,9 @@ namespace RengarBuddy
         {
             if (Orbwalker.IsAutoAttacking) return;
             Orbwalker.ForcedTarget = null;
-            var source =
-                ObjectManager.Get<Obj_AI_Minion>()
-                    .Where(a => a.IsEnemy && a.Distance(_Player) < GetCustomRange())
-                    .OrderBy(a => a.Health)
-                    .FirstOrDefault();
+            var source = EntityManager.GetLaneMinions(EntityManager.UnitTeam.Enemy, Player.Instance.Position.To2D(), GetCustomRange()).OrderBy(a => a.Health).FirstOrDefault();
 
-                if (Program.FarmMenu["saveStacksWC"].Cast<CheckBox>().CurrentValue && (int) _Player.Mana == 5 || source == null)
+            if (Program.FarmMenu["saveStacksWC"].Cast<CheckBox>().CurrentValue && (int) _Player.Mana == 5 || source == null)
                     return;
                 if((int) _Player.Mana == 5) { 
                     var ferocityMode = Program.FarmMenu["selectedStackedSpellWC"].Cast<Slider>().CurrentValue;
@@ -196,24 +189,24 @@ namespace RengarBuddy
                             Program.W.Cast();
                             break;
                         case 2:
-                            if (source == null || !Program.E.IsReady()) return;
+                            if (!Program.E.IsReady()) return;
                             Program.E.Cast(source);
                             break;
                     }
                     return;
                 }
 
-                if (Program.FarmMenu["qWaveClear"].Cast<CheckBox>().CurrentValue && Damage.Q1(source) > source.Health && source.Distance(_Player) < _Player.GetAutoAttackRange(source))
+                if (Program.Q.IsReady() && Program.FarmMenu["qWaveClear"].Cast<CheckBox>().CurrentValue && Damage.Q1(source) > source.Health && source.Distance(_Player) < _Player.GetAutoAttackRange(source))
                 {
                     Program.Q.Cast();
                     return;
                 }
-                if (Program.FarmMenu["wWaveClear"].Cast<CheckBox>().CurrentValue && Damage.W(source) > source.Health && source.Distance(_Player) < Program.W.Range)
+                if (Program.W.IsReady() && Program.FarmMenu["wWaveClear"].Cast<CheckBox>().CurrentValue && Damage.W(source) > source.Health && source.Distance(_Player) < Program.W.Range)
                 {
                     Program.W.Cast();
                     return;
                 }
-                if (Program.FarmMenu["eWaveClear"].Cast<CheckBox>().CurrentValue && Damage.E(source) > source.Health && source.Distance(_Player) < Program.E.Range)
+                if (Program.E.IsReady() && Program.FarmMenu["eWaveClear"].Cast<CheckBox>().CurrentValue && Damage.E(source) > source.Health && source.Distance(_Player) < Program.E.Range)
                 {
                     Program.E.Cast(source);
                     return;
@@ -224,13 +217,10 @@ namespace RengarBuddy
         {
             if (Orbwalker.IsAutoAttacking) return;
             Orbwalker.ForcedTarget = null;
-            var source =
-                ObjectManager.Get<Obj_AI_Minion>()
-                    .Where(a => a.Team == GameObjectTeam.Neutral && a.Distance(_Player) < GetCustomRange())
-                    .OrderByDescending(a => a.MaxHealth)
-                    .FirstOrDefault();
 
-            if (Program.JungleMenu["saveStacksJungle"].Cast<CheckBox>().CurrentValue && (int)_Player.Mana == 5)
+            var source = EntityManager.GetJungleMonsters(Player.Instance.Position.To2D(), GetCustomRange() + 200).OrderByDescending(a => a.MaxHealth).FirstOrDefault();
+
+            if (Program.JungleMenu["saveStacksJungle"].Cast<CheckBox>().CurrentValue && (int)_Player.Mana == 5 || source == null)
                 return;
             if ((int) _Player.Mana == 5)
             {
@@ -247,24 +237,24 @@ namespace RengarBuddy
                         Program.W.Cast();
                         break;
                     case 2:
-                        if (source == null || !Program.E.IsReady()) return;
+                        if (!Program.E.IsReady()) return;
                         Program.E.Cast(source);
                         break;
                 }
                 return;
             }
-
-            if (Program.FarmMenu["qJng"].Cast<CheckBox>().CurrentValue && source.Distance(_Player) < _Player.GetAutoAttackRange(source))
+            
+            if (Program.Q.IsReady() && Program.JungleMenu["qJng"].Cast<CheckBox>().CurrentValue && source.Distance(_Player) < _Player.GetAutoAttackRange(source))
                 {
                     Program.Q.Cast();
                     return;
                 }
-                if (Program.FarmMenu["wJng"].Cast<CheckBox>().CurrentValue && source.Distance(_Player) < Program.W.Range)
+                if (Program.W.IsReady() && Program.JungleMenu["wJng"].Cast<CheckBox>().CurrentValue && source.Distance(_Player) < Program.W.Range)
                 {
                     Program.W.Cast();
                     return;
                 }
-                if (Program.FarmMenu["eJng"].Cast<CheckBox>().CurrentValue && source.Distance(_Player) < Program.E.Range)
+                if (Program.E.IsReady() && Program.JungleMenu["eJng"].Cast<CheckBox>().CurrentValue && source.Distance(_Player) < Program.E.Range)
                 {
                     Program.E.Cast(source);
                 }

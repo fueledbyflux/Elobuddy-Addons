@@ -11,17 +11,18 @@ using EloBuddy.SDK.Events;
 using EloBuddy.SDK.Menu;
 using EloBuddy.SDK.Menu.Values;
 using EloBuddy.SDK.Rendering;
+using SharpDX;
 
 namespace RengarBuddy
 {
     internal class Program
     {
-        public static Menu ComboMenu, FarmMenu, JungleMenu, HarassMenu, menu;
+        public static Menu ComboMenu, FarmMenu, JungleMenu, HarassMenu, DrawMenu, menu;
         public static Spell.Active Q;
         public static Spell.Active W;
         public static Spell.Skillshot E;
         public static Spell.Active R;
-        public static bool disableAntiSkills;
+        public static bool DisableAntiSkills = true;
         public static AIHeroClient _Player { get { return ObjectManager.Player; } }
         public static int Mana { get { return (int) _Player.Mana; } }
         private static void Main(string[] args)
@@ -31,7 +32,8 @@ namespace RengarBuddy
 
         private static void Loading_OnLoadingComplete(EventArgs args)
         {
-            Hacks.AntiAFK = true;
+            if (Player.Instance.ChampionName != Champion.Rengar.ToString()) return;
+
             Bootstrap.Init(null);
             TargetSelector2.init();
 
@@ -114,25 +116,47 @@ namespace RengarBuddy
             JungleMenu.Add("qJng", new CheckBox("Use Q"));
             JungleMenu.Add("wJng", new CheckBox("Use W"));
             JungleMenu.Add("eJng", new CheckBox("Use E"));
+
+            DrawMenu = menu.AddSubMenu("Draw Menu", "drawmenu");
+            DrawMenu.Add("drawW", new CheckBox("Draw W"));
+            DrawMenu.Add("drawE", new CheckBox("Draw E"));
             
-            //MeleeOrbwalker.Init();
             Game.OnTick += Game_OnTick;
             AIHeroClient.OnProcessSpellCast += AIHeroClient_OnProcessSpellCast;
+            Drawing.OnDraw += Drawing_OnDraw;
+        }
+
+        private static void Drawing_OnDraw(EventArgs args)
+        {
+            if (DrawMenu["drawW"].Cast<CheckBox>().CurrentValue)
+            {
+                Circle.Draw(W.IsReady() ? Color.BlueViolet : Color.OrangeRed, W.Range, Player.Instance.Position);
+            }
+            if (DrawMenu["drawE"].Cast<CheckBox>().CurrentValue)
+            {
+                Circle.Draw(E.IsReady() ? Color.BlueViolet : Color.OrangeRed, E.Range, Player.Instance.Position);
+            }
         }
 
         private static void AIHeroClient_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
-            if (sender.IsMe && args.SData.IsAutoAttack() && Player.HasBuff("RengarR"))
+            if (sender.IsMe && args.SData.Name == "RengarR")
             {
-                disableAntiSkills = true;
+                Core.DelayAction(() => DisableAntiSkills = true, 300);
             }
+            if (sender.IsMe && args.SData.IsAutoAttack() && Player.HasBuff("RengarR") && DisableAntiSkills)
+            {
+                DisableAntiSkills = false;
+            }
+           
         }
 
         private static void Game_OnTick(EventArgs args)
         {
-            if (!Player.HasBuff("RengarR"))
+            Orbwalker.ForcedTarget = Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo) && TargetSelector2.Target != null ? TargetSelector2.Target : null;
+            if (!Player.HasBuff("RengarR") || Player.Instance.GetAutoAttackRange() < 200)
             {
-                disableAntiSkills = false;
+                DisableAntiSkills = false;
             }
             if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
             {

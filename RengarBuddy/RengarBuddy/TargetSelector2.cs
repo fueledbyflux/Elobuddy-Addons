@@ -17,24 +17,24 @@ namespace RengarBuddy
 
             private static void Drawing_OnDraw(EventArgs args)
             {
-                if (_target != null)
+                if (Target != null)
                 {
-                    Circle.Draw(Color.Red, 150, _target.Position);
+                    Circle.Draw(Color.Red, 150, Target.Position);
                 }
             }
 
             public static AIHeroClient GetTarget(float range, DamageType type, Vector2 secondaryPos = new Vector2())
             {
-                if (_target == null || _target.IsDead || _target.Health <= 0 || !_target.IsValidTarget())
-                    _target = null;
-                if (secondaryPos.IsValid() && _target.Distance(secondaryPos) < range || _target.IsValidTarget(range))
+                if (Target == null || Target.IsDead || Target.Health <= 0 || !Target.IsValidTarget())
+                    Target = null;
+                if (secondaryPos.IsValid() && Target.Distance(secondaryPos) < range || Target.IsValidTarget(range))
                 {
-                    return _target;
+                    return Target;
                 }
                 return TargetSelector.GetTarget(range, type);
             }
 
-            private static AIHeroClient _target;
+            public static AIHeroClient Target;
             private static int _lastClick;
 
             private static void Game_OnWndProc(WndEventArgs args)
@@ -42,11 +42,11 @@ namespace RengarBuddy
                 if (args.Msg != 0x202) return;
                 if (_lastClick + 500 <= Environment.TickCount)
                 {
-                    _target =
+                    Target =
                         ObjectManager.Get<AIHeroClient>()
                             .OrderBy(a => a.Distance(ObjectManager.Player))
                             .FirstOrDefault(a => a.IsEnemy && a.Distance(Game.CursorPos) < 200);
-                    if (_target != null)
+                    if (Target != null)
                     {
                         _lastClick = Environment.TickCount;
                     }
