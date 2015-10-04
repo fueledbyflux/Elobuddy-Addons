@@ -58,9 +58,9 @@ namespace LeeSinBuddy
 
         private static void GameObject_OnCreate(GameObject sender, EventArgs args)
         {
-            if (sender.IsAlly && sender is Obj_Ward && sender.Distance(_Player) < 600 && _jumpPos.Distance(sender) < 200 && WardjumpActive)
+            if (sender.IsAlly && sender is Obj_AI_Base && sender.Name.ToLower().Contains("ward") && sender.Distance(_Player) < 600 && _jumpPos.Distance(sender) < 200 && WardjumpActive)
             {
-                Program.W.Cast((Obj_Ward) sender);
+                Program.W.Cast((Obj_AI_Base) sender);
             }
         }
 
@@ -124,7 +124,7 @@ namespace LeeSinBuddy
 
         public static InventorySlot GetWardSlot()
         {
-            var wardIds = new[] {ItemId.Warding_Totem_Trinket, ItemId.Greater_Stealth_Totem_Trinket, ItemId.Sightstone, ItemId.Ruby_Sightstone, ItemId.Vision_Ward, ItemId.Farsight_Orb_Trinket};
+            var wardIds = new[] {ItemId.Warding_Totem_Trinket, ItemId.Greater_Stealth_Totem_Trinket, ItemId.Sightstone, ItemId.Ruby_Sightstone, ItemId.Stealth_Ward, ItemId.Vision_Ward, ItemId.Farsight_Orb_Trinket};
             return _Player.InventoryItems.FirstOrDefault(a => wardIds.Contains(a.Id) && a.IsWard && a.CanUseItem());
         }
     }
