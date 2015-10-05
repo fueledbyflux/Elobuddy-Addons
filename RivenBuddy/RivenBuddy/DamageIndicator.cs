@@ -20,7 +20,7 @@ namespace RivenBuddy
             private readonly bool _onlyIfActive;
             private readonly SpellSlot _spellSlot = SpellSlot.Unknown;
             private readonly DamageLibrary.SpellStages _stage = DamageLibrary.SpellStages.Default;
-            public Color Color = Color.Aqua;
+            public Color Color = Color.FromArgb(100, Color.Aqua);
 
             public SpellData(int flatDamage, DamageType damageType, Color c)
             {
@@ -119,6 +119,7 @@ namespace RivenBuddy
                                          : (damageItem.Value.CalculateDamage(aiHeroClient)/aiHeroClient.MaxHealth));
                         Line.DrawLine(damageItem.Value.Color, 9f, new Vector2(end, pos.Y),
                             new Vector2(end + (damage > fullbar ? fullbar : damage), pos.Y));
+                        Line.DrawLine(Color.Black, 3, new Vector2(end + (damage > fullbar ? fullbar : damage) + 1, pos.Y - 4), new Vector2(end + (damage > fullbar ? fullbar : damage) + 1, pos.Y + 5));
                         end = pos.X + damage;
                     }
                 }

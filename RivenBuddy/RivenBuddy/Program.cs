@@ -158,7 +158,7 @@ namespace RivenBuddy
             if (DrawMenu["draw.rState"].Cast<CheckBox>().CurrentValue)
                 text.Draw("Forced R: " + IsRActive, Color.AliceBlue, (int) pos.X - 45,
                     (int) pos.Y + 40);
-
+            /*
             foreach (var position in WallJump.Spots.Where(a => a.Start.Distance(Player.Instance) < 400))
             {
                 Circle.Draw(SharpDX.Color.OrangeRed,
@@ -166,6 +166,7 @@ namespace RivenBuddy
                 Circle.Draw(SharpDX.Color.DarkCyan,
                      100, position.End);
             }
+            */
 
             if (DrawMenu["draw.Combo"].Cast<CheckBox>().CurrentValue)
             {
