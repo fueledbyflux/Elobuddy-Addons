@@ -155,6 +155,9 @@ namespace TrackerBuddy
                     case "summonerclairvoyance":
                         bitmap = Resources.summonerclairvoyance;
                         break;
+                    case "summonersnowball":
+                        bitmap = Resources.summonersnowball;
+                        break;
                 }
 
                 if (bitmap == null)
