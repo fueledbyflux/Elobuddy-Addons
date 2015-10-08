@@ -124,7 +124,7 @@ namespace LeeSinBuddy
 
         public static InventorySlot GetWardSlot()
         {
-            var wardIds = new[] {ItemId.Warding_Totem_Trinket, ItemId.Greater_Stealth_Totem_Trinket, ItemId.Sightstone, ItemId.Ruby_Sightstone, ItemId.Stealth_Ward, ItemId.Vision_Ward, ItemId.Farsight_Orb_Trinket};
+            var wardIds = new[] {ItemId.Warding_Totem_Trinket, ItemId.Greater_Stealth_Totem_Trinket, ItemId.Greater_Vision_Totem_Trinket, ItemId.Sightstone, ItemId.Ruby_Sightstone, ItemId.Stealth_Ward, ItemId.Vision_Ward, ItemId.Farsight_Orb_Trinket};
             return _Player.InventoryItems.FirstOrDefault(a => wardIds.Contains(a.Id) && a.IsWard && a.CanUseItem());
         }
     }

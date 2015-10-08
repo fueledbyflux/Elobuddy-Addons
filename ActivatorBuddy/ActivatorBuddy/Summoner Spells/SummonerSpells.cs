@@ -30,7 +30,7 @@ namespace ActivatorBuddy.Summoner_Spells
             {
                 _summonerMenu.AddGroupLabel("Ignite Settings");
                 _summonerMenu.AddSeparator();
-                _summonerMenu.Add("useignite", new CheckBox("Use Ignite"));
+                _summonerMenu.Add("useIgnite", new CheckBox("Use Ignite"));
                 _summonerMenu.Add("comboOnlyIgnite", new CheckBox("Combo Only"));
                 _summonerMenu.Add("drawIngiteRange", new CheckBox("Draw Ignite Range"));
                 _summonerMenu.AddSeparator();
@@ -156,7 +156,7 @@ namespace ActivatorBuddy.Summoner_Spells
 
         private static void HealEvent(EventArgs args)
         {
-            if (_summonerMenu["comboOnlyHeal"].Cast<CheckBox>().CurrentValue &&
+            if (!_summonerMenu["useHeal"].Cast<CheckBox>().CurrentValue || _summonerMenu["comboOnlyHeal"].Cast<CheckBox>().CurrentValue &&
                 !Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
                 return;
             foreach (
@@ -182,7 +182,7 @@ namespace ActivatorBuddy.Summoner_Spells
 
         private static void ExhaustEvent(EventArgs args)
         {
-            if (_summonerMenu["comboOnlyExhaust"].Cast<CheckBox>().CurrentValue &&
+            if (!_summonerMenu["useExhaust"].Cast<CheckBox>().CurrentValue || _summonerMenu["comboOnlyExhaust"].Cast<CheckBox>().CurrentValue &&
                 !Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
                 return;
             foreach (
@@ -209,7 +209,7 @@ namespace ActivatorBuddy.Summoner_Spells
 
         private static void IgniteEvent(EventArgs args)
         {
-            if (_summonerMenu["comboOnlyIgnite"].Cast<CheckBox>().CurrentValue &&
+            if (!_summonerMenu["useIgnite"].Cast<CheckBox>().CurrentValue || _summonerMenu["comboOnlyIgnite"].Cast<CheckBox>().CurrentValue &&
                 !Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo)) return;
             foreach (
                 var source in
@@ -240,8 +240,7 @@ namespace ActivatorBuddy.Summoner_Spells
             {
                 Circle.Draw(SharpDX.Color.DeepSkyBlue, _heal.Range, _Player.Position);
             }
-            if (HasSpell("smite") && _smiteMenu["drawSmiteRange"].Cast<CheckBox>().CurrentValue &&
-                Smite.IsReady())
+            if (HasSpell("smite") && _smiteMenu["drawSmiteRange"].Cast<CheckBox>().CurrentValue && _smiteMenu["smiteActive"].Cast<KeyBind>().CurrentValue)
             {
                 Circle.Draw(SharpDX.Color.Yellow, Smite.Range, _Player.Position);
             }
