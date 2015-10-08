@@ -23,8 +23,10 @@ namespace OrbwalkerDisabler
         private static void Loading_OnLoadingComplete(EventArgs args)
         {
             Menu = MainMenu.AddMenu("Orbwalker Disabler", "orbws");
+            Menu.AddGroupLabel("Universal");
             var a = Menu.Add("disableMovement", new CheckBox("Disable Movement", false));
-            var b = Menu.Add("disableAttacks", new CheckBox("Disable Movement", false));
+            var b = Menu.Add("disableAttacks", new CheckBox("Disable Attacks", false));
+
 
             Game.OnTick += delegate
             {
