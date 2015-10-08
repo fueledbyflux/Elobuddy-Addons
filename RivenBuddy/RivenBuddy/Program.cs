@@ -115,7 +115,6 @@ namespace RivenBuddy
             Indicator.Add("Combo", new SpellData(0, DamageType.True, Color.Aqua));
 
             R2 = new Spell.Skillshot(SpellSlot.R, 900, SkillShotType.Cone, 250, 1600, 125);
-            new WallJump();
             TargetSelector2.Init();
             SpellEvents.Init();
             Game.OnUpdate += Game_OnUpdate;
@@ -126,7 +125,7 @@ namespace RivenBuddy
             Chat.Print("RivenBuddy : Fully Loaded. by fluxy");
         }
 
-        public static Obj_AI_Base OrderTarget;
+        public static GameObject OrderTarget;
         public static Vector3 OrderPosition;
         public static GameObjectOrder Order;
 
@@ -135,7 +134,7 @@ namespace RivenBuddy
             if (!sender.IsMe) return;
             Order = args.Order;
             OrderPosition = args.TargetPosition;
-            OrderTarget = (Obj_AI_Base) args.Target;
+            OrderTarget = args.Target;
         }
 
         public static void IssueLastOrder()
@@ -221,7 +220,7 @@ namespace RivenBuddy
             }
             if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear))
             {
-                var target = EntityManager.GetJungleMonsters(Player.Instance.Position.To2D(),
+                var target = EntityManager.MinionsAndMonsters.GetJungleMonsters(Player.Instance.Position,
                     SpellManager.Spells[SpellSlot.Q].Range + 300).OrderByDescending(a => a.MaxHealth).FirstOrDefault();
                 if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.JungleClear) && target == null)
                 {

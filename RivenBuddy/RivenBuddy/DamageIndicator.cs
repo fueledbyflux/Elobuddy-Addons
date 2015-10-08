@@ -103,7 +103,7 @@ namespace RivenBuddy
             {
                 if (!Program.DrawMenu["draw.Damage"].Cast<CheckBox>().CurrentValue) return;
 
-                foreach (var aiHeroClient in HeroManager.Enemies)
+                foreach (var aiHeroClient in EntityManager.Heroes.Enemies)
                 {
                     if (!aiHeroClient.IsHPBarRendered) continue;
 

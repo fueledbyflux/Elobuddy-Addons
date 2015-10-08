@@ -370,7 +370,7 @@ namespace RivenBuddy
 
         public static void WaveClear()
         {
-            var target = EntityManager.GetLaneMinions(EntityManager.UnitTeam.Enemy, Player.Instance.Position.To2D(),
+            var target = EntityManager.MinionsAndMonsters.GetLaneMinions(EntityManager.UnitTeam.Enemy, Player.Instance.Position,
                 SpellManager.Spells[SpellSlot.Q].Range).OrderBy(a => a.Health).FirstOrDefault();
 
             if (target == null)
@@ -398,7 +398,7 @@ namespace RivenBuddy
             }
 
             if (Program.MinionClear["waveclear.useQ"].Cast<CheckBox>().CurrentValue &&
-                SpellManager.Spells[SpellSlot.Q].IsInRange(target) && Orbwalker.CanAutoAttack)
+                SpellManager.Spells[SpellSlot.Q].IsInRange(target) && Orbwalker.CanAutoAttack && SpellManager.Spells[SpellSlot.Q].IsReady())
             {
                 Queuer.Queue.Add("AA");
                 Queuer.Queue.Add("Q");
@@ -420,7 +420,7 @@ namespace RivenBuddy
 
         public static void LastHit()
         {
-            var target = EntityManager.GetLaneMinions(EntityManager.UnitTeam.Enemy, Player.Instance.Position.To2D(),
+            var target = EntityManager.MinionsAndMonsters.GetLaneMinions(EntityManager.UnitTeam.Enemy, Player.Instance.Position,
                 SpellManager.Spells[SpellSlot.Q].Range).OrderBy(a => a.Health).FirstOrDefault();
 
             if (target == null)
@@ -468,7 +468,7 @@ namespace RivenBuddy
 
         public static void Jungle()
         {
-            var target = EntityManager.GetJungleMonsters(Player.Instance.Position.To2D(),
+            var target = EntityManager.MinionsAndMonsters.GetJungleMonsters(Player.Instance.Position,
                 SpellManager.Spells[SpellSlot.Q].Range + 300).OrderByDescending(a => a.MaxHealth).FirstOrDefault();
 
             if (target == null)

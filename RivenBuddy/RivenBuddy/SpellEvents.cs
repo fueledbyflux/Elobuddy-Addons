@@ -120,7 +120,7 @@ namespace RivenBuddy
 
             if (HasR2 && LastCast["R1"] + 14800 < Environment.TickCount && Program.ComboMenu["combo.useRBeforeExpire"].Cast<CheckBox>().CurrentValue && !Player.Instance.IsRecalling)
             {
-                foreach (var target in HeroManager.Enemies.Where(a => a.Distance(Player.Instance) < 1000))
+                foreach (var target in EntityManager.Heroes.Enemies.Where(a => a.Distance(Player.Instance) < 1000))
                 {
                     Program.R2.Cast(target);
                 }
