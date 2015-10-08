@@ -72,6 +72,8 @@ namespace LeeSinBuddy
 
         private static void Load_OnLoad(EventArgs a)
         {
+            if (Player.Instance.Hero != Champion.LeeSin) return;
+
             Bootstrap.Init(null);
 
             menu = MainMenu.AddMenu("Fluxy's LeeSinBuddy", "LeeSinBuddyMenu");
