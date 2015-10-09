@@ -141,7 +141,7 @@ namespace YasuoBuddy.EvadePlus
         {
         }
 
-        private void CacheSkillshots()
+        public void CacheSkillshots()
         {
             Skillshots =
                 (DodgeDangerousOnly

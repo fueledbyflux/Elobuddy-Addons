@@ -47,7 +47,7 @@ namespace YasuoBuddy.EvadePlus
                 SkillshotMenu.Add(skillshotString + "/enable", new CheckBox("Dodge"));
                 SkillshotMenu.Add(skillshotString + "/draw", new CheckBox("Draw"));
 
-                if (c is CircularMissileSkillshot) SkillshotMenu.Add(skillshotString + "/w", new CheckBox("Evade With W"));
+                if (c is LinearMissileSkillshot) SkillshotMenu.Add(skillshotString + "/w", new CheckBox("Evade With W"));
 
                 var dangerous = new CheckBox("Dangerous", c.SpellData.IsDangerous);
                 dangerous.OnValueChange += delegate(ValueBase<bool> sender, ValueBase<bool>.ValueChangeArgs args)

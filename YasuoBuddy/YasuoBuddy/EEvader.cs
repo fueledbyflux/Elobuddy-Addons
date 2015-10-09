@@ -3,6 +3,7 @@ using System.Linq;
 using EloBuddy;
 using EloBuddy.SDK;
 using SharpDX;
+using YasuoBuddy.EvadePlus;
 using YasuoBuddy.EvadePlus.SkillshotTypes;
 
 namespace YasuoBuddy
@@ -14,7 +15,6 @@ namespace YasuoBuddy
 
         public static void UpdateTask()
         {
-
             GameObject wall = null;
             foreach (var gameObject in ObjectManager.Get<GameObject>())
             {
@@ -35,7 +35,7 @@ namespace YasuoBuddy
                 var wallEnd = wallStart - wallWidth*wallDirection;
                 var wallPolygon = new Geometry.Polygon.Rectangle(wallStart, wallEnd, 75);
 
-                foreach (var activeSkillshot in EvadePlus.Program.Evade.SkillshotDetector.ActiveSkillshots.Where(a => (a is LinearMissileSkillshot) && EvadePlus.EvadeMenu.IsSkillshotW(a)))
+                foreach (var activeSkillshot in EvadePlus.Program.Evade.SkillshotDetector.ActiveSkillshots.Where(a => (a is LinearMissileSkillshot) && EvadeMenu.IsSkillshotW(a)))
                 {
                     if (wallPolygon.IsInside(activeSkillshot.GetPosition()))
                     {
@@ -50,7 +50,7 @@ namespace YasuoBuddy
                 {
                     foreach (var activeSkillshot in EvadePlus.Program.Evade.SkillshotDetector.ActiveSkillshots.Where(a => a is LinearMissileSkillshot && EvadePlus.EvadeMenu.IsSkillshotW(a)))
                     {
-                        if (EvadePlus.EvadeMenu.IsSkillshotW(activeSkillshot) && activeSkillshot.ToPolygon().IsInside(Player.Instance))
+                        if (activeSkillshot.ToPolygon().IsInside(Player.Instance))
                         {
                             Player.CastSpell(SpellSlot.W, activeSkillshot.GetPosition());
                             return;
