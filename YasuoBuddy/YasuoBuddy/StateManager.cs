@@ -12,8 +12,8 @@ namespace YasuoBuddy
     {
         public static void Combo()
         {
-            var target = TargetSelector2.IsSelected
-                    ? TargetSelector2.GetTarget(1375, DamageType.Physical)
+            var target = TargetSelector2.IsSelected && Yasuo.ComboMenu["combo.leftclickRape"].Cast<CheckBox>().CurrentValue && TargetSelector2.Target != null && TargetSelector2.Target.Distance(Player.Instance) < 1375
+                    ? TargetSelector2.Target
                     : TargetSelector2.GetTarget(SpellManager.Q().Range + 475 + 100, DamageType.Physical);
             if (target == null) return;
 

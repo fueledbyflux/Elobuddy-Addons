@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using System.Linq;
 using System.Security.AccessControl;
 using EloBuddy;
 using EloBuddy.SDK;
@@ -21,12 +22,15 @@ namespace YasuoBuddy
 
         private static void Loading_OnLoadingComplete(EventArgs args)
         {
+            if (Player.Instance.Hero != Champion.Yasuo) return;
+
             Menu = MainMenu.AddMenu("YasuoBuddy", "yasuobuddyfluxy");
 
             ComboMenu = Menu.AddSubMenu("Combo", "yasuCombo");
             ComboMenu.Add("combo.Q", new CheckBox("Use Q"));
             ComboMenu.Add("combo.E", new CheckBox("Use E"));
             ComboMenu.Add("combo.stack", new CheckBox("Stack Q"));
+            ComboMenu.Add("combo.leftclickRape", new CheckBox("Left Click Rape"));
             ComboMenu.AddSeparator();
             ComboMenu.Add("combo.R", new CheckBox("Use R"));
             ComboMenu.Add("combo.RTarget", new CheckBox("Use R always on Selected Target"));
@@ -68,7 +72,6 @@ namespace YasuoBuddy
             Game.OnTick += Game_OnTick;
             Obj_AI_Base.OnProcessSpellCast += Obj_AI_Base_OnProcessSpellCast;
             Drawing.OnDraw += Drawing_OnDraw;
-            Chat.Print("Yasuo Loaded", Color.AliceBlue);
         }
 
         private static void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)

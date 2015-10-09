@@ -45,7 +45,7 @@ namespace YasuoBuddy
                 }
             }
 
-            if (EvadePlus.Program.Evade.IsHeroInDanger(Player.Instance))
+            if (Program.Evade.IsHeroInDanger(Player.Instance))
             {
                 if (Player.GetSpell(SpellSlot.W).State == SpellState.Ready)
                 {
