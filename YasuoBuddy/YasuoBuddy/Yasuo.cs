@@ -105,6 +105,10 @@ namespace YasuoBuddy
             {
                 StateManager.Flee();
             }
+            if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Harass))
+            {
+                StateManager.Harass();
+            }
             if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
             {
                 StateManager.Combo();

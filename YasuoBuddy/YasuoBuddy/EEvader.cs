@@ -15,6 +15,7 @@ namespace YasuoBuddy
 
         public static void UpdateTask()
         {
+            Program.Evade.CacheSkillshots();
             GameObject wall = null;
             foreach (var gameObject in ObjectManager.Get<GameObject>())
             {
