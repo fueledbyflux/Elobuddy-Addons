@@ -92,7 +92,7 @@ namespace LeeSinBuddy
 
         public static void LastHit()
         {
-            var minions = EntityManager.GetLaneMinions().Where(a => a.Distance(Player.Instance) < 1400).OrderBy(a => a.Health);
+            var minions = EntityManager.MinionsAndMonsters.GetLaneMinions().Where(a => a.Distance(Player.Instance) < 1400).OrderBy(a => a.Health);
             var minion =
                 minions.FirstOrDefault(
                     a => Extended.BuffedEnemy != null && a.NetworkId == Extended.BuffedEnemy.NetworkId) ??
@@ -113,7 +113,7 @@ namespace LeeSinBuddy
 
         public static void WaveClear()
         {
-            var minions = EntityManager.GetLaneMinions().Where(a => a.Distance(Player.Instance) < 1400).OrderBy(a => a.Health);
+            var minions = EntityManager.MinionsAndMonsters.GetLaneMinions().Where(a => a.Distance(Player.Instance) < 1400).OrderBy(a => a.Health);
             var minion = (Extended.BuffedEnemy != null && Extended.BuffedEnemy.IsValidTarget(1400)) ? Extended.BuffedEnemy : minions.FirstOrDefault();
             if (minion == null || Program.LastSpellTime + 200 > Environment.TickCount) return;
 
