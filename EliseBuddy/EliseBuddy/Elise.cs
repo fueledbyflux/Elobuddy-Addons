@@ -25,6 +25,8 @@ namespace EliseBuddy
 
         private static void Loading_OnLoadingComplete(EventArgs args)
         {
+            if (Player.Instance.Hero != Champion.Elise) return;
+            
             Menu = MainMenu.AddMenu("Elise Buddy", "EliseBuddy");
 
             ComboMenu = Menu.AddSubMenu("Combo", "eliseCombo");
@@ -37,6 +39,7 @@ namespace EliseBuddy
             ComboMenu.Add("comboSpiderQ", new CheckBox("Spider Q"));
             ComboMenu.Add("comboSpiderW", new CheckBox("Spider W"));
             ComboMenu.Add("comboSpiderE", new CheckBox("Spider E"));
+            ComboMenu.Add("antiGapcloser", new CheckBox("Anti-Gapcloser"));
 
 
             HarassMenu = Menu.AddSubMenu("Harass", "eliseharass");
@@ -84,6 +87,7 @@ namespace EliseBuddy
             Drawing.OnDraw += Drawing_OnDraw;
             Game.OnTick += Game_OnTick;
             Obj_AI_Base.OnProcessSpellCast += EliseSpellManager.Obj_AI_Base_OnProcessSpellCast;
+            Events.Init();
         }
 
         private static void Drawing_OnDraw(EventArgs args)

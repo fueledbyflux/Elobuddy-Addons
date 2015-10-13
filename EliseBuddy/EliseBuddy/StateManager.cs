@@ -89,11 +89,11 @@ namespace EliseBuddy
                 {
                     EliseSpellManager.HumanESpell.Cast(target);
                 }
-                else if (Elise.HarassMenu["harassHumanE"].Cast<CheckBox>().CurrentValue && EliseSpellManager.HumanQSpell.IsReady() && target.IsValidTarget(EliseSpellManager.HumanQSpell.Range))
+                else if (Elise.HarassMenu["harassHumanQ"].Cast<CheckBox>().CurrentValue && EliseSpellManager.HumanQSpell.IsReady() && target.IsValidTarget(EliseSpellManager.HumanQSpell.Range))
                 {
                     EliseSpellManager.HumanQSpell.Cast(target);
                 }
-                else if (Elise.HarassMenu["harassHumanE"].Cast<CheckBox>().CurrentValue && EliseSpellManager.HumanWSpell.IsReady() && target.IsValidTarget(Player.Instance.GetAutoAttackRange(target)))
+                else if (Elise.HarassMenu["harassHumanW"].Cast<CheckBox>().CurrentValue && EliseSpellManager.HumanWSpell.IsReady() && target.IsValidTarget(Player.Instance.GetAutoAttackRange(target)))
                 {
                     EliseSpellManager.HumanWSpell.Cast(target);
                 }

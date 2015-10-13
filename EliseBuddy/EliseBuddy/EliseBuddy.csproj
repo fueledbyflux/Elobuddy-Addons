@@ -61,6 +61,7 @@
     <Compile Include="EliseDamage.cs" />
     <Compile Include="Elise.cs" />
     <Compile Include="EliseSpell.cs" />
+    <Compile Include="Events.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StateManager.cs" />
   </ItemGroup>
