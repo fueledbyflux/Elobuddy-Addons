@@ -143,7 +143,11 @@ namespace LeeSinBuddy
 
         public static void Jungle()
         {
+<<<<<<< HEAD
             var source = EntityManager.MinionsAndMonsters.GetJungleMonsters().OrderByDescending(a => a.MaxHealth).FirstOrDefault(b => b.Distance(Player.Instance) < 1300);
+=======
+            var source = EntityManager.MinionsAndMonsters.EnemyMinions.OrderByDescending(a => a.MaxHealth).FirstOrDefault(b => b.Distance(Player.Instance) < 1300);
+>>>>>>> origin/master
             if (source == null || !source.IsValidTarget()) return;
 
             if (CastQAgain && Extended.BuffedEnemy != null && Extended.BuffedEnemy.NetworkId == source.NetworkId &&
