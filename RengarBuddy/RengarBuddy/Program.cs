@@ -124,6 +124,23 @@ namespace RengarBuddy
             Game.OnTick += Game_OnTick;
             AIHeroClient.OnProcessSpellCast += AIHeroClient_OnProcessSpellCast;
             Drawing.OnDraw += Drawing_OnDraw;
+            GameObject.OnCreate += GameObject_OnCreate;
+        }
+
+        private static void GameObject_OnCreate(GameObject sender, EventArgs args)
+        {
+            var to = TargetSelector.GetTarget(1000f, DamageType.Physical);
+            if (sender.Name == "BloodSlash.troy")
+            {
+                if (Q.IsReady())
+                {
+                    Q.Cast();
+                }
+                if (E.IsReady())
+                {
+                    E.Cast(to);
+                }
+            }
         }
 
         private static void Drawing_OnDraw(EventArgs args)

@@ -74,8 +74,6 @@ namespace LeeSinBuddy
         {
             if (Player.Instance.Hero != Champion.LeeSin) return;
 
-            Bootstrap.Init(null);
-
             menu = MainMenu.AddMenu("Fluxy's LeeSinBuddy", "LeeSinBuddyMenu");
             menu.AddGroupLabel("Fluxy's LeeSinBuddy");
             menu.AddSeparator();

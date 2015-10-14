@@ -147,7 +147,7 @@ namespace RengarBuddy
         {
             if (Orbwalker.IsAutoAttacking) return;
             Orbwalker.ForcedTarget = null;
-            var source = EntityManager.GetLaneMinions(EntityManager.UnitTeam.Enemy, Player.Instance.Position.To2D(), GetCustomRange()).OrderBy(a => a.Health).FirstOrDefault();
+            var source = EntityManager.MinionsAndMonsters.GetLaneMinions(EntityManager.UnitTeam.Enemy, Player.Instance.Position, GetCustomRange()).OrderBy(a => a.Health).FirstOrDefault();
 
             if (Program.FarmMenu["saveStacksWC"].Cast<CheckBox>().CurrentValue && (int)_Player.Mana == 5 || source == null)
                 return;
@@ -172,7 +172,7 @@ namespace RengarBuddy
         {
             if (Orbwalker.IsAutoAttacking) return;
             Orbwalker.ForcedTarget = null;
-            var source = EntityManager.GetLaneMinions(EntityManager.UnitTeam.Enemy, Player.Instance.Position.To2D(), GetCustomRange()).OrderBy(a => a.Health).FirstOrDefault();
+            var source = EntityManager.MinionsAndMonsters.GetLaneMinions(EntityManager.UnitTeam.Enemy, Player.Instance.Position, GetCustomRange()).OrderBy(a => a.Health).FirstOrDefault();
 
             if (Program.FarmMenu["saveStacksWC"].Cast<CheckBox>().CurrentValue && (int) _Player.Mana == 5 || source == null)
                     return;
@@ -218,7 +218,7 @@ namespace RengarBuddy
             if (Orbwalker.IsAutoAttacking) return;
             Orbwalker.ForcedTarget = null;
 
-            var source = EntityManager.GetJungleMonsters(Player.Instance.Position.To2D(), GetCustomRange() + 200).OrderByDescending(a => a.MaxHealth).FirstOrDefault();
+            var source = EntityManager.MinionsAndMonsters.GetJungleMonsters(Player.Instance.Position, GetCustomRange() + 200).OrderByDescending(a => a.MaxHealth).FirstOrDefault();
 
             if (Program.JungleMenu["saveStacksJungle"].Cast<CheckBox>().CurrentValue && (int)_Player.Mana == 5 || source == null)
                 return;

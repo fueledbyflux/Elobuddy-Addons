@@ -132,7 +132,7 @@ namespace JinxBuddy
 
         public static void WaveClear()
         {
-            var minions = ObjectManager.Get<Obj_AI_Base>().Where(a => a.IsEnemy && a.Distance(_Player) <= Events.MinigunRange(a) + Events.FishBonesBonus && a.Health <= _Player.GetAutoAttackDamage(a) * 1.1);
+            var minions = EntityManager.MinionsAndMonsters.GetLaneMinions().Where(a => a.IsEnemy && a.Distance(_Player) <= Events.MinigunRange(a) + Events.FishBonesBonus && a.Health <= _Player.GetAutoAttackDamage(a) * 1.1);
             var minions2 =
                 ObjectManager.Get<Obj_AI_Base>()
                     .Where(a => a.IsEnemy && a.Distance(_Player) <= Events.MinigunRange(a) + Events.FishBonesBonus + 100 && a.Health <= _Player.GetAutoAttackDamage(a) * 1.1);
