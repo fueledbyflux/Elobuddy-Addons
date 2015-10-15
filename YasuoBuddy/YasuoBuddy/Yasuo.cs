@@ -27,47 +27,67 @@ namespace YasuoBuddy
             Menu = MainMenu.AddMenu("YasuoBuddy", "yasuobuddyfluxy");
 
             ComboMenu = Menu.AddSubMenu("Combo", "yasuCombo");
+            ComboMenu.AddGroupLabel("Combo Settings");
             ComboMenu.Add("combo.Q", new CheckBox("Use Q"));
             ComboMenu.Add("combo.E", new CheckBox("Use E"));
             ComboMenu.Add("combo.stack", new CheckBox("Stack Q"));
             ComboMenu.Add("combo.leftclickRape", new CheckBox("Left Click Rape"));
             ComboMenu.AddSeparator();
+            ComboMenu.AddLabel("R Settings");
             ComboMenu.Add("combo.R", new CheckBox("Use R"));
             ComboMenu.Add("combo.RTarget", new CheckBox("Use R always on Selected Target"));
             ComboMenu.Add("combo.RKillable", new CheckBox("Use R Execute"));
             ComboMenu.Add("combo.MinTargetsR", new Slider("Use R Min Targets", 2, 1, 5));
 
             HarassMenu = Menu.AddSubMenu("Harass", "yasuHarass");
+            HarassMenu.AddGroupLabel("Harass Settings");
             HarassMenu.Add("harass.Q", new CheckBox("Use Q"));
             HarassMenu.Add("harass.E", new CheckBox("Use E"));
             HarassMenu.Add("harass.stack", new CheckBox("Stack Q"));
 
             FarmMenu = Menu.AddSubMenu("Farming Settings", "yasuoFarm");
-            FarmMenu.AddGroupLabel("Last Hit");
+            FarmMenu.AddGroupLabel("Farming Settings");
+            FarmMenu.AddLabel("Last Hit");
             FarmMenu.Add("LH.Q", new CheckBox("Use Q"));
             FarmMenu.Add("LH.E", new CheckBox("Use E"));
 
-            FarmMenu.AddGroupLabel("WaveClear");
+            FarmMenu.AddLabel("WaveClear");
             FarmMenu.Add("WC.Q", new CheckBox("Use Q"));
             FarmMenu.Add("WC.E", new CheckBox("Use E"));
 
-            FarmMenu.AddGroupLabel("Jungle");
+            FarmMenu.AddLabel("Jungle");
             FarmMenu.Add("JNG.Q", new CheckBox("Use Q"));
             FarmMenu.Add("JNG.E", new CheckBox("Use E"));
 
-            FleeMenu = Menu.AddSubMenu("Flee", "yasuoFlee");
+            FleeMenu = Menu.AddSubMenu("Flee/Evade", "yasuoFlee");
+            FleeMenu.AddGroupLabel("Flee Settings");
             FleeMenu.Add("Flee.E", new CheckBox("Use E"));
             FleeMenu.Add("Flee.stack", new CheckBox("Stack Q"));
-
-            DrawMenu = Menu.AddSubMenu("Draw", "yasuoDraw");
-            DrawMenu.Add("Draw.Q", new CheckBox("Draw Q", false));
-            DrawMenu.Add("Draw.E", new CheckBox("Draw E", false));
-            DrawMenu.Add("Draw.R", new CheckBox("Draw R", false));
-
-
+            FleeMenu.AddGroupLabel("Evade Settings");
+            FleeMenu.Add("Evade.E", new CheckBox("Use E to Evade"));
+            FleeMenu.Add("Evade.W", new CheckBox("Use W to Evade"));
+            
             EvadePlus.Program.Main(null);
             TargetedSpells.SpellDetectorWindwaller.Init();
-            TargetSelector2.Init();
+
+            DrawMenu = Menu.AddSubMenu("Draw", "yasuoDraw");
+            DrawMenu.AddGroupLabel("Draw Settings");
+
+            DrawMenu.Add("Draw.Q", new CheckBox("Draw Q", false));
+            DrawMenu.AddColourItem("Draw.Q.Colour");
+            DrawMenu.AddSeparator();
+
+            DrawMenu.Add("Draw.E", new CheckBox("Draw E", false));
+            DrawMenu.AddColourItem("Draw.E.Colour");
+            DrawMenu.AddSeparator();
+
+            DrawMenu.Add("Draw.R", new CheckBox("Draw R", false));
+            DrawMenu.AddColourItem("Draw.R.Colour");
+            DrawMenu.AddSeparator();
+
+            DrawMenu.AddLabel("When Spell is Down Colour = ");
+            DrawMenu.AddColourItem("Draw.Down", 7);
+
             EventManager.Init();
             Game.OnTick += Game_OnTick;
             Obj_AI_Base.OnProcessSpellCast += Obj_AI_Base_OnProcessSpellCast;
@@ -86,17 +106,17 @@ namespace YasuoBuddy
         {
             if (DrawMenu["Draw.Q"].Cast<CheckBox>().CurrentValue)
             {
-                Circle.Draw(SpellManager.Q().IsReady() ? SharpDX.Color.Cyan : SharpDX.Color.DarkRed,
+                Circle.Draw(SpellManager.Q().IsReady() ? DrawMenu.GetColour("Draw.Q.Colour") : DrawMenu.GetColour("Draw.Down"),
                     SpellManager.Q().Range, Player.Instance.Position);
             }
             if (DrawMenu["Draw.R"].Cast<CheckBox>().CurrentValue)
             {
-                Circle.Draw(SpellManager.R.IsReady() ? SharpDX.Color.Cyan : SharpDX.Color.DarkRed,
+                Circle.Draw(SpellManager.R.IsReady() ? DrawMenu.GetColour("Draw.R.Colour") : DrawMenu.GetColour("Draw.Down"),
                     SpellManager.R.Range, Player.Instance.Position);
             }
             if (DrawMenu["Draw.E"].Cast<CheckBox>().CurrentValue)
             {
-                Circle.Draw(SpellManager.E.IsReady() ? SharpDX.Color.Cyan : SharpDX.Color.DarkRed,
+                Circle.Draw(SpellManager.E.IsReady() ? DrawMenu.GetColour("Draw.E.Colour") : DrawMenu.GetColour("Draw.Down"),
                     SpellManager.E.Range, Player.Instance.Position);
             }
         }

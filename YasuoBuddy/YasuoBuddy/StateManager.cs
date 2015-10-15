@@ -12,14 +12,14 @@ namespace YasuoBuddy
     {
         public static void Combo()
         {
-            var target = TargetSelector2.IsSelected && Yasuo.ComboMenu["combo.leftclickRape"].Cast<CheckBox>().CurrentValue && TargetSelector2.Target != null && TargetSelector2.Target.Distance(Player.Instance) < 1375
-                    ? TargetSelector2.Target
-                    : TargetSelector2.GetTarget(SpellManager.Q().Range + 475 + 100, DamageType.Physical);
+            var target = TargetSelector.SeletedEnabled && Yasuo.ComboMenu["combo.leftclickRape"].Cast<CheckBox>().CurrentValue && TargetSelector.SelectedTarget != null && TargetSelector.SelectedTarget.IsValidTarget(1375)
+                    ? TargetSelector.SelectedTarget
+                    : TargetSelector.GetTarget(SpellManager.Q().Range + 475 + 100, DamageType.Physical);
             if (target == null) return;
 
             if (SpellManager.R.IsReady() && SpellManager.GetLowestKnockupTime() <= 250 + Game.Ping &&
                 Yasuo.ComboMenu["combo.R"].Cast<CheckBox>().CurrentValue &&
-                (Yasuo.ComboMenu["combo.RTarget"].Cast<CheckBox>().CurrentValue && target.IsKnockedUp() && TargetSelector2.IsSelected ||
+                (Yasuo.ComboMenu["combo.RTarget"].Cast<CheckBox>().CurrentValue && target.IsKnockedUp() && TargetSelector.SelectedTarget == target ||
                 Yasuo.ComboMenu["combo.RKillable"].Cast<CheckBox>().CurrentValue && target.Health <= DamageHandler.RDamage(target) && target.Health > DamageHandler.QDamage(target) ||
                 SpellManager.GetKnockedUpTargets() >= Yasuo.ComboMenu["combo.MinTargetsR"].Cast<Slider>().CurrentValue))
             {
@@ -31,7 +31,7 @@ namespace YasuoBuddy
                 if (Player.Instance.IsDashing())
                 {
                     var pos = DashingManager.GetPlayerPosition(300);
-                    if (SpellManager.Q().IsReady() && (target.Distance(pos) < 475))
+                    if (SpellManager.Q().IsReady() && (target.Distance(pos) < 450))
                     {
                         Player.CastSpell(SpellSlot.Q);
                     }
@@ -44,18 +44,19 @@ namespace YasuoBuddy
             }
 
             var unit = target.GetClosestEUnit();
-            if (Yasuo.ComboMenu["combo.E"].Cast<CheckBox>().CurrentValue && unit != null && unit.GetDashPos().Distance(target) < Player.Instance.Distance(target) && (!unit.GetDashPos().IsUnderTower() || TargetSelector2.IsSelected))
+            if (Yasuo.ComboMenu["combo.E"].Cast<CheckBox>().CurrentValue && !Player.Instance.IsDashing() && unit != null && unit.GetDashPos().Distance(target) < Player.Instance.Distance(target) && (!unit.GetDashPos().IsUnderTower() || TargetSelector.SelectedTarget == target))
             {
                 SpellManager.E.Cast(unit);
             }
+
             if (Yasuo.ComboMenu["combo.stack"].Cast<CheckBox>().CurrentValue) SpellManager.StackQ();
         }
 
         public static void Harass()
         {
-            var target = TargetSelector2.IsSelected
-                    ? TargetSelector2.GetTarget(1375, DamageType.Physical)
-                    : TargetSelector2.GetTarget(SpellManager.Q().Range + 475 + 100, DamageType.Physical);
+            var target = TargetSelector.SeletedEnabled && TargetSelector.SelectedTarget != null && TargetSelector.SelectedTarget.IsValidTarget(1375)
+                    ? TargetSelector.SelectedTarget
+                    : TargetSelector.GetTarget(SpellManager.Q().Range + 475 + 100, DamageType.Physical);
             if (target == null) return;
             if (target.IsValidTarget(SpellManager.Q().Range) && Yasuo.HarassMenu["harass.Q"].Cast<CheckBox>().CurrentValue)
             {
@@ -75,7 +76,7 @@ namespace YasuoBuddy
             }
 
             var unit = target.GetClosestEUnit();
-            if (Yasuo.HarassMenu["harass.E"].Cast<CheckBox>().CurrentValue && unit != null && unit.GetDashPos().Distance(target) < Player.Instance.Distance(target) && (!unit.GetDashPos().IsUnderTower() || TargetSelector2.IsSelected))
+            if (Yasuo.HarassMenu["harass.E"].Cast<CheckBox>().CurrentValue && unit != null && unit.GetDashPos().Distance(target) < Player.Instance.Distance(target) && (!unit.GetDashPos().IsUnderTower() || TargetSelector.SelectedTarget == target))
             {
                 SpellManager.E.Cast(unit);
             }

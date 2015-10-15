@@ -34,7 +34,7 @@ namespace YasuoBuddy
                     a =>
                         a.Distance(Player.Instance.Position) < 475 && !Player.Instance.IsDashing() ||
                         Player.Instance.IsDashing() &&
-                        DashingManager.GetPlayerPosition(300).Distance(Q().GetPrediction(a).UnitPosition) < 475).OrderBy(TargetSelector.GetPriority).FirstOrDefault();
+                        DashingManager.GetPlayerPosition(300).Distance(Q().GetPrediction(a).UnitPosition) < 450).OrderBy(TargetSelector.GetPriority).FirstOrDefault();
             if (target != null)
             {
                 if (!Player.Instance.IsDashing())
@@ -49,7 +49,7 @@ namespace YasuoBuddy
             var target2 =
                 EntityManager.MinionsAndMonsters.EnemyMinions.FirstOrDefault(a => a.Distance(Player.Instance.Position) <= 475 && !Player.Instance.IsDashing() ||
                         Player.Instance.IsDashing() &&
-                        DashingManager.GetPlayerPosition(300).Distance(Q().GetPrediction(a).UnitPosition) < 475);
+                        DashingManager.GetPlayerPosition(300).Distance(Q().GetPrediction(a).UnitPosition) < 450);
             if (target2 != null)
             {
                 if (!Player.Instance.IsDashing())

@@ -2,6 +2,7 @@
 using System.Linq;
 using EloBuddy;
 using EloBuddy.SDK;
+using EloBuddy.SDK.Menu.Values;
 using SharpDX;
 using YasuoBuddy.EvadePlus;
 using YasuoBuddy.EvadePlus.SkillshotTypes;
@@ -16,6 +17,7 @@ namespace YasuoBuddy
         public static void UpdateTask()
         {
             Program.Evade.CacheSkillshots();
+
             GameObject wall = null;
             foreach (var gameObject in ObjectManager.Get<GameObject>())
             {
@@ -45,9 +47,11 @@ namespace YasuoBuddy
                 }
             }
 
+            Program.Evade.CacheSkillshots();
+
             if (Program.Evade.IsHeroInDanger(Player.Instance))
             {
-                if (Player.GetSpell(SpellSlot.W).State == SpellState.Ready)
+                if (Yasuo.FleeMenu["Evade.W"].Cast<CheckBox>().CurrentValue && Player.GetSpell(SpellSlot.W).State == SpellState.Ready)
                 {
                     foreach (var activeSkillshot in EvadePlus.Program.Evade.SkillshotDetector.ActiveSkillshots.Where(a => a is LinearMissileSkillshot && EvadePlus.EvadeMenu.IsSkillshotW(a)))
                     {
@@ -59,7 +63,7 @@ namespace YasuoBuddy
                     }
                 }
                 
-                if (Player.GetSpell(SpellSlot.E).State == SpellState.Ready)
+                if (Yasuo.FleeMenu["Evade.E"].Cast<CheckBox>().CurrentValue && Player.GetSpell(SpellSlot.E).State == SpellState.Ready)
                 {
                     foreach (
                         var source in

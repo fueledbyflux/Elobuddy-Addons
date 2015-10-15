@@ -61,6 +61,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ColourMenuItem.cs" />
     <Compile Include="DamageHandler.cs" />
     <Compile Include="DashingManager.cs" />
     <Compile Include="EEvader.cs" />
@@ -83,7 +84,6 @@
     <Compile Include="TargetedSpells\SpellDetectorWindwaller.cs" />
     <Compile Include="TargetedSpells\TargetedSpells.cs" />
     <Compile Include="TargetedSpells\TargetSpellData.cs" />
-    <Compile Include="TargetSelector2.cs" />
     <Compile Include="Yasuo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
