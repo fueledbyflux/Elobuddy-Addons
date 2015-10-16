@@ -13,7 +13,7 @@ namespace JinxBuddy
         {
             return
                 (int)
-                    (new int[] {10, 60, 110, 160, 210}[Program.Spells[SpellSlot.W].Level - 1] +
+                    (new int[] {10, 60, 110, 160, 210}[Program.W.Level - 1] +
                      1.4*(ObjectManager.Player.TotalAttackDamage));
         }
 
@@ -21,7 +21,7 @@ namespace JinxBuddy
         {
             return
                 (int)
-                    (new double[] { 80, 135, 190, 245, 300 }[Program.Spells[SpellSlot.E].Level -1]
+                    (new double[] { 80, 135, 190, 245, 300 }[Program.E.Level -1]
                                     + 1 * ObjectManager.Player.FlatMagicDamageMod);
         }
     }

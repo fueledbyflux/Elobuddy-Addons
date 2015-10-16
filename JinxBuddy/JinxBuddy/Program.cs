@@ -1,57 +1,32 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using EloBuddy;
 using EloBuddy.SDK;
 using EloBuddy.SDK.Enumerations;
 using EloBuddy.SDK.Events;
 using EloBuddy.SDK.Menu;
 using EloBuddy.SDK.Menu.Values;
+using EloBuddy.SDK.Rendering;
+using SharpDX;
 
 namespace JinxBuddy
 {
     internal class Program
     {
-        public static AIHeroClient _Player
-        {
-            get { return ObjectManager.Player; }
-        }
+        public static Spell.Active Q = new Spell.Active(SpellSlot.Q);
 
-        public static Dictionary<SpellSlot, Spell.SpellBase> Spells = new Dictionary<SpellSlot, Spell.SpellBase>()
+        public static Spell.Skillshot W = new Spell.Skillshot(SpellSlot.W, 1450, SkillShotType.Linear, 600, 3300, 180)
         {
-            {SpellSlot.Q, new Spell.Active(SpellSlot.Q)},
-            {SpellSlot.W, new Spell.Skillshot(SpellSlot.W, 1450, SkillShotType.Linear, 600, 3300, 120) {MinimumHitChance = HitChance.Medium} },
-            {SpellSlot.E, new Spell.Skillshot(SpellSlot.E, 900, SkillShotType.Circular, 1200, 1750, 1)},
-            {SpellSlot.R, new Spell.Skillshot(SpellSlot.R, 3000, SkillShotType.Linear, 600, 1700, 140)}
+            MinimumHitChance = HitChance.High
         };
 
-        public static Dictionary<SpellSlot, int> Mana = new Dictionary<SpellSlot, int>()
-        {
-            {SpellSlot.Q, 20},
-            {SpellSlot.W, new[] {50, 60, 70, 80, 90}[Spells[SpellSlot.W].IsLearned ? Spells[SpellSlot.W].Level - 1 : 0]},
-            {SpellSlot.E, 50},
-            {SpellSlot.R, 100}
-        };
+        public static Spell.Skillshot E = new Spell.Skillshot(SpellSlot.E, 900, SkillShotType.Circular, 1200, 1750, 1);
+        public static Spell.Skillshot R = new Spell.Skillshot(SpellSlot.R, 3000, SkillShotType.Linear, 600, 1700, 140);
 
-        public static int WMana
-        {
-            get
-            {
-                return new[] {50, 60, 70, 80, 90}[Spells[SpellSlot.W].IsLearned ? Spells[SpellSlot.W].Level - 1 : 0];
-            }
-        }
+        public static Menu Menu, ComboMenu, HarassMenu, FarmMenu, MiscMenu, DrawMenu;
 
-        public static int RMana = 100;
-        public static int EMana = 50;
-        public static int QMana = 20;
-
-        public static Menu menu, ComboMenu, HarassMenu, FarmMenu, MiscMenu;
-        public static CheckBox SmartMode;
-
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             Loading.OnLoadingComplete += Loading_OnLoadingComplete;
         }
@@ -60,51 +35,72 @@ namespace JinxBuddy
         {
             Bootstrap.Init(null);
 
-            menu = MainMenu.AddMenu("Jinx Buddy", "jinxBuddy");
-            menu.AddGroupLabel("Jinx Buddy");
-            menu.AddLabel("made by the flauxbauss");
-            menu.AddSeparator();
-            SmartMode = menu.Add("smartMode", new CheckBox("Smart Mode", false));
-            menu.AddLabel("Smart mode enables mana management / smarter skill usage");
+            Menu = MainMenu.AddMenu("Jinx Buddy", "jinxBuddy");
+            Menu.AddGroupLabel("Jinx Buddy");
+            Menu.AddLabel("made by the flauxbauss");
+            Menu.AddSeparator();
 
-            ComboMenu = menu.AddSubMenu("Combo", "ComboJinx");
+            ComboMenu = Menu.AddSubMenu("Combo", "ComboJinx");
             ComboMenu.AddGroupLabel("Combo Settings");
-            ComboMenu.AddSeparator();
             ComboMenu.Add("useQCombo", new CheckBox("Use Q"));
             ComboMenu.Add("useQSplash", new CheckBox("Use Q Splash"));
-            ComboMenu.Add("useQRange", new CheckBox("Use Q Range"));
             ComboMenu.Add("useWCombo", new CheckBox("Use W"));
             ComboMenu.Add("useECombo", new CheckBox("Use E"));
             ComboMenu.Add("useRCombo", new CheckBox("Use R"));
 
-            HarassMenu = menu.AddSubMenu("Harass", "HarassJinx");
+            HarassMenu = Menu.AddSubMenu("Harass", "HarassJinx");
             HarassMenu.AddGroupLabel("Harass Settings");
-            HarassMenu.AddSeparator();
             HarassMenu.Add("useQHarass", new CheckBox("Use Q"));
             HarassMenu.Add("useWHarass", new CheckBox("Use W"));
 
-            FarmMenu = menu.AddSubMenu("Farm", "FarmJinx");
+            FarmMenu = Menu.AddSubMenu("Farm", "FarmJinx");
             FarmMenu.AddGroupLabel("Farm Settings");
-            FarmMenu.AddSeparator();
+            FarmMenu.AddLabel("WaveClear");
             FarmMenu.Add("useQFarm", new CheckBox("Use Q"));
+            FarmMenu.Add("disableRocketsWC", new CheckBox("Disable Rockets (only if use q off)", false));
+            FarmMenu.AddLabel("Last Hit");
+            FarmMenu.Add("disableRocketsLH", new CheckBox("Disable Rockets"));
 
-
-            MiscMenu = menu.AddSubMenu("Misc", "MiscMenuJinx");
+            MiscMenu = Menu.AddSubMenu("Misc", "MiscMenuJinx");
+            MiscMenu.AddGroupLabel("Misc Settings");
             MiscMenu.Add("gapcloser", new CheckBox("Gapcloser E"));
             MiscMenu.Add("interruptor", new CheckBox("Interruptor E"));
             MiscMenu.Add("CCE", new CheckBox("On CC'd E"));
 
-            Events.Init();
+            DrawMenu = Menu.AddSubMenu("Drawing Settings");
+            DrawMenu.Add("drawRange", new CheckBox("Draw Other AA Range"));
+            DrawMenu.Add("drawW", new CheckBox("Draw W"));
+            DrawMenu.Add("drawE", new CheckBox("Draw E"));
+
             Game.OnTick += Game_OnTick;
             Gapcloser.OnGapcloser += Events.Gapcloser_OnGapCloser;
             Interrupter.OnInterruptableSpell += Interrupter_OnInterruptableSpell;
+            Drawing.OnDraw += Drawing_OnDraw;
         }
 
-        private static void Interrupter_OnInterruptableSpell(Obj_AI_Base sender, Interrupter.InterruptableSpellEventArgs e)
+        private static void Drawing_OnDraw(EventArgs args)
         {
-            if (MiscMenu["interruptor"].Cast<CheckBox>().CurrentValue && sender.IsEnemy && e.DangerLevel == DangerLevel.High && sender.IsValidTarget(900))
+            if (DrawMenu["drawRange"].Cast<CheckBox>().CurrentValue)
             {
-                Spells[SpellSlot.E].Cast(sender);
+                Circle.Draw(Color.HotPink, !Events.FishBonesActive ? Events.FishBonesBonus + Events.MinigunRange() - Player.Instance.BoundingRadius/2 : Events.MinigunRange() - Player.Instance.BoundingRadius/2, Player.Instance.Position);
+            }
+            if (DrawMenu["drawW"].Cast<CheckBox>().CurrentValue)
+            {
+                Circle.Draw(W.IsReady() ? Color.HotPink : Color.DarkRed, W.Range, Player.Instance.Position);
+            }
+            if (DrawMenu["drawE"].Cast<CheckBox>().CurrentValue)
+            {
+                Circle.Draw(W.IsReady() ? Color.HotPink : Color.DarkRed, W.Range, Player.Instance.Position);
+            }
+        }
+
+        private static void Interrupter_OnInterruptableSpell(Obj_AI_Base sender,
+            Interrupter.InterruptableSpellEventArgs e)
+        {
+            if (MiscMenu["interruptor"].Cast<CheckBox>().CurrentValue && sender.IsEnemy &&
+                e.DangerLevel == DangerLevel.High && sender.IsValidTarget(900))
+            {
+                E.Cast(sender);
             }
         }
 
@@ -112,140 +108,199 @@ namespace JinxBuddy
         {
             Orbwalker.ForcedTarget = null;
             if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo)) Combo();
-            else if(Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Harass)) Harass();
-            else if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear)) WaveClear();
+            if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Harass)) Harass();
+            if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear)) WaveClear();
+            if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LastHit)) LastHit();
 
             if (MiscMenu["CCE"].Cast<CheckBox>().CurrentValue)
             {
-                foreach (var enemy in HeroManager.Enemies)
+                foreach (var enemy in EntityManager.Heroes.Enemies)
                 {
-                    if (enemy.Distance(Player.Instance) < Spells[SpellSlot.E].Range &&
+                    if (enemy.Distance(Player.Instance) < E.Range &&
                         (enemy.HasBuffOfType(BuffType.Stun)
                          || enemy.HasBuffOfType(BuffType.Snare)
                          || enemy.HasBuffOfType(BuffType.Suppression)))
                     {
-                        Spells[SpellSlot.E].Cast(enemy);
+                        E.Cast(enemy);
                     }
                 }
+            }
+        }
+
+        public static void LastHit()
+        {
+            if (FarmMenu["disableRocketsLH"].Cast<CheckBox>().CurrentValue && Events.FishBonesActive)
+            {
+                Q.Cast();
             }
         }
 
         public static void WaveClear()
         {
-            var minions = EntityManager.MinionsAndMonsters.GetLaneMinions().Where(a => a.IsEnemy && a.Distance(_Player) <= Events.MinigunRange(a) + Events.FishBonesBonus && a.Health <= _Player.GetAutoAttackDamage(a) * 1.1);
-            var minions2 =
-                ObjectManager.Get<Obj_AI_Base>()
-                    .Where(a => a.IsEnemy && a.Distance(_Player) <= Events.MinigunRange(a) + Events.FishBonesBonus + 100 && a.Health <= _Player.GetAutoAttackDamage(a) * 1.1);
-            var minion = minions.OrderByDescending(a => minions2.Count(b => b.Distance(a) <= 200)).FirstOrDefault();
-            Orbwalker.ForcedTarget = minion;
+            if (Orbwalker.IsAutoAttacking) return;
+            if (FarmMenu["useQFarm"].Cast<CheckBox>().CurrentValue)
+            {
+                var unit =
+                    EntityManager.MinionsAndMonsters.GetLaneMinions()
+                        .Where(
+                            a =>
+                                a.IsValidTarget(Events.MinigunRange(a) + Events.FishBonesBonus) &&
+                                a.Health < Player.Instance.GetAutoAttackDamage(a)*1.1)
+                        .FirstOrDefault(minion => EntityManager.MinionsAndMonsters.EnemyMinions.Count(
+                            a => a.Distance(minion) < 150 && a.Health < Player.Instance.GetAutoAttackDamage(a)*1.1) > 1);
+
+                if (unit != null)
+                {
+                    if (!Events.FishBonesActive)
+                    {
+                        Q.Cast();
+                    }
+                    Orbwalker.ForcedTarget = unit;
+                    return;
+                }
+
+                if (Events.FishBonesActive)
+                {
+                    Q.Cast();
+                }
+            }
+            else if (FarmMenu["disableRocketsLH"].Cast<CheckBox>().CurrentValue && Events.FishBonesActive)
+            {
+                Q.Cast();
+            }
         }
 
         public static void Harass()
         {
-            var target = TargetSelector.GetTarget(1550, DamageType.Physical);
+            var target = TargetSelector.SelectedTarget != null &&
+                         TargetSelector.SelectedTarget.Distance(Player.Instance) < 2000
+                ? TargetSelector.SelectedTarget
+                : TargetSelector.GetTarget(1500, DamageType.Physical);
+
+            Orbwalker.ForcedTarget = null;
 
             if (target == null) return;
 
             if (Orbwalker.IsAutoAttacking) return;
 
-            if (HarassMenu["useQHarass"].Cast<CheckBox>().CurrentValue && Spells[SpellSlot.Q].IsReady())
+            // W out of range
+            if (HarassMenu["useWHarass"].Cast<CheckBox>().CurrentValue && W.IsReady() && target.Distance(Player.Instance) > Player.Instance.GetAutoAttackRange(target) &&
+                target.IsValidTarget(W.Range))
             {
-                var distance = target.Distance(_Player);
+                W.Cast(target);
+            }
+
+            if (HarassMenu["useQHarass"].Cast<CheckBox>().CurrentValue)
+            {
+                // Aoe Logic
+                foreach (
+                    var enemy in
+                        EntityManager.Heroes.Enemies.Where(
+                            a => a.IsValidTarget(Events.MinigunRange(a) + Events.FishBonesBonus))
+                            .OrderBy(TargetSelector.GetPriority))
+                {
+                    if (enemy.CountEnemiesInRange(150) > 1 &&
+                        (enemy.NetworkId == target.NetworkId || enemy.Distance(target) < 150))
+                    {
+                        if (!Events.FishBonesActive)
+                        {
+                            Q.Cast();
+                        }
+                        Orbwalker.ForcedTarget = enemy;
+                        return;
+                    }
+                }
+
+                // Regular Q Logic
                 if (Events.FishBonesActive)
                 {
-                    if (distance < Events.MinigunRange(target) + target.BoundingRadius)
+                    if (target.Distance(Player.Instance) <= Events.MinigunRange(target))
                     {
-                        Spells[SpellSlot.Q].Cast();
+                        Q.Cast();
                     }
                 }
                 else
                 {
-                    if (distance > Events.MinigunRange(target) + target.BoundingRadius &&
-                        distance <= Events.MinigunRange(target) + Events.FishBonesBonus + target.BoundingRadius + 200)
+                    if (target.Distance(Player.Instance) > Events.MinigunRange(target))
                     {
-                        Spells[SpellSlot.Q].Cast();
+                        Q.Cast();
                     }
                 }
             }
-
-            if (HarassMenu["useWHarass"].Cast<CheckBox>().CurrentValue && Spells[SpellSlot.W].IsReady())
-            {
-                var pred = Prediction.Position.PredictLinearMissile(target, Spells[SpellSlot.W].Range, 60, 600, 3300, 0);
-                if (SmartMode.CurrentValue && pred.HitChance >= HitChance.High)
-                {
-                    if (_Player.Mana > RMana + EMana + WMana)
-                    {
-                        Spells[SpellSlot.W].Cast(pred.CastPosition);
-                    }
-                }
-                else
-                {
-                    Spells[SpellSlot.W].Cast(pred.CastPosition);
-                }
-            }
-
-
         }
 
         public static void Combo()
         {
-            var target = TargetSelector.GetTarget(1700, DamageType.Physical);
+            var target = TargetSelector.SelectedTarget != null &&
+                         TargetSelector.SelectedTarget.Distance(Player.Instance) < 2000
+                ? TargetSelector.SelectedTarget
+                : TargetSelector.GetTarget(1500, DamageType.Physical);
             var rtarget = TargetSelector.GetTarget(3000, DamageType.Physical);
 
+            Orbwalker.ForcedTarget = null;
 
             if (target == null) return;
 
             if (Orbwalker.IsAutoAttacking) return;
 
-            if (ComboMenu["useWCombo"].Cast<CheckBox>().CurrentValue && Spells[SpellSlot.W].IsReady())
+            // E on immobile
+
+            if (ComboMenu["useECombo"].Cast<CheckBox>().CurrentValue && (target.HasBuffOfType(BuffType.Snare) ||  target.HasBuffOfType(BuffType.Stun)))
             {
-                if (SmartMode.CurrentValue)
+                E.Cast(target);
+            }
+
+            // W/R KS
+            var wPred = W.GetPrediction(rtarget);
+
+            if (ComboMenu["useWCombo"].Cast<CheckBox>().CurrentValue && wPred.HitChance >= HitChance.Medium && W.IsReady() && rtarget.IsValidTarget(W.Range) &&
+                Damages.WDamage(target) >= rtarget.Health)
+            {
+                W.Cast(rtarget);
+            }
+            else if (ComboMenu["useRCombo"].Cast<CheckBox>().CurrentValue && rtarget != null &&
+                     rtarget.Distance(Player.Instance) > Events.MinigunRange(target) + Events.FishBonesBonus &&
+                     rtarget.IsKillableByR())
+            {
+                R.Cast(rtarget);
+            }
+
+            // W out of range
+            if (ComboMenu["useWCombo"].Cast<CheckBox>().CurrentValue && W.IsReady() && target.Distance(Player.Instance) > Player.Instance.GetAutoAttackRange(target) &&
+                target.IsValidTarget(W.Range))
+            {
+                W.Cast(target);
+            }
+
+            if (ComboMenu["useQSplash"].Cast<CheckBox>().CurrentValue)
+            {
+                // Aoe Logic
+                foreach (var enemy in EntityManager.Heroes.Enemies.Where(
+                    a => a.IsValidTarget(Events.MinigunRange(a) + Events.FishBonesBonus))
+                    .OrderBy(TargetSelector.GetPriority).Where(enemy => enemy.CountEnemiesInRange(150) > 1 && (enemy.NetworkId == target.NetworkId || enemy.Distance(target) < 150)))
                 {
-                    if (_Player.Mana > RMana + EMana)
+                    if (!Events.FishBonesActive)
                     {
-                        Spells[SpellSlot.W].Cast(target);
-                        return;
+                        Q.Cast();
                     }
-                }
-                else
-                {
-                    Spells[SpellSlot.W].Cast(target);
+                    Orbwalker.ForcedTarget = enemy;
                     return;
                 }
             }
 
-            if (ComboMenu["useRCombo"].Cast<CheckBox>().CurrentValue && Spells[SpellSlot.R].IsReady() && rtarget.Distance(_Player) > _Player.GetAutoAttackRange(rtarget) && rtarget.IsKillableByR())
+            // Regular Q Logic
+            if (ComboMenu["useQCombo"].Cast<CheckBox>().CurrentValue && Events.FishBonesActive)
             {
-                Spells[SpellSlot.R] = new Spell.Skillshot(SpellSlot.R, 2000, SkillShotType.Linear, 600, (int) UltimateHandler.UltSpeed(target.Position), 140);
-                Spells[SpellSlot.R].Cast(rtarget);
-            }
-
-            if (ComboMenu["useECombo"].Cast<CheckBox>().CurrentValue && Spells[SpellSlot.E].IsReady() 
-                && target.HasBuffOfType(BuffType.Slow)
-                || target.HasBuffOfType(BuffType.Stun)
-                || target.HasBuffOfType(BuffType.Snare)
-                || target.HasBuffOfType(BuffType.Suppression))
-            {
-                Spells[SpellSlot.E].Cast(target);
-            }
-
-            if (ComboMenu["useQCombo"].Cast<CheckBox>().CurrentValue && Spells[SpellSlot.Q].IsReady())
-            {
-                var distance = target.Distance(_Player);
-                if (Events.FishBonesActive)
+                if (target.Distance(Player.Instance) <= Events.MinigunRange(target))
                 {
-                    if (distance < Events.MinigunRange(target) + target.BoundingRadius && ComboMenu["useQRange"].Cast<CheckBox>().CurrentValue)
-                    {
-                        Spells[SpellSlot.Q].Cast();
-                    }
+                    Q.Cast();
                 }
-                else
+            }
+            else if(ComboMenu["useQCombo"].Cast<CheckBox>().CurrentValue)
+            {
+                if (target.Distance(Player.Instance) > Events.MinigunRange(target))
                 {
-                    if (distance > Events.MinigunRange(target) + target.BoundingRadius && ComboMenu["useQRange"].Cast<CheckBox>().CurrentValue &&
-                        distance <= Events.MinigunRange(target) + Events.FishBonesBonus + target.BoundingRadius + 200 && ComboMenu["useQRange"].Cast<CheckBox>().CurrentValue)
-                    {
-                        Spells[SpellSlot.Q].Cast();
-                    }
+                    Q.Cast();
                 }
             }
         }

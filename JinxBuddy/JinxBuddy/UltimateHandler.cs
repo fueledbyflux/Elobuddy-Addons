@@ -21,8 +21,8 @@ namespace JinxBuddy
         }
         public static float RDamage(AIHeroClient target)
         {
-            if (!Program.Spells[SpellSlot.R].IsLearned) return 0;
-            var level = Program.Spells[SpellSlot.R].Level - 1;
+            if (!Program.R.IsLearned) return 0;
+            var level = Program.R.Level - 1;
 
             if (target.Distance(_Player) < 1350)
             {
