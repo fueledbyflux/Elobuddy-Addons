@@ -171,7 +171,7 @@ namespace ActivatorBuddy.Items
                     {
                         if (!Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo)) continue;
 
-                        var target = (Obj_AI_Base) Orbwalker.GetTarget();
+                        var target = (Obj_AI_Base) Orbwalker.LastTarget;
 
                         var menuItem = OffensiveMenu[item.Name + "Manager"].Cast<CheckBox>();
                         var menuItemMe = OffensiveMenu[item.Name + "ManagerMinMeHP"].Cast<Slider>();
