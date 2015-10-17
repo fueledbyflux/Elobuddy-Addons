@@ -94,7 +94,7 @@ namespace GangplankBuddy
             if (target == null || !target.IsValidTarget()) return;
 
             var barrel = BarrelManager.KillableBarrelAroundUnit(target);
-            if (Program.HarassMenu["useQBarrels"].Cast<CheckBox>().CurrentValue && barrel != null &&
+            if (Program.HarassMenu["useQBarrelsHarass"].Cast<CheckBox>().CurrentValue && barrel != null &&
                 SpellManager.Q.IsReady())
             {
                 SpellManager.Q.Cast(barrel);
