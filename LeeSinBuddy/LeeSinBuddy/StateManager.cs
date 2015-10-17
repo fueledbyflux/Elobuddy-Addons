@@ -217,7 +217,7 @@ namespace LeeSinBuddy
 
             if (ComboMenu["useR"].Cast<CheckBox>().CurrentValue && Program.R.IsReady() &&
                 target.Distance(_Player) <= Program.R.Range
-                && Damage.RDamage(target) >= target.Health + target.AttackShield)
+                && (Damage.RDamage(target) >= target.Health + target.AttackShield || target.HasQBuff() && target.Health < Damage.RDamage(target) + Damage.Q2Damage(target, Damage.RDamage(target))))
             {
                 Program.R.Cast(target);
                 return;
@@ -354,6 +354,34 @@ namespace LeeSinBuddy
                 && Program.E.Instance().Name == Program.Spells["E1"] && target.Distance(_Player) < 430)
             {
                 Program.E.Cast();
+            }
+        }
+
+        public static void KillSteal()
+        {
+            foreach (var enemy in EntityManager.Heroes.Enemies)
+            {
+                if (Program.E.IsReady() && enemy.Health < Damage.EDamage(enemy) && Program.E.Instance().Name == Program.Spells["E1"] &&
+                    enemy.Distance(_Player) < 430)
+                {
+                    Program.E.Cast();
+                    return;
+                }
+                if (Program.Q.IsReady() && enemy.HasQBuff() && enemy.Health < Damage.Q2Damage(enemy) && Program.Q.Instance().Name == Program.Spells["Q2"] && enemy.Distance(_Player) < 1400)
+                {
+                    Program.Q2.Cast();
+                    return;
+                }
+                if (Program.Q.IsReady() && enemy.Health < Damage.QDamage(enemy) && Program.Q.Instance().Name == Program.Spells["Q1"] && enemy.Distance(_Player) < 1100)
+                {
+                    Program.Q.Cast(enemy);
+                    return;
+                }
+                if (Program.R.IsReady() && enemy.Health < Damage.QDamage(enemy) &&
+                    enemy.Distance(_Player) < Program.R.Range)
+                {
+                    Program.R.Cast(enemy);
+                }
             }
         }
     }

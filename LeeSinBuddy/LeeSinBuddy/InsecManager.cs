@@ -206,24 +206,18 @@ namespace LeeSinBuddy
             {
                 Program.Q2.Cast();
             }
-            if (Program.Q.Instance().Name == Program.Spells["Q1"] && target.Distance(_Player) < Program.Q.Range)
+            if (Program.Q.Instance().Name == Program.Spells["Q1"] && Program.Q.IsReady() && target.Distance(_Player) < Program.Q.Range)
             {
-                if (!Program.Q.GetPrediction(InsecTarget).HitChance.HasFlag(HitChance.Collision))
-                {
-                    SpellClass.SmiteQCast(InsecTarget);
-                }
-                else if (InsecMenu["checkAllUnits"].Cast<CheckBox>().CurrentValue)
+                if (!SpellClass.SmiteQCast(target) && InsecMenu["checkAllUnits"].Cast<CheckBox>().CurrentValue)
                 {
                     foreach (
                         var unit in
-                            ObjectManager.Get<Obj_AI_Base>()
-                                .Where(
-                                    a =>
-                                        a.IsEnemy && a.Distance(_Player) < Program.Q.Range && a.Distance(InsecPos) < 600)
+                            EntityManager.MinionsAndMonsters.EnemyMinions.Where(
+                                    a => a.Distance(_Player) < Program.Q.Range && a.Distance(InsecPos) < 550)
                         )
                     {
                         var pred = Program.Q.GetPrediction(unit);
-                        if (!pred.HitChance.HasFlag(HitChance.High) && !pred.HitChance.HasFlag(HitChance.Medium)) continue;
+                        if (pred.HitChance > HitChance.Medium) continue;
                         Program.Q.Cast(pred.CastPosition);
                         break;
                     }

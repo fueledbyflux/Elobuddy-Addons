@@ -139,6 +139,7 @@ namespace LeeSinBuddy
 
         private static void Game_OnTick(EventArgs args)
         {
+            StateManager.KillSteal();
             if (PassiveTimer <= Environment.TickCount)
             {
                 PassiveStacks = 0;

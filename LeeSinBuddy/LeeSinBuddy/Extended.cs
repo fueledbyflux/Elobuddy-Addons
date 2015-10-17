@@ -16,8 +16,8 @@ namespace LeeSinBuddy
             int defaultValue = 0)
         {
             var slider = menu.Add(name, new Slider(displayName, defaultValue, 0, values.Length - 1));
-            var text = menu.Add(name + "label", new Label(values[slider.CurrentValue]));
-            slider.OnValueChange += delegate { text.DisplayName = values[slider.CurrentValue]; };
+            slider.DisplayName = values[slider.CurrentValue];
+            slider.OnValueChange += delegate { slider.DisplayName = values[slider.CurrentValue]; };
         }
 
         public static bool HasEBuff(this Obj_AI_Base unit)
