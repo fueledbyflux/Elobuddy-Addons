@@ -103,7 +103,6 @@ namespace LeeSinBuddy
             InsecManager.Init();
             StateManager.Init();
             WardJumper.Init();
-            TargetSelector2.init();
             Game.OnTick += Game_OnTick;
 
             Chat.Print("Fluxy's Lee Sin Buddy Loaded.", System.Drawing.Color.BlueViolet);

@@ -37,11 +37,12 @@ namespace LeeSinBuddy
         {
             InsecMenu = Program.menu.AddSubMenu("Insec Settings");
             InsecMenu.AddGroupLabel("Insec Settings");
-            InsecMenu.AddLabeledSlider("insecPosMode", "Insec Position Mode",
-                new[] {"Ally Position", "Game Cursor", "Selected Unit"}, 1);
+            InsecMenu.AddLabeledSlider("insecPositionMode", "Insec Position Mode",
+                new[] {"Ally Position", "Game Cursor", "Selected Unit"});
             InsecMenu.AddLabeledSlider("insecTargetMode", "Insec Targeting Mode", new[] {"Click", "TargetSelector"});
             InsecMenu.Add("useFlash", new CheckBox("Use Flash in Insec?", false));
-            InsecMenu.Add("checkAllUnits", new CheckBox("Check Other Units for Insec", true));
+            InsecMenu.Add("checkAllUnits", new CheckBox("Check Other Units for Insec"));
+            InsecMenu.Add("insecDistance", new Slider("Insec Distance", 200, 100, 350));
             var insec = InsecMenu.Add("insecActive",
                 new KeyBind("Insec Active", false, KeyBind.BindTypes.HoldActive, 'T'));
             var wtfsec = InsecMenu.Add("wtfsecActive",
@@ -101,11 +102,11 @@ namespace LeeSinBuddy
             {
                 Circle.Draw(SharpDX.Color.BlueViolet, AllyTarget.BoundingRadius + 100, AllyTarget.Position);
             }
-            if (InsecPos.IsValid() && (InsecActive) && GetTargetForInsec() != null)
+            if (InsecPos.IsValid() && InsecActive && GetTargetForInsec() != null)
             {
                 var p1 = Drawing.WorldToScreen(WtfSecActive ? Game.CursorPos : GetBestInsecPos());
                 Circle.Draw(SharpDX.Color.DodgerBlue, 100, InsecPos);
-                Drawing.DrawLine(p1, Drawing.WorldToScreen(InsecPos), 3, Color.Green);
+                Drawing.DrawLine(p1, Drawing.WorldToScreen(InsecPos), 3, Color.CornflowerBlue);
             }
         }
 
@@ -120,7 +121,7 @@ namespace LeeSinBuddy
             var allyPos = Game.CursorPos;
             if (InsecPos == new Vector3())
             {
-                var insecPos = allyPos.Extend(target.Position, target.Distance(allyPos) + 250);
+                var insecPos = allyPos.Extend(target.Position, target.Distance(allyPos) + InsecMenu["insecDistance"].Cast<Slider>().CurrentValue);
                 InsecPos = insecPos.To3D();
                 LastUpdate = Environment.TickCount;
             }
@@ -161,7 +162,7 @@ namespace LeeSinBuddy
         {
             var target = EnemyTarget;
 
-            Orbwalker.OrbwalkTo(InsecMenu["insecPosMode"].Cast<Slider>().CurrentValue == 1 && target != null ? target.Position : Game.CursorPos);
+            Orbwalker.OrbwalkTo(InsecMenu["insecPositionMode"].Cast<Slider>().CurrentValue == 1 && target != null || GetBestInsecPos() == Game.CursorPos && target != null ? target.Position : Game.CursorPos);
 
 
             if (target == null || !target.IsValidTarget())
@@ -169,7 +170,7 @@ namespace LeeSinBuddy
             var allyPos = GetBestInsecPos();
             if (InsecPos == new Vector3())
             {
-                var insecPos = allyPos.Extend(target.Position, target.Distance(allyPos) + 250).To3D();
+                var insecPos = allyPos.Extend(target.Position, target.Distance(allyPos) + InsecMenu["insecDistance"].Cast<Slider>().CurrentValue).To3D();
                 InsecPos = insecPos;
                 LastUpdate = Environment.TickCount;
             }
@@ -222,9 +223,8 @@ namespace LeeSinBuddy
                         )
                     {
                         var pred = Program.Q.GetPrediction(unit);
-                        if (!pred.HitChance.HasFlag(HitChance.High) &&
-                            !pred.HitChance.HasFlag(HitChance.Medium)) continue;
-                        Program.Q.Cast(unit);
+                        if (!pred.HitChance.HasFlag(HitChance.High) && !pred.HitChance.HasFlag(HitChance.Medium)) continue;
+                        Program.Q.Cast(pred.CastPosition);
                         break;
                     }
                 }
@@ -247,13 +247,13 @@ namespace LeeSinBuddy
                 case 0:
                     return InsecTarget;
                 default:
-                    return TargetSelector2.GetTarget(1400, DamageType.Physical);
+                    return TargetSelector.GetTarget(1400, DamageType.Physical);
             }
         }
 
         public static Vector3 GetBestInsecPos()
         {
-            switch (InsecMenu["insecPosMode"].Cast<Slider>().CurrentValue)
+            switch (InsecMenu["insecPositionMode"].Cast<Slider>().CurrentValue)
             {
                 case 0:
                     var b =
@@ -300,7 +300,7 @@ namespace LeeSinBuddy
                     .ToList()
                     .OrderBy(a => a.Distance(Game.CursorPos))
                     .FirstOrDefault();
-            if (allyT != null && InsecMenu["insecPosMode"].Cast<Slider>().CurrentValue == 2)
+            if (allyT != null && InsecMenu["insecPositionMode"].Cast<Slider>().CurrentValue == 2)
             {
                 AllyTarget = allyT;
                 return;
