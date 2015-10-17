@@ -252,7 +252,7 @@ namespace LeeSinBuddy
             if (ComboMenu["useQ1"].Cast<CheckBox>().CurrentValue && Program.Q.IsReady()
                 && Program.Q.Instance().Name == Program.Spells["Q1"] && target.Distance(_Player) < Program.Q.Range)
             {
-                Program.Q.Cast(target);
+                SpellClass.SmiteQCast(target);
                 return;
             }
             if (ComboMenu["useE2"].Cast<CheckBox>().CurrentValue && Program.E.IsReady() &&

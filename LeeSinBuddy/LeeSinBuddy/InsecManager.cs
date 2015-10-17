@@ -149,7 +149,7 @@ namespace LeeSinBuddy
             }
             else if (Program.Q.Instance().Name == Program.Spells["Q1"] && Program.Q.IsReady())
             {
-                Program.Q.Cast(InsecTarget);
+                SpellClass.SmiteQCast(InsecTarget);
                 Program.LastSpellTime = Environment.TickCount;
             }
             else if (jumpPos.Distance(_Player.Position) < 600)
@@ -210,7 +210,7 @@ namespace LeeSinBuddy
             {
                 if (!Program.Q.GetPrediction(InsecTarget).HitChance.HasFlag(HitChance.Collision))
                 {
-                    Program.Q.Cast(InsecTarget);
+                    SpellClass.SmiteQCast(InsecTarget);
                 }
                 else if (InsecMenu["checkAllUnits"].Cast<CheckBox>().CurrentValue)
                 {

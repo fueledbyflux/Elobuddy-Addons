@@ -67,6 +67,7 @@
     <Compile Include="InsecManager.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Smiter.cs" />
     <Compile Include="Spell.cs" />
     <Compile Include="StateManager.cs" />
     <Compile Include="WardJumper.cs" />

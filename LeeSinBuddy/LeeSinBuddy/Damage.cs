@@ -10,7 +10,7 @@ namespace LeeSinBuddy
             get { return ObjectManager.Player; }
         }
 
-        public static double Q2Damage(Obj_AI_Base target, float subHp = 0, bool monster = false)
+        public static double Q2Damage(Obj_AI_Base target, double subHp = 0, bool monster = false)
         {
             if (!Player.GetSpell(SpellSlot.Q).IsLearned) return 0;
             var damage = (50 + (Program.Q.Level*30)) + (0.09*_Player.FlatPhysicalDamageMod) +
