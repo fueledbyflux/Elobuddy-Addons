@@ -366,7 +366,7 @@ namespace LeeSinBuddy
 
         public static void KillSteal()
         {
-            foreach (var enemy in EntityManager.Heroes.Enemies)
+            foreach (var enemy in EntityManager.Heroes.Enemies.Where(a => !a.IsDead && !a.IsZombie && a.Health > 0))
             {
                 if (KillstealMenu["KSE1"].Cast<CheckBox>().CurrentValue && Program.E.IsReady() && enemy.Health < Damage.EDamage(enemy) && Program.E.Instance().Name == Program.Spells["E1"] &&
                     enemy.Distance(_Player) < 430)
