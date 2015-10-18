@@ -1,17 +1,18 @@
 ﻿using System;
 using EloBuddy;
+using EloBuddy.SDK;
 
 namespace RivenBuddy
 {
     internal class DamageHandler
     {
-        public static double ComboDamage()
+        public static double ComboDamage(Obj_AI_Base target, bool noR = false)
         {
             double dmg = 0;
             var passiveStacks = 0;
 
             dmg += SpellManager.Spells[SpellSlot.Q].IsReady()
-                ? QDamage()*(3 - SpellEvents.QCount)
+                ? QDamage(!noR)*(3 - SpellEvents.QCount)
                 : 0;
             passiveStacks += SpellManager.Spells[SpellSlot.Q].IsReady()
                 ? (3 - SpellEvents.QCount)
@@ -28,20 +29,21 @@ namespace RivenBuddy
                 : 0;
 
             dmg += PassiveDamage()*passiveStacks;
-            dmg += Player.Instance.TotalAttackDamage*passiveStacks;
+            dmg += (SpellManager.Spells[SpellSlot.R].IsReady() && !noR && !SpellEvents.HasR ? Player.Instance.TotalAttackDamage * 1.2 : Player.Instance.TotalAttackDamage)*passiveStacks;
 
             if (dmg < 10)
             {
                 return 3*Player.Instance.TotalAttackDamage;
             }
 
-            return dmg;
+            dmg += SpellManager.Spells[SpellSlot.R].IsReady() && !noR ? RDamage(target, Player.Instance.CalculateDamageOnUnit(target, DamageType.Physical, (float) dmg)) : 0;
+            return Player.Instance.CalculateDamageOnUnit(target, DamageType.Physical, (float) dmg);
         }
 
-        public static double QDamage()
+        public static double QDamage(bool useR = false)
         {
             return new double[] {10, 30, 50, 70, 90}[SpellManager.Spells[SpellSlot.Q].Level - 1] +
-                   ((ObjectManager.Player.BaseAttackDamage + ObjectManager.Player.FlatPhysicalDamageMod)/100)*
+                   ((SpellManager.Spells[SpellSlot.R].IsReady() && useR && !SpellEvents.HasR ? Player.Instance.TotalAttackDamage * 1.2 : Player.Instance.TotalAttackDamage) /100)*
                    new double[] {40, 45, 50, 55, 60}[SpellManager.Spells[SpellSlot.Q].Level - 1];
         }
 
@@ -59,11 +61,11 @@ namespace RivenBuddy
 
         public static double RDamage(Obj_AI_Base target, double healthMod = 0)
         {
-            var health = (target.MaxHealth - (target.Health - healthMod)) > 0
-                ? (target.MaxHealth - (target.Health - healthMod))
-                : 1;
-            return (new double[] {80, 120, 160}[SpellManager.Spells[SpellSlot.R].Level - 1] +
-                    0.6*ObjectManager.Player.FlatPhysicalDamageMod)*(health/target.MaxHealth*2.67 + 1);
+            if (!SpellManager.Spells[SpellSlot.R].IsLearned) return 0;
+            var hpPercent = (target.Health - healthMod > 0 ? 1 : target.Health - healthMod) /target.MaxHealth;
+            return (new double[] {80, 120, 160}[SpellManager.Spells[SpellSlot.R].Level - 1]
+                   + 0.6 * Player.Instance.FlatPhysicalDamageMod) *
+                   (hpPercent < 25 ? 3 : (((100 - hpPercent) * 2.67) / 100) + 1);
         }
     }
 }

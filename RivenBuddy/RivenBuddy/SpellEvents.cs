@@ -30,7 +30,14 @@ namespace RivenBuddy
             Obj_AI_Base.OnProcessSpellCast += Obj_AI_Base_OnProcessSpellCast;
             Obj_AI_Base.OnPlayAnimation += Obj_AI_Base_OnPlayAnimation;
             Obj_AI_Base.OnSpellCast += Obj_AI_Base_OnSpellCast;
+            Player.OnBasicAttack += Player_OnBasicAttack;
             Game.OnUpdate += delegate { UpdateSpells(); };
+        }
+
+        private static void Player_OnBasicAttack(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
+        {
+            if (!sender.IsMe) return;
+
         }
 
         private static void Obj_AI_Base_OnPlayAnimation(Obj_AI_Base sender, GameObjectPlayAnimationEventArgs args)
@@ -43,15 +50,15 @@ namespace RivenBuddy
             switch (args.Animation)
             {
                 case "Spell1a":
-                    t = 291;
+                   // t = 291;
                     QCount = 1;
                     break;
                 case "Spell1b":
-                    t = 291;
+                    //t = 291;
                     QCount = 2;
                     break;
                 case "Spell1c":
-                    t = 393;
+                    //t = 393;
                     QCount = 0;
                     break;
                 case "Spell2":
@@ -96,18 +103,32 @@ namespace RivenBuddy
                 else if (!Queuer.Queue.Any() && Queuer.tiamat != null && Queuer.tiamat.CanUseItem() && Program.ComboMenu["combo.hydra"].Cast<CheckBox>().CurrentValue && Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo) && args.Target is AIHeroClient)
                 {
                     Queuer.tiamat.Cast();
+                    Orbwalker.ResetAutoAttack();
                 }
+            }
+            if (args.SData.Name.ToLower().Contains("itemtiamatcleave"))
+            {
+                Queuer.Remove("H");
+                Orbwalker.ResetAutoAttack();
+            }
+            if (Orbwalker.ActiveModesFlags == Orbwalker.ActiveModes.None &&
+                !Program.ComboMenu["combo.alwaysCancelQ"].Cast<CheckBox>().CurrentValue) return;
+            if (args.SData.Name.ToLower().Contains("riventricleave"))
+            {
+                Orbwalker.ResetAutoAttack();
+                if (QCount == 2)
+                {
+                    Core.DelayAction(CancelAnimation, 362 + Game.Ping);
+                    return;
+                }
+                Core.DelayAction(CancelAnimation, 250 + Game.Ping);
             }
         }
 
         public static void CancelAnimation()
         {
             Player.DoEmote(Emote.Dance);
-            var target = Orbwalker.LastTarget;
-            if (target != null)
-            {
-                Player.IssueOrder(GameObjectOrder.AttackUnit, target);
-            }
+            Orbwalker.ResetAutoAttack();
         }
 
         public static void UpdateSpells()
@@ -152,19 +173,14 @@ namespace RivenBuddy
         private static void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
             if (!sender.IsMe) return;
-            if (args.SData.IsAutoAttack())
+            if (args.SData.Name.ToLower().Contains("attack"))
             {
                 if (PassiveStacks > 0) PassiveStacks--;
                 LastCast["AA"] = Environment.TickCount;
             }
             switch (args.SData.Name.ToLower())
             {
-                case "itemtiamatcleave":
-                    Queuer.Remove("H");
-                    break;
-
                 case "riventricleave": //Q
-
                     LastCast["Q"] = Environment.TickCount;
                     Queuer.Remove("Q");
                     if (PassiveStacks <= 2) PassiveStacks++;

@@ -7,8 +7,7 @@ namespace RivenBuddy
     {
         public static bool inRange(this Spell.SpellBase s, Obj_AI_Base target)
         {
-            return ObjectManager.Player.Distance(target) <=
-                   s.Range;
+            return ObjectManager.Player.Distance(target) <= s.Range;
         }
 
         public static float getTrueRange(this Spell.SpellBase s, Obj_AI_Base target)

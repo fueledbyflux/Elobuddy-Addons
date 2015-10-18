@@ -68,7 +68,7 @@ namespace RivenBuddy
             public DamageIndicator()
             {
                 Drawing.OnEndScene += Drawing_OnDraw;
-                Chat.Print("Damage Indicator By Fluxy - Loaded", Color.Red);
+                //Chat.Print("Damage Indicator By Fluxy - Loaded", Color.Red);
             }
 
             public void Add(string s, SpellData data)
@@ -109,19 +109,15 @@ namespace RivenBuddy
 
                     var pos = new Vector2(aiHeroClient.HPBarPosition.X + _xOffset,
                         aiHeroClient.HPBarPosition.Y + _yOffset);
-                    var end = pos.X;
-                    foreach (var damageItem in _damageItems)
-                    {
+                    
                         var fullbar = (_barLength)*(aiHeroClient.HealthPercent/100);
                         var damage = (_barLength)*
-                                     ((damageItem.Value.CalculateDamage(aiHeroClient)/aiHeroClient.MaxHealth) > 1
+                                     ((DamageHandler.ComboDamage(aiHeroClient)/aiHeroClient.MaxHealth) > 1
                                          ? 1
-                                         : (damageItem.Value.CalculateDamage(aiHeroClient)/aiHeroClient.MaxHealth));
-                        Line.DrawLine(damageItem.Value.Color, 9f, new Vector2(end, pos.Y),
-                            new Vector2(end + (damage > fullbar ? fullbar : damage), pos.Y));
-                        Line.DrawLine(Color.Black, 3, new Vector2(end + (damage > fullbar ? fullbar : damage) + 1, pos.Y - 4), new Vector2(end + (damage > fullbar ? fullbar : damage) + 1, pos.Y + 5));
-                        end = pos.X + damage;
-                    }
+                                         : (DamageHandler.ComboDamage(aiHeroClient) /aiHeroClient.MaxHealth));
+                        Line.DrawLine(Color.FromArgb(100, Color.Aqua), 9f, new Vector2(pos.X, pos.Y),
+                            new Vector2((float) (pos.X + (damage > fullbar ? fullbar : damage)), pos.Y));
+                        Line.DrawLine(Color.Black, 3, new Vector2((float) (pos.X + (damage > fullbar ? fullbar : damage) + 1), pos.Y - 4), new Vector2((float) (pos.X + (damage > fullbar ? fullbar : damage) + 1), pos.Y + 5));
                 }
             }
         }

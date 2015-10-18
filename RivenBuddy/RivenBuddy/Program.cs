@@ -111,9 +111,6 @@ namespace RivenBuddy
             DrawMenu.Add("draw.Combo", new CheckBox("Write Current Combo", false));
             DrawMenu.Add("draw.rState", new CheckBox("Write R State"));
 
-            Indicator = new DamageIndicator.DamageIndicator();
-            Indicator.Add("Combo", new SpellData(0, DamageType.True, Color.Aqua));
-
             R2 = new Spell.Skillshot(SpellSlot.R, 900, SkillShotType.Cone, 250, 1600, 125);
             TargetSelector2.Init();
             SpellEvents.Init();
@@ -121,8 +118,9 @@ namespace RivenBuddy
             Drawing.OnDraw += Drawing_OnDraw;
             Game.OnUpdate += delegate { SpellManager.UpdateSpells(); };
             Player.OnIssueOrder += Player_OnIssueOrder;
+            Indicator = new DamageIndicator.DamageIndicator();
 
-            Chat.Print("RivenBuddy : Fully Loaded. by fluxy");
+            //Chat.Print("RivenBuddy : Fully Loaded. by fluxy");
         }
 
         public static GameObject OrderTarget;
@@ -200,8 +198,7 @@ namespace RivenBuddy
             Queuer.tiamat =
                 ObjectManager.Player.InventoryItems.FirstOrDefault(
                     a => a.Id == ItemId.Tiamat_Melee_Only || a.Id == ItemId.Ravenous_Hydra_Melee_Only);
-
-            Indicator.Update("Combo", new SpellData((int) DamageHandler.ComboDamage(), DamageType.Physical, Color.Aqua));
+            
             if (BurstActive)
             {
                 States.Burst();
