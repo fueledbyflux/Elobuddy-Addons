@@ -10,7 +10,7 @@ namespace LeeSinBuddy
 {
     internal class StateManager
     {
-        public static Menu ComboMenu, HarassMenu, FarmMenu, JungleMenu;
+        public static Menu ComboMenu, HarassMenu, FarmMenu, JungleMenu, KillstealMenu;
         public static AIHeroClient _Player
         {
             get { return ObjectManager.Player; }
@@ -77,6 +77,13 @@ namespace LeeSinBuddy
             JungleMenu.Add("useE1J", new CheckBox("Use E-1"));
             JungleMenu.Add("useE2J", new CheckBox("Use E-2"));
             JungleMenu.Add("minPassiveSlider", new Slider("Passive Stacks Before Spell", 1, 0, 2));
+
+            KillstealMenu = Program.menu.AddSubMenu("Killsteal Settings");
+            KillstealMenu.AddGroupLabel("Killsteal Settings");
+            KillstealMenu.Add("KSQ1", new CheckBox("KS Q1"));
+            KillstealMenu.Add("KSQ2", new CheckBox("KS Q2"));
+            KillstealMenu.Add("KSE1", new CheckBox("KS E"));
+            KillstealMenu.Add("KSR1", new CheckBox("KS R"));
 
             Game.OnTick += Game_OnUpdate;
         }
@@ -361,23 +368,23 @@ namespace LeeSinBuddy
         {
             foreach (var enemy in EntityManager.Heroes.Enemies)
             {
-                if (Program.E.IsReady() && enemy.Health < Damage.EDamage(enemy) && Program.E.Instance().Name == Program.Spells["E1"] &&
+                if (KillstealMenu["KSE1"].Cast<CheckBox>().CurrentValue && Program.E.IsReady() && enemy.Health < Damage.EDamage(enemy) && Program.E.Instance().Name == Program.Spells["E1"] &&
                     enemy.Distance(_Player) < 430)
                 {
                     Program.E.Cast();
                     return;
                 }
-                if (Program.Q.IsReady() && enemy.HasQBuff() && enemy.Health < Damage.Q2Damage(enemy) && Program.Q.Instance().Name == Program.Spells["Q2"] && enemy.Distance(_Player) < 1400)
+                if (KillstealMenu["KSQ2"].Cast<CheckBox>().CurrentValue && Program.Q.IsReady() && enemy.HasQBuff() && enemy.Health < Damage.Q2Damage(enemy) && Program.Q.Instance().Name == Program.Spells["Q2"] && enemy.Distance(_Player) < 1400)
                 {
                     Program.Q2.Cast();
                     return;
                 }
-                if (Program.Q.IsReady() && enemy.Health < Damage.QDamage(enemy) && Program.Q.Instance().Name == Program.Spells["Q1"] && enemy.Distance(_Player) < 1100)
+                if (KillstealMenu["KSQ1"].Cast<CheckBox>().CurrentValue && Program.Q.IsReady() && enemy.Health < Damage.QDamage(enemy) && Program.Q.Instance().Name == Program.Spells["Q1"] && enemy.Distance(_Player) < 1100)
                 {
                     Program.Q.Cast(enemy);
                     return;
                 }
-                if (Program.R.IsReady() && enemy.Health < Damage.QDamage(enemy) &&
+                if (KillstealMenu["KSR1"].Cast<CheckBox>().CurrentValue && Program.R.IsReady() && enemy.Health < Damage.QDamage(enemy) &&
                     enemy.Distance(_Player) < Program.R.Range)
                 {
                     Program.R.Cast(enemy);
