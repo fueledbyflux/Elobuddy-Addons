@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using EloBuddy;
 using EloBuddy.SDK;
+using EloBuddy.SDK.Constants;
 using EloBuddy.SDK.Enumerations;
 using EloBuddy.SDK.Events;
 using EloBuddy.SDK.Menu;
@@ -46,10 +47,7 @@ namespace VayneBuddy
         {
             if (!_Player.ChampionName.ToLower().Contains("vayne")) return;
 
-            Bootstrap.Init(null);
-            TargetSelector2.init();
-
-            Q = new Spell.Skillshot(SpellSlot.Q, (uint) _Player.GetAutoAttackRange(), SkillShotType.Circular);
+            Q = new Spell.Skillshot(SpellSlot.Q, int.MaxValue, SkillShotType.Linear);
             E = new Spell.Targeted(SpellSlot.E, 590);
             Condemn.ESpell = new Spell.Skillshot(SpellSlot.E, 590, SkillShotType.Linear, 250, 1250);
             R = new Spell.Active(SpellSlot.R);
@@ -58,7 +56,7 @@ namespace VayneBuddy
             Menu = MainMenu.AddMenu("Vayne Buddy", "vBuddy");
 
             Menu.AddGroupLabel("Vayne Buddy");
-            Menu.AddLabel("Version: " + "0.0.0.1");
+            Menu.AddLabel("Version: " + "0.0.0.2");
             Menu.AddSeparator();
             Menu.AddLabel("By Fluxy ;)");
             Menu.AddSeparator();
@@ -67,6 +65,7 @@ namespace VayneBuddy
             ComboMenu = Menu.AddSubMenu("Combo", "vBuddyCombo");
             ComboMenu.AddGroupLabel("Combo Settings");
             ComboMenu.Add("useQCombo", new CheckBox("Use Q", true));
+            ComboMenu.Add("useECombo", new CheckBox("Use E (Execute)", true));
             ComboMenu.AddLabel("R Settings");
             ComboMenu.Add("useRCombo", new CheckBox("Use R", false));
             ComboMenu.Add("noRUnderTurret", new CheckBox("Disable R if Target is under allied turret", true));
@@ -101,8 +100,7 @@ namespace VayneBuddy
             CondemnMenu.Add("condemnPercent", new Slider("Condemn Percent", 33, 1));
             CondemnMenu.AddSeparator();
             CondemnMenu.AddLabel("Active Mode Settings");
-            CondemnMenu.Add("smartVsCheap",
-                new CheckBox("On (SMART CONDEMN (saves fps)) / OFF (360 degree check)", true));
+            CondemnMenu.Add("smartVsCheap", new CheckBox("On (SMART CONDEMN (saves fps)) / OFF (360 degree check)", true));
             CondemnMenu.AddSeparator();
             CondemnMenu.Add("condemnCombo", new CheckBox("Condemn in Combo", true));
             CondemnMenu.Add("condemnComboTrinket", new CheckBox("Trinket Bush After E", true));
@@ -111,11 +109,10 @@ namespace VayneBuddy
             HarassMenu = Menu.AddSubMenu("Harass", "vBuddyHarass");
             HarassMenu.AddGroupLabel("Harass Settings");
             HarassMenu.Add("useQHarass", new CheckBox("Use Q", true));
+            HarassMenu.Add("useEHarass", new CheckBox("Use E (Execute)", true));
 
             FarmMenu = Menu.AddSubMenu("Farming", "vBuddyFarm");
             FarmMenu.AddGroupLabel("Farming Settings");
-            FarmMenu.Add("customLastHitWaveClearMode", new CheckBox("Custom LH / WC"));
-            FarmMenu.Add("MinManaQLHWC", new Slider("Minimum Mana % for Farm", 30));
             FarmMenu.AddLabel("Last Hit");
             FarmMenu.Add("useQLastHit", new CheckBox("Use Q Last", true));
             FarmMenu.AddLabel("WaveClear");
@@ -128,6 +125,7 @@ namespace VayneBuddy
             DrawMenu.Add("drawStacks", new CheckBox("Draw W Stacks", false));
             DrawMenu.AddLabel("Misc");
             DrawMenu.Add("wallJumpKey", new KeyBind("Tumble Walls", false, KeyBind.BindTypes.HoldActive, 'Z'));
+            DrawMenu.Add("condemnNextAA", new KeyBind("Condemn Next AA", false, KeyBind.BindTypes.PressToggle, 'E'));
 
             InterruptorMenu = Menu.AddSubMenu("Interrupter", "InterruptorvBuddy");
             InterruptorMenu.AddGroupLabel("Interrupter Menu");
@@ -153,11 +151,68 @@ namespace VayneBuddy
             Drawing.OnDraw += Drawing_OnDraw;
             Gapcloser.OnGapcloser += Events.Gapcloser_OnGapCloser;
             Interrupter.OnInterruptableSpell += Events.Interrupter_OnInterruptableSpell;
-            AIHeroClient.OnProcessSpellCast += AIHeroClient_OnProcessSpellCast;
+            Obj_AI_Base.OnProcessSpellCast += AIHeroClient_OnProcessSpellCast;
+            Obj_AI_Base.OnSpellCast += Obj_AI_Base_OnSpellCast;
+        }
 
-            Chat.Print("VayneBuddy: Loading Tasks Done.", Color.Firebrick);
-            Chat.Print("VayneBuddy: iMeh is faggot.", Color.Firebrick);
+        private static void Obj_AI_Base_OnSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
+        {
+            if (!sender.IsMe) return;
+            if (args.SData.IsAutoAttack())
+            {
+                var target = (Obj_AI_Base) args.Target;
 
+                if (target is AIHeroClient)
+                {
+                    if (DrawMenu["condemnNextAA"].Cast<KeyBind>().CurrentValue && E.IsReady())
+                    {
+                        E.Cast(target);
+                        DrawMenu["condemnNextAA"].Cast<KeyBind>().CurrentValue = false;
+                    }
+                    if (target.IsValidTarget() && Q.IsReady() &&
+                        (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo) &&
+                         Program.ComboMenu["useQCombo"].Cast<CheckBox>().CurrentValue ||
+                         Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Harass) &&
+                         Program.ComboMenu["useQHarass"].Cast<CheckBox>().CurrentValue))
+                    {
+                        var pos = (_Player.Position.Extend(Game.CursorPos, 300).Distance(target) <=
+                                   _Player.GetAutoAttackRange(target) &&
+                                   _Player.Position.Extend(Game.CursorPos, 300).Distance(target) > 100
+                            ? Game.CursorPos
+                            : (_Player.Position.Extend(target.Position, 300).Distance(target) < 100)
+                                ? target.Position
+                                : new Vector3());
+
+                        if (pos.IsValid())
+                        {
+                            Player.CastSpell(SpellSlot.Q, pos);
+                        }
+                    }
+                    else if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo) && ComboMenu["useECombo"].Cast<CheckBox>().CurrentValue || Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Harass) && HarassMenu["useEHarass"].Cast<CheckBox>().CurrentValue)
+                    {
+                        if (target.Health - Player.Instance.GetAutoAttackDamage(target) + (target.HasWBuff() ? Player.Instance.GetSpellDamage(target, SpellSlot.W, DamageLibrary.SpellStages.Passive) : 0) < Player.Instance.GetSpellDamage(target, SpellSlot.E))
+                        {
+                            E.Cast(target);
+                        }
+                    }
+                }
+
+                if ((Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LastHit) && FarmMenu["useQLastHit"].Cast<CheckBox>().CurrentValue || Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear) && FarmMenu["useQWaveClear"].Cast<CheckBox>().CurrentValue) && Q.IsReady())
+                {
+                    var source =
+                        EntityManager.MinionsAndMonsters.EnemyMinions
+                            .Where(
+                                a =>  a.NetworkId != target.NetworkId && a.Distance(Player.Instance) < 300 + Player.Instance.GetAutoAttackRange(a) &&
+                                    Prediction.Health.GetPrediction(a, (int) Player.Instance.AttackDelay) < Player.Instance.GetAutoAttackDamage(a, true) + Damages.QDamage(a))
+                            .OrderBy(a => a.Health)
+                            .FirstOrDefault();
+
+                    if (source == null) return;
+                    Orbwalker.ForcedTarget = source;
+                    Player.CastSpell(SpellSlot.Q, source.Position);
+                    
+                }
+            }
         }
 
         private static void AIHeroClient_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
@@ -165,35 +220,11 @@ namespace VayneBuddy
             if (!sender.IsMe) return;
             if (args.SData.Name.ToLower().Contains("vaynetumble"))
             {
-                Core.DelayAction(Orbwalker.ResetAutoAttack, 250);
+                Orbwalker.ResetAutoAttack();
             }
-            if (args.SData.Name.ToLower().Equals("vaynecondemn") && args.Target != null)
+            if (args.SData.Name == Player.GetSpell(SpellSlot.E).Name)
             {
-                Events.LastAa = Environment.TickCount;
-                if (_Player.Spellbook.GetSpell(SpellSlot.W).IsLearned)
-                {
-                    if (Events.AAedTarget != null && args.Target.NetworkId == Events.AAedTarget.NetworkId)
-                    {
-                        switch (Events.AaStacks)
-                        {
-                            case 0:
-                                Events.AaStacks = 1;
-                                break;
-                            case 1:
-                                Events.AaStacks = 2;
-                                break;
-                            case 2:
-                                Events.AaStacks = 0;
-                                Events.AAedTarget = null;
-                                break;
-                        }
-                    }
-                    else
-                    {
-                        Events.AAedTarget = args.Target as Obj_AI_Base;
-                        Events.AaStacks = 1;
-                    }
-                }
+                DrawMenu["condemnNextAA"].Cast<KeyBind>().CurrentValue = false;
             }
         }
 
@@ -221,7 +252,13 @@ namespace VayneBuddy
 
         private static void Game_OnUpdate(EventArgs args)
         {
-            Orbwalker.ForcedTarget = Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo) ? TargetSelector2.GetTarget(_Player.GetAutoAttackRange(), DamageType.Physical) : null;
+                if (Orbwalker.ForcedTarget == null || Orbwalker.ForcedTarget.Health <= 0 || Orbwalker.ForcedTarget.IsDead ||
+                    Orbwalker.ForcedTarget.Distance(Player.Instance) > (Player.Instance.IsDashing()
+                    ? Player.Instance.GetAutoAttackRange() + 300
+                    : Player.Instance.GetAutoAttackRange()))
+                {
+                    Orbwalker.ForcedTarget = null;
+                }
 
             if (Events.AAedTarget == null || Events.LastAa + 3500 + 400 <= Environment.TickCount || Events.AAedTarget.IsDead || !Events.AAedTarget.HasBuff("vaynesilvereddebuff") && (Events.LastAa + 1000 < Environment.TickCount))
             {
@@ -232,6 +269,10 @@ namespace VayneBuddy
             if (DrawMenu["wallJumpKey"].Cast<KeyBind>().CurrentValue)
             {
                 WallQ.WallTumble();
+            }
+            else
+            {
+                Orbwalker.DisableMovement = false;
             }
             if (CondemnPriorityMenu["autoCondemnToggle"].Cast<KeyBind>().CurrentValue)
             {
@@ -249,11 +290,6 @@ namespace VayneBuddy
             {
                 States.Harass();
             }
-        }
-
-        public static bool Has2WStacks(this AIHeroClient target)
-        {
-            return target.Buffs.Any(bu => bu.Name == "vaynesilvereddebuff");
         }
 
     }

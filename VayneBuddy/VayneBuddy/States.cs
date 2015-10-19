@@ -14,8 +14,13 @@ namespace VayneBuddy
 
         public static void Combo()
         {
-            var target = (Events.AAedTarget != null && Events.AAedTarget.IsValidTarget(_Player.GetAutoAttackRange(Events.AAedTarget)) && Events.AAedTarget is AIHeroClient && Events.AaStacks == 2) ? (AIHeroClient) Events.AAedTarget : TargetSelector2.GetTarget((int)_Player.GetAutoAttackRange(), DamageType.Physical);
-            var condemnTarget = TargetSelector2.GetTarget((int)_Player.GetAutoAttackRange() + 300, DamageType.Physical);
+            var target = TargetSelector.GetTarget((int)_Player.GetAutoAttackRange(), DamageType.Physical);
+            var target2 = EntityManager.Heroes.Enemies.FirstOrDefault(a => a.HasWBuff() && Player.Instance.GetAutoAttackRange(target) >= target.Distance(Player.Instance));
+            if (target2 != null)
+            {
+                target = target2;
+            }
+            var condemnTarget = TargetSelector.GetTarget((int)_Player.GetAutoAttackRange() + 300, DamageType.Physical);
             Orbwalker.ForcedTarget = target;
 
             if (!target.IsValidTarget() || Orbwalker.IsAutoAttacking) return;
@@ -48,20 +53,20 @@ namespace VayneBuddy
                 {
                     if (condemnTarget.IsCondemable(_Player.Position.Extend(Game.CursorPos, 300)))
                     {
-                        Program.Q.Cast(Game.CursorPos);
+                        Player.CastSpell(SpellSlot.Q, Game.CursorPos);
                         return;
                     }
                     if (condemnTarget.IsCondemable(_Player.Position.Extend(target.Position, 300)))
                     {
-                        Program.Q.Cast(condemnTarget.Position);
+                        Player.CastSpell(SpellSlot.Q, condemnTarget.Position);
                         return;
                     }
                 }
             }
 
-            if (Program.Q.IsReady() && _Player.Position.Extend(Game.CursorPos, 300).Distance(target) > 100)
+            if (Program.Q.IsReady() && Player.Instance.Distance(target) > Player.Instance.GetAutoAttackRange(target) && Player.Instance.Distance(target) < Player.Instance.GetAutoAttackRange(target) + 300 && Program.ComboMenu["useQCombo"].Cast<CheckBox>().CurrentValue)
             {
-                Program.Q.Cast(Game.CursorPos);
+                Player.CastSpell(SpellSlot.Q, Game.CursorPos);
                 return;
             }
 
@@ -74,7 +79,7 @@ namespace VayneBuddy
                     var rotatedPosition = ObjectManager.Player.Position.To2D() + (300f * direction.Rotated(angleRad));
                     if (condemnTarget.IsCondemable(rotatedPosition))
                     {
-                        Program.Q.Cast(rotatedPosition.To3D());
+                        Player.CastSpell(SpellSlot.Q, rotatedPosition.To3D());
                         return;
                     }
                 }
@@ -83,13 +88,13 @@ namespace VayneBuddy
 
         public static void Harass()
         {
-            var target = TargetSelector2.GetTarget((int)_Player.AttackRange + 500, DamageType.Physical);
+            var target = TargetSelector.GetTarget((int)_Player.AttackRange + 500, DamageType.Physical);
             Orbwalker.ForcedTarget = target;
             if (!target.IsValidTarget()) return;
 
-            if (Program.Q.IsReady() && _Player.Position.Extend(Game.CursorPos, 300).Distance(target) > 100)
+            if (Program.Q.IsReady() && Program.ComboMenu["useQHarass"].Cast<CheckBox>().CurrentValue && Player.Instance.Distance(target) > Player.Instance.GetAutoAttackRange(target) && Player.Instance.Distance(target) < Player.Instance.GetAutoAttackRange(target) + 300)
             {
-                Program.Q.Cast(Game.CursorPos);
+                Player.CastSpell(SpellSlot.Q, Game.CursorPos);
             }
         }
     }

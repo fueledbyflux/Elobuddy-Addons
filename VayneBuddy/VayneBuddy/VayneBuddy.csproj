@@ -61,11 +61,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Condemn.cs" />
+    <Compile Include="Damages.cs" />
     <Compile Include="Events.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="States.cs" />
-    <Compile Include="TargetSelector2.cs" />
     <Compile Include="Utility.cs" />
     <Compile Include="WallQ.cs" />
   </ItemGroup>

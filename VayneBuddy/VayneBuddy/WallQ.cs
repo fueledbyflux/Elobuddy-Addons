@@ -28,21 +28,15 @@ namespace VayneBuddy
 
         }
 
-        public static Dictionary<Action, int> DelayedActions = new Dictionary<Action, int>();
-
         public static void WallTumble()
         {
             if (Game.MapId != GameMapId.SummonersRift) return;
-            foreach (var delayedAction in DelayedActions)
+            if (!Program.Q.IsReady())
             {
-                if (delayedAction.Value <= Environment.TickCount)
-                {
-                    delayedAction.Key.Invoke();
-                    DelayedActions.Remove(delayedAction.Key);
-                    return;
-                }
+                Orbwalker.DisableMovement = false;
+                return;
             }
-            if (!Program.Q.IsReady()) return;
+            Orbwalker.DisableMovement = true;
 
             Vector2 drakeWallQPos = new Vector2(11514, 4462);
             Vector2 midWallQPos = new Vector2(6667, 8794);
@@ -51,14 +45,13 @@ namespace VayneBuddy
             var walkPos = drakeWallQPos.Distance(_Player) < midWallQPos.Distance(_Player)
                 ? new Vector2(12050, 4827)
                 : new Vector2(6962, 8952);
-            if (_Player.Distance(walkPos) < 200 && _Player.Distance(walkPos) > 1)
+            if (_Player.Distance(walkPos) < 200 && _Player.Distance(walkPos) > 60)
             {
                 Player.IssueOrder(GameObjectOrder.MoveTo, walkPos.To3D());
             }
-            else if(_Player.Distance(walkPos) <= 10)
+            else if(_Player.Distance(walkPos) <= 50)
             {
-                Player.IssueOrder(GameObjectOrder.MoveTo, walkPos.To3D());
-                DelayedActions.Add(delegate {Program.Q.Cast(selectedPos.To3D());}, Environment.TickCount + 106 + (Game.Ping/2));
+                Player.CastSpell(SpellSlot.Q, selectedPos.To3D());
             }
         }
     }
