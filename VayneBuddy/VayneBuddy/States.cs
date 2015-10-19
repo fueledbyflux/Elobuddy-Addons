@@ -69,21 +69,6 @@ namespace VayneBuddy
                 Player.CastSpell(SpellSlot.Q, Game.CursorPos);
                 return;
             }
-
-            if (Program.E.IsReady())
-            {
-                var direction = ObjectManager.Player.Direction.To2D().Perpendicular();
-                for (var i = 0f; i < 360f; i += 30)
-                {
-                    var angleRad = Geometry.DegreeToRadian(i);
-                    var rotatedPosition = ObjectManager.Player.Position.To2D() + (300f * direction.Rotated(angleRad));
-                    if (condemnTarget.IsCondemable(rotatedPosition))
-                    {
-                        Player.CastSpell(SpellSlot.Q, rotatedPosition.To3D());
-                        return;
-                    }
-                }
-            }
         }
 
         public static void Harass()
