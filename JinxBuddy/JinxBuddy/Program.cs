@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using EloBuddy;
 using EloBuddy.SDK;
+using EloBuddy.SDK.Constants;
 using EloBuddy.SDK.Enumerations;
 using EloBuddy.SDK.Events;
 using EloBuddy.SDK.Menu;
@@ -18,7 +19,7 @@ namespace JinxBuddy
 
         public static Spell.Skillshot W = new Spell.Skillshot(SpellSlot.W, 1450, SkillShotType.Linear, 600, 3300, 180)
         {
-            MinimumHitChance = HitChance.High
+            MinimumHitChance = HitChance.High, AllowedCollisionCount = 0
         };
 
         public static Spell.Skillshot E = new Spell.Skillshot(SpellSlot.E, 900, SkillShotType.Circular, 1200, 1750, 1);
@@ -33,7 +34,7 @@ namespace JinxBuddy
 
         private static void Loading_OnLoadingComplete(EventArgs args)
         {
-            Bootstrap.Init(null);
+            if (Player.Instance.Hero != Champion.Jinx) return;
 
             Menu = MainMenu.AddMenu("Jinx Buddy", "jinxBuddy");
             Menu.AddGroupLabel("Jinx Buddy");
@@ -107,6 +108,7 @@ namespace JinxBuddy
         private static void Game_OnTick(EventArgs args)
         {
             Orbwalker.ForcedTarget = null;
+
             if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo)) Combo();
             if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Harass)) Harass();
             if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear)) WaveClear();

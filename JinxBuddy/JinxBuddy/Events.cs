@@ -26,7 +26,7 @@ namespace JinxBuddy
 
         public static float MinigunRange(Obj_AI_Base target = null)
         {
-            return (525 + _Player.BoundingRadius + (target != null ? target.BoundingRadius : 0));
+            return (590 + (target != null ? target.BoundingRadius : 0));
         }
 
         public static bool FishBonesActive
