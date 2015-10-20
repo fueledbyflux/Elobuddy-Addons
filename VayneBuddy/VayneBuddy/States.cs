@@ -69,6 +69,11 @@ namespace VayneBuddy
                 Player.CastSpell(SpellSlot.Q, Game.CursorPos);
                 return;
             }
+
+            if (target.Health < Player.Instance.GetSpellDamage(target, SpellSlot.E) + (target.HasWBuff() ? Player.Instance.GetSpellDamage(target, SpellSlot.W, DamageLibrary.SpellStages.Passive) : 0) && Program.ComboMenu["useECombo"].Cast<CheckBox>().CurrentValue)
+            {
+                Program.E.Cast(target);
+            }
         }
 
         public static void Harass()

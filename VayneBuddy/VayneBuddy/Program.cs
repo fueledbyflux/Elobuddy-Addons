@@ -109,7 +109,6 @@ namespace VayneBuddy
             HarassMenu = Menu.AddSubMenu("Harass", "vBuddyHarass");
             HarassMenu.AddGroupLabel("Harass Settings");
             HarassMenu.Add("useQHarass", new CheckBox("Use Q", true));
-            HarassMenu.Add("useEHarass", new CheckBox("Use E (Execute)", true));
 
             FarmMenu = Menu.AddSubMenu("Farming", "vBuddyFarm");
             FarmMenu.AddGroupLabel("Farming Settings");
@@ -186,13 +185,6 @@ namespace VayneBuddy
                         if (pos.IsValid())
                         {
                             Player.CastSpell(SpellSlot.Q, pos);
-                        }
-                    }
-                    else if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo) && ComboMenu["useECombo"].Cast<CheckBox>().CurrentValue || Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Harass) && HarassMenu["useEHarass"].Cast<CheckBox>().CurrentValue)
-                    {
-                        if (target.Health - Player.Instance.GetAutoAttackDamage(target) + (target.HasWBuff() ? Player.Instance.GetSpellDamage(target, SpellSlot.W, DamageLibrary.SpellStages.Passive) : 0) < Player.Instance.GetSpellDamage(target, SpellSlot.E))
-                        {
-                            E.Cast(target);
                         }
                     }
                 }
