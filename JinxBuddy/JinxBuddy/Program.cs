@@ -174,58 +174,69 @@ namespace JinxBuddy
 
         public static void Harass()
         {
-            var target = TargetSelector.SelectedTarget != null &&
-                         TargetSelector.SelectedTarget.Distance(Player.Instance) < 2000
+            var targetW = TargetSelector.SelectedTarget != null &&
+                         TargetSelector.SelectedTarget.Distance(Player.Instance) < W.Range
                 ? TargetSelector.SelectedTarget
-                : TargetSelector.GetTarget(1500, DamageType.Physical);
+                : TargetSelector.GetTarget(W.Range, DamageType.Physical);
+
+            var target = TargetSelector.SelectedTarget != null &&
+                         TargetSelector.SelectedTarget.Distance(Player.Instance) < (!Events.FishBonesActive ? Player.Instance.GetAutoAttackRange() + Events.FishBonesBonus : Player.Instance.GetAutoAttackRange()) + 300
+                ? TargetSelector.SelectedTarget
+                : TargetSelector.GetTarget((!Events.FishBonesActive ? Player.Instance.GetAutoAttackRange() + Events.FishBonesBonus : Player.Instance.GetAutoAttackRange()) + 300, DamageType.Physical);
 
             Orbwalker.ForcedTarget = null;
 
-            if (target == null) return;
-
             if (Orbwalker.IsAutoAttacking) return;
 
-            // W out of range
-            if (HarassMenu["useWHarass"].Cast<CheckBox>().CurrentValue && W.IsReady() && target.Distance(Player.Instance) > Player.Instance.GetAutoAttackRange(target) &&
-                target.IsValidTarget(W.Range))
+            if (targetW != null)
             {
-                W.Cast(target);
+                // W out of range
+                if (HarassMenu["useWHarass"].Cast<CheckBox>().CurrentValue && W.IsReady() &&
+                    target.Distance(Player.Instance) > Player.Instance.GetAutoAttackRange(targetW) &&
+                    targetW.IsValidTarget(W.Range))
+                {
+                    W.Cast(targetW);
+                }
             }
 
-            if (HarassMenu["useQHarass"].Cast<CheckBox>().CurrentValue)
+            if (target != null)
             {
-                // Aoe Logic
-                foreach (
-                    var enemy in
-                        EntityManager.Heroes.Enemies.Where(
-                            a => a.IsValidTarget(Events.MinigunRange(a) + Events.FishBonesBonus))
-                            .OrderBy(TargetSelector.GetPriority))
+
+                if (HarassMenu["useQHarass"].Cast<CheckBox>().CurrentValue)
                 {
-                    if (enemy.CountEnemiesInRange(150) > 1 &&
-                        (enemy.NetworkId == target.NetworkId || enemy.Distance(target) < 150))
+                    // Aoe Logic
+                    foreach (
+                        var enemy in
+                            EntityManager.Heroes.Enemies.Where(
+                                a => a.IsValidTarget(Events.MinigunRange(a) + Events.FishBonesBonus))
+                                .OrderBy(TargetSelector.GetPriority))
                     {
-                        if (!Events.FishBonesActive)
+                        if (enemy.CountEnemiesInRange(150) > 1 &&
+                            (enemy.NetworkId == target.NetworkId || enemy.Distance(target) < 150))
+                        {
+                            if (!Events.FishBonesActive)
+                            {
+                                Q.Cast();
+                            }
+                            Orbwalker.ForcedTarget = enemy;
+                            return;
+                        }
+                    }
+
+                    // Regular Q Logic
+                    if (Events.FishBonesActive)
+                    {
+                        if (target.Distance(Player.Instance) <= Events.MinigunRange(target))
                         {
                             Q.Cast();
                         }
-                        Orbwalker.ForcedTarget = enemy;
-                        return;
                     }
-                }
-
-                // Regular Q Logic
-                if (Events.FishBonesActive)
-                {
-                    if (target.Distance(Player.Instance) <= Events.MinigunRange(target))
+                    else
                     {
-                        Q.Cast();
-                    }
-                }
-                else
-                {
-                    if (target.Distance(Player.Instance) > Events.MinigunRange(target))
-                    {
-                        Q.Cast();
+                        if (target.Distance(Player.Instance) > Events.MinigunRange(target))
+                        {
+                            Q.Cast();
+                        }
                     }
                 }
             }
@@ -233,48 +244,57 @@ namespace JinxBuddy
 
         public static void Combo()
         {
-            var target = TargetSelector.SelectedTarget != null &&
-                         TargetSelector.SelectedTarget.Distance(Player.Instance) < 2000
+
+            var targetW = TargetSelector.SelectedTarget != null &&
+                         TargetSelector.SelectedTarget.Distance(Player.Instance) < W.Range
                 ? TargetSelector.SelectedTarget
-                : TargetSelector.GetTarget(1500, DamageType.Physical);
+                : TargetSelector.GetTarget(W.Range, DamageType.Physical);
+
+
+            var target = TargetSelector.SelectedTarget != null &&
+                         TargetSelector.SelectedTarget.Distance(Player.Instance) < (!Events.FishBonesActive ? Player.Instance.GetAutoAttackRange() + Events.FishBonesBonus : Player.Instance.GetAutoAttackRange()) + 300
+                ? TargetSelector.SelectedTarget
+                : TargetSelector.GetTarget((!Events.FishBonesActive ? Player.Instance.GetAutoAttackRange() + Events.FishBonesBonus : Player.Instance.GetAutoAttackRange()) + 300, DamageType.Physical);
             var rtarget = TargetSelector.GetTarget(3000, DamageType.Physical);
 
             Orbwalker.ForcedTarget = null;
-
-            if (target == null) return;
 
             if (Orbwalker.IsAutoAttacking) return;
 
             // E on immobile
 
-            if (ComboMenu["useECombo"].Cast<CheckBox>().CurrentValue && (target.HasBuffOfType(BuffType.Snare) ||  target.HasBuffOfType(BuffType.Stun)))
+            if (target != null && ComboMenu["useECombo"].Cast<CheckBox>().CurrentValue && (target.HasBuffOfType(BuffType.Snare) ||  target.HasBuffOfType(BuffType.Stun)))
             {
                 E.Cast(target);
             }
 
-            // W/R KS
-            var wPred = W.GetPrediction(rtarget);
+            if (rtarget != null)
+            {
+                // W/R KS
+                var wPred = W.GetPrediction(rtarget);
 
-            if (ComboMenu["useWCombo"].Cast<CheckBox>().CurrentValue && wPred.HitChance >= HitChance.Medium && W.IsReady() && rtarget.IsValidTarget(W.Range) &&
-                Damages.WDamage(target) >= rtarget.Health)
-            {
-                W.Cast(rtarget);
-            }
-            else if (ComboMenu["useRCombo"].Cast<CheckBox>().CurrentValue && rtarget != null &&
-                     rtarget.Distance(Player.Instance) > Events.MinigunRange(target) + Events.FishBonesBonus &&
-                     rtarget.IsKillableByR())
-            {
-                R.Cast(rtarget);
+                if (ComboMenu["useWCombo"].Cast<CheckBox>().CurrentValue &&
+                    wPred.HitChance >= HitChance.Medium && W.IsReady() && rtarget.IsValidTarget(W.Range) &&
+                    Damages.WDamage(target) >= rtarget.Health)
+                {
+                    W.Cast(rtarget);
+                }
+                else if (ComboMenu["useRCombo"].Cast<CheckBox>().CurrentValue && rtarget != null &&
+                         rtarget.Distance(Player.Instance) > Events.MinigunRange(target) + Events.FishBonesBonus &&
+                         rtarget.IsKillableByR())
+                {
+                    R.Cast(rtarget);
+                }
             }
 
             // W out of range
-            if (ComboMenu["useWCombo"].Cast<CheckBox>().CurrentValue && W.IsReady() && target.Distance(Player.Instance) > Player.Instance.GetAutoAttackRange(target) &&
-                target.IsValidTarget(W.Range))
+            if (targetW != null && ComboMenu["useWCombo"].Cast<CheckBox>().CurrentValue && W.IsReady() && targetW.Distance(Player.Instance) > Player.Instance.GetAutoAttackRange(targetW) &&
+                targetW.IsValidTarget(W.Range))
             {
-                W.Cast(target);
+                W.Cast(targetW);
             }
 
-            if (ComboMenu["useQSplash"].Cast<CheckBox>().CurrentValue)
+            if (target != null && ComboMenu["useQSplash"].Cast<CheckBox>().CurrentValue)
             {
                 // Aoe Logic
                 foreach (var enemy in EntityManager.Heroes.Enemies.Where(
@@ -291,14 +311,14 @@ namespace JinxBuddy
             }
 
             // Regular Q Logic
-            if (ComboMenu["useQCombo"].Cast<CheckBox>().CurrentValue && Events.FishBonesActive)
+            if (target != null && ComboMenu["useQCombo"].Cast<CheckBox>().CurrentValue && Events.FishBonesActive)
             {
                 if (target.Distance(Player.Instance) <= Events.MinigunRange(target))
                 {
                     Q.Cast();
                 }
             }
-            else if(ComboMenu["useQCombo"].Cast<CheckBox>().CurrentValue)
+            else if(target != null && ComboMenu["useQCombo"].Cast<CheckBox>().CurrentValue)
             {
                 if (target.Distance(Player.Instance) > Events.MinigunRange(target))
                 {
