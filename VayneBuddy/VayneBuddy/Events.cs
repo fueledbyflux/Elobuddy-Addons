@@ -42,11 +42,6 @@ namespace VayneBuddy
             }
         }
 
-        public static void Orbwalker_OnPostAttack(AttackableUnit target, EventArgs args)
-        {
-            return;
-        }
-
         public static void Interrupter_OnInterruptableSpell(Obj_AI_Base sender, Interrupter.InterruptableSpellEventArgs e)
         {
             var dangerLevel =

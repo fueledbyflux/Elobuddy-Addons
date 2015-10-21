@@ -64,11 +64,12 @@ namespace VayneBuddy
 
             ComboMenu = Menu.AddSubMenu("Combo", "vBuddyCombo");
             ComboMenu.AddGroupLabel("Combo Settings");
-            ComboMenu.Add("useQCombo", new CheckBox("Use Q", true));
-            ComboMenu.Add("useECombo", new CheckBox("Use E (Execute)", true));
+            ComboMenu.Add("useQCombo", new CheckBox("Use Q"));
+            ComboMenu.Add("useQKite", new CheckBox("Use Q to Kite Melee", false));
+            ComboMenu.Add("useECombo", new CheckBox("Use E (Execute)"));
             ComboMenu.AddLabel("R Settings");
             ComboMenu.Add("useRCombo", new CheckBox("Use R", false));
-            ComboMenu.Add("noRUnderTurret", new CheckBox("Disable R if Target is under allied turret", true));
+            ComboMenu.Add("noRUnderTurret", new CheckBox("Disable R if Target is under enemy turret"));
 
             CondemnPriorityMenu = Menu.AddSubMenu("Auto Condemn", "vBuddyCondemnPriority");
             CondemnPriorityMenu.AddGroupLabel("Condemn Priority");
@@ -89,8 +90,7 @@ namespace VayneBuddy
                 sliderValue.DisplayName = "Min Priority for Auto Condemn: " + PriorityValues[sliderValue.CurrentValue];
             };
             sliderValue.DisplayName = "Min Priority for Auto Condemn: " + PriorityValues[sliderValue.CurrentValue];
-            CondemnPriorityMenu.Add("autoCondemnToggle",
-                new KeyBind("Auto Condemn", false, KeyBind.BindTypes.PressToggle, 'H'));
+            CondemnPriorityMenu.Add("autoCondemnToggle", new KeyBind("Auto Condemn", false, KeyBind.BindTypes.PressToggle, 'H'));
             CondemnPriorityMenu.AddSeparator();
 
             CondemnMenu = Menu.AddSubMenu("Condemn", "vBuddyCondemn");
@@ -112,6 +112,7 @@ namespace VayneBuddy
 
             FarmMenu = Menu.AddSubMenu("Farming", "vBuddyFarm");
             FarmMenu.AddGroupLabel("Farming Settings");
+            FarmMenu.Add("onlyTumbleToCursor", new CheckBox("Only Tumble To Cursor", false));
             FarmMenu.AddLabel("Last Hit");
             FarmMenu.Add("useQLastHit", new CheckBox("Use Q Last", true));
             FarmMenu.AddLabel("WaveClear");
@@ -142,9 +143,7 @@ namespace VayneBuddy
             GapCloserMenu = Menu.AddSubMenu("Anti-GapClosers", "gapClosersvBuddy");
             GapCloserMenu.AddGroupLabel("Anti-GapCloser Menu");
             GapCloserMenu.Add("enableGapCloser", new CheckBox("Enable Anti-GapCloser"));
-
-
-            Orbwalker.OnPostAttack += Events.Orbwalker_OnPostAttack;
+            
             Orbwalker.OnPreAttack += Events.Orbwalker_OnPreAttack;
             Game.OnUpdate += Game_OnUpdate;
             Drawing.OnDraw += Drawing_OnDraw;
@@ -170,9 +169,9 @@ namespace VayneBuddy
                     }
                     if (target.IsValidTarget() && Q.IsReady() &&
                         (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo) &&
-                         Program.ComboMenu["useQCombo"].Cast<CheckBox>().CurrentValue ||
+                        ComboMenu["useQCombo"].Cast<CheckBox>().CurrentValue ||
                          Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Harass) &&
-                         Program.ComboMenu["useQHarass"].Cast<CheckBox>().CurrentValue))
+                         HarassMenu["useQHarass"].Cast<CheckBox>().CurrentValue))
                     {
                         var pos = (_Player.Position.Extend(Game.CursorPos, 300).Distance(target) <=
                                    _Player.GetAutoAttackRange(target) &&
@@ -187,6 +186,15 @@ namespace VayneBuddy
                             Player.CastSpell(SpellSlot.Q, pos);
                         }
                     }
+
+                    if ( ComboMenu["useQKite"].Cast<CheckBox>().CurrentValue &&
+                        EntityManager.Heroes.Enemies.Any(
+                            a => a.IsMelee && a.Distance(Player.Instance) < a.GetAutoAttackRange(Player.Instance)))
+                    {
+                        Player.CastSpell(SpellSlot.Q,
+                            target.Position.Extend(Player.Instance.Position,
+                                target.Position.Distance(Player.Instance) + 300).To3D());
+                    }
                 }
 
                 if ((Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LastHit) && FarmMenu["useQLastHit"].Cast<CheckBox>().CurrentValue || Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear) && FarmMenu["useQWaveClear"].Cast<CheckBox>().CurrentValue) && Q.IsReady())
@@ -199,10 +207,11 @@ namespace VayneBuddy
                             .OrderBy(a => a.Health)
                             .FirstOrDefault();
 
-                    if (source == null) return;
+                    if (source == null || Player.Instance.Position.Extend(Game.CursorPos, 300).Distance(source) >
+                        Player.Instance.GetAutoAttackRange(source) &&
+                        FarmMenu["onlyTumbleToCursor"].Cast<CheckBox>().CurrentValue) return;
                     Orbwalker.ForcedTarget = source;
-                    Player.CastSpell(SpellSlot.Q, source.Position);
-                    
+                    Player.CastSpell(SpellSlot.Q, Player.Instance.Position.Extend(Game.CursorPos, 300).Distance(source) <= Player.Instance.GetAutoAttackRange(source) ? Game.CursorPos : source.Position);
                 }
             }
         }
