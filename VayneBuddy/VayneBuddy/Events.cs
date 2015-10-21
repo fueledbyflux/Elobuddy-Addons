@@ -14,10 +14,16 @@ namespace VayneBuddy
         public static Obj_AI_Base AAedTarget = null;
         public static long LastAa;
         public static int AaStacks;
+        public static int LastR;
 
         public static AIHeroClient _Player
         {
             get { return ObjectManager.Player; }
+        }
+
+        public static bool HasR
+        {
+            get { return LastR > Environment.TickCount; }
         }
 
         public static void Gapcloser_OnGapCloser(AIHeroClient sender, Gapcloser.GapcloserEventArgs e)
@@ -25,6 +31,37 @@ namespace VayneBuddy
             if (e.End.Distance(_Player) < 200 && sender.IsValidTarget())
             {
                 Program.E.Cast(sender);
+            }
+        }
+
+        public static void GameObject_OnCreate(GameObject sender, EventArgs args)
+        {
+            var rengar = EntityManager.Heroes.Enemies.FirstOrDefault(a => a.Hero == Champion.Rengar);
+            if (Program.DrawMenu["antiRengar"].Cast<CheckBox>().CurrentValue && sender.Name == "Rengar_LeapSound.troy" &&
+                ObjectManager.Player.Distance(Player.Instance.Position) <= Program.E.Range && rengar != null)
+            {
+                Program.E.Cast(rengar);
+                Console.WriteLine("fuck rengar");
+            }
+        }
+
+        public static void ObjAiBaseOnOnBasicAttack(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
+        {
+            var target = (AIHeroClient) sender;
+            if (Program.DrawMenu["antiKalista"].Cast<CheckBox>().CurrentValue && target != null && target.IsEnemy && target.Hero == Champion.Kalista && Program.Q.IsReady())
+            {
+                var pos = (_Player.Position.Extend(Game.CursorPos, 300).Distance(target) <=
+                                   _Player.GetAutoAttackRange(target) &&
+                                   _Player.Position.Extend(Game.CursorPos, 300).Distance(target) > 100
+                            ? Game.CursorPos
+                            : (_Player.Position.Extend(target.Position, 300).Distance(target) < 100)
+                                ? target.Position
+                                : new Vector3());
+
+                if (pos.IsValid())
+                {
+                    Player.CastSpell(SpellSlot.Q, pos);
+                }
             }
         }
 

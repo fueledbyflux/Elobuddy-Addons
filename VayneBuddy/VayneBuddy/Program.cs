@@ -43,6 +43,7 @@ namespace VayneBuddy
         public static string[] DangerSliderValues = {"Low", "Medium", "High"};
         public static string[] PriorityValues = {"Very Low", "Low", "Medium", "High", "Very High"};
         public static List<Vector2> Points = new List<Vector2>();
+
         private static void Game_OnStart(EventArgs args)
         {
             if (!_Player.ChampionName.ToLower().Contains("vayne")) return;
@@ -51,7 +52,7 @@ namespace VayneBuddy
             E = new Spell.Targeted(SpellSlot.E, 590);
             Condemn.ESpell = new Spell.Skillshot(SpellSlot.E, 590, SkillShotType.Linear, 250, 1250);
             R = new Spell.Active(SpellSlot.R);
-            
+
 
             Menu = MainMenu.AddMenu("Vayne Buddy", "vBuddy");
 
@@ -75,7 +76,8 @@ namespace VayneBuddy
             CondemnPriorityMenu.AddGroupLabel("Condemn Priority");
             foreach (var enem in ObjectManager.Get<AIHeroClient>().Where(a => a.IsEnemy))
             {
-                var champValue = CondemnPriorityMenu.Add(enem.ChampionName + "priority", new Slider(enem.ChampionName + ": ", 1, 1, 5));
+                var champValue = CondemnPriorityMenu.Add(enem.ChampionName + "priority",
+                    new Slider(enem.ChampionName + ": ", 1, 1, 5));
                 var enem1 = enem;
                 champValue.OnValueChange += delegate
                 {
@@ -84,13 +86,15 @@ namespace VayneBuddy
                 champValue.DisplayName = enem1.ChampionName + ": " + PriorityValues[champValue.CurrentValue];
             }
             CondemnPriorityMenu.AddSeparator();
-            var sliderValue = CondemnPriorityMenu.Add("minSliderAutoCondemn", new Slider("Min Priority for Auto Condemn: ", 2, 1, 5));
+            var sliderValue = CondemnPriorityMenu.Add("minSliderAutoCondemn",
+                new Slider("Min Priority for Auto Condemn: ", 2, 1, 5));
             sliderValue.OnValueChange += delegate
             {
                 sliderValue.DisplayName = "Min Priority for Auto Condemn: " + PriorityValues[sliderValue.CurrentValue];
             };
             sliderValue.DisplayName = "Min Priority for Auto Condemn: " + PriorityValues[sliderValue.CurrentValue];
-            CondemnPriorityMenu.Add("autoCondemnToggle", new KeyBind("Auto Condemn", false, KeyBind.BindTypes.PressToggle, 'H'));
+            CondemnPriorityMenu.Add("autoCondemnToggle",
+                new KeyBind("Auto Condemn", false, KeyBind.BindTypes.PressToggle, 'H'));
             CondemnPriorityMenu.AddSeparator();
 
             CondemnMenu = Menu.AddSubMenu("Condemn", "vBuddyCondemn");
@@ -100,7 +104,8 @@ namespace VayneBuddy
             CondemnMenu.Add("condemnPercent", new Slider("Condemn Percent", 33, 1));
             CondemnMenu.AddSeparator();
             CondemnMenu.AddLabel("Active Mode Settings");
-            CondemnMenu.Add("smartVsCheap", new CheckBox("On (SMART CONDEMN (saves fps)) / OFF (360 degree check)", true));
+            CondemnMenu.Add("smartVsCheap",
+                new CheckBox("On (SMART CONDEMN (saves fps)) / OFF (360 degree check)", true));
             CondemnMenu.AddSeparator();
             CondemnMenu.Add("condemnCombo", new CheckBox("Condemn in Combo", true));
             CondemnMenu.Add("condemnComboTrinket", new CheckBox("Trinket Bush After E", true));
@@ -126,6 +131,9 @@ namespace VayneBuddy
             DrawMenu.AddLabel("Misc");
             DrawMenu.Add("wallJumpKey", new KeyBind("Tumble Walls", false, KeyBind.BindTypes.HoldActive, 'Z'));
             DrawMenu.Add("condemnNextAA", new KeyBind("Condemn Next AA", false, KeyBind.BindTypes.PressToggle, 'E'));
+            DrawMenu.AddLabel("Anti-Champions");
+            DrawMenu.Add("antiKalista", new CheckBox("Anti-Kalista"));
+            DrawMenu.Add("antiRengar", new CheckBox("Anti-Rengar"));
 
             InterruptorMenu = Menu.AddSubMenu("Interrupter", "InterruptorvBuddy");
             InterruptorMenu.AddGroupLabel("Interrupter Menu");
@@ -143,7 +151,7 @@ namespace VayneBuddy
             GapCloserMenu = Menu.AddSubMenu("Anti-GapClosers", "gapClosersvBuddy");
             GapCloserMenu.AddGroupLabel("Anti-GapCloser Menu");
             GapCloserMenu.Add("enableGapCloser", new CheckBox("Enable Anti-GapCloser"));
-            
+
             Orbwalker.OnPreAttack += Events.Orbwalker_OnPreAttack;
             Game.OnUpdate += Game_OnUpdate;
             Drawing.OnDraw += Drawing_OnDraw;
@@ -151,6 +159,8 @@ namespace VayneBuddy
             Interrupter.OnInterruptableSpell += Events.Interrupter_OnInterruptableSpell;
             Obj_AI_Base.OnProcessSpellCast += AIHeroClient_OnProcessSpellCast;
             Obj_AI_Base.OnSpellCast += Obj_AI_Base_OnSpellCast;
+            Obj_AI_Base.OnBasicAttack += Events.ObjAiBaseOnOnBasicAttack;
+            GameObject.OnCreate += Events.GameObject_OnCreate;
         }
 
         private static void Obj_AI_Base_OnSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
@@ -219,6 +229,10 @@ namespace VayneBuddy
         private static void AIHeroClient_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
             if (!sender.IsMe) return;
+            if (args.SData.Name == Player.GetSpell(SpellSlot.R).Name)
+            {
+                Events.LastR = Environment.TickCount + new[] {8000, 10000, 12000}[R.Level - 1];
+            }
             if (args.SData.Name.ToLower().Contains("vaynetumble"))
             {
                 Orbwalker.ResetAutoAttack();
