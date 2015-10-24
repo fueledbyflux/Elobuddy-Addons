@@ -129,7 +129,7 @@ namespace YasuoBuddy.EvadePlus.SkillshotTypes.SpecialTypes
         public override Geometry.Polygon ToPolygon(float extrawidth = 0)
         {
             if (SpellData.AddHitbox)
-                extrawidth += Player.Instance.BoundingRadius/2;
+                extrawidth += Player.Instance.BoundingRadius;
 
             return new Geometry.Polygon.Rectangle(StartPosition, EndPosition.ExtendVector3(StartPosition, -extrawidth),
                 SpellData.Radius*2 + extrawidth);

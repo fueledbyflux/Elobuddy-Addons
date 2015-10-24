@@ -21,7 +21,7 @@ namespace YasuoBuddy.EvadePlus
 
                 if (!castPos.IsZero && slot != SpellSlot.Unknown && Player.CanUseSpell(slot) == SpellState.Ready)
                 {
-                    //Player.IssueOrder(GameObjectOrder.Stop, Player.Instance.Position);
+                    //Player.IssueOrder(GameObjectOrder.Stop, Player.Instance.Position, true);
                     Player.CastSpell(slot, castPos.To3DWorld());
                     return true;
                 }

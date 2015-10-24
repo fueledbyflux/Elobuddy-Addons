@@ -65,6 +65,7 @@
     <Compile Include="DamageHandler.cs" />
     <Compile Include="DashingManager.cs" />
     <Compile Include="EEvader.cs" />
+    <Compile Include="EvadePlus\AutoPathing.cs" />
     <Compile Include="EvadePlus\EvadeMenu.cs" />
     <Compile Include="EvadePlus\EvadePlus.cs" />
     <Compile Include="EvadePlus\EvadeSkillshot.cs" />

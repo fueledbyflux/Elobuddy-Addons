@@ -15,7 +15,7 @@ namespace YasuoBuddy.TargetedSpells
         private static Menu TargetedMenu;
         public static void Init()
         {
-            TargetedMenu = Yasuo.Menu.AddSubMenu("Targeted Skills");
+            TargetedMenu = EvadePlus.EvadeMenu.MainMenu.AddSubMenu("Targeted Skills");
             TargetedMenu.AddGroupLabel("Targeted Skills");
             foreach (var enemy in EntityManager.Heroes.Enemies)
             {
@@ -36,7 +36,15 @@ namespace YasuoBuddy.TargetedSpells
             var spell = TargetSpellDatabase.GetByName(args.SData.Name);
             if (spell != null && TargetedMenu[spell.Name + "/e"] != null && TargetedMenu[spell.Name + "/e"].Cast<CheckBox>().CurrentValue)
             {
-                Player.CastSpell(SpellSlot.W, sender.Position);
+                Core.DelayAction(delegate { Player.CastSpell(SpellSlot.W, sender.Position); },
+                    (int)
+                        ((Player.Instance.Distance(sender) - 100/args.SData.MissileSpeed > 0
+                            ? args.SData.MissileSpeed
+                            : 2000)*1000 > 1
+                            ? (Player.Instance.Distance(sender) - 100/args.SData.MissileSpeed > 0
+                                ? args.SData.MissileSpeed
+                                : 2000)*1000
+                            : 0));
             }
         }
     }

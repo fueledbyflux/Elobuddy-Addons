@@ -33,7 +33,7 @@ namespace YasuoBuddy
         }
 
         private static void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
-        {
+        {   
             if (!sender.IsMe) return;
             if (args.SData.Name == Player.GetSpell(SpellSlot.E).Name)
             {

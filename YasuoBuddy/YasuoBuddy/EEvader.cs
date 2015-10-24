@@ -13,6 +13,7 @@ namespace YasuoBuddy
     {
         public static int WallCastT;
         public static Vector2 YasuoWallCastedPos;
+        public static int WDelay;
 
         public static void UpdateTask()
         {
@@ -58,10 +59,13 @@ namespace YasuoBuddy
                         if (activeSkillshot.ToPolygon().IsInside(Player.Instance))
                         {
                             Player.CastSpell(SpellSlot.W, activeSkillshot.GetPosition());
+                            WDelay = Environment.TickCount + 500;
                             return;
                         }
                     }
                 }
+
+                if (WDelay > Environment.TickCount) return;
                 
                 if (Yasuo.FleeMenu["Evade.E"].Cast<CheckBox>().CurrentValue && Player.GetSpell(SpellSlot.E).State == SpellState.Ready)
                 {

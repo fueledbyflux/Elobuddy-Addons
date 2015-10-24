@@ -31,6 +31,23 @@ namespace YasuoBuddy.EvadePlus
                         ToggleParticleName = "Summoner_Snowball_Explosion_Sound.troy"
                     }
                 },
+                new CircularMissileSkillshot
+                {
+                    SpellData = new SpellData
+                    {
+                        DisplayName = "Dark Flight",
+                        ChampionName = "Aatrox",
+                        SpellName = "AatroxQ",
+                        Slot = SpellSlot.Q,
+                        Delay = 250,
+                        Range = 650,
+                        Radius = 285,
+                        MissileSpeed = 450,
+                        DangerValue = 3,
+                        IsDangerous = true,
+                        MissileSpellName = "AatroxQ"
+                    }
+                },
                 new LinearMissileSkillshot
                 {
                     SpellData = new SpellData
@@ -99,6 +116,40 @@ namespace YasuoBuddy.EvadePlus
                         MissileSpellName = "AhriOrbofDeception2"
                     }
                 },
+                new CircularMissileSkillshot
+                {
+                    SpellData = new SpellData
+                    {
+                        DisplayName = "Pulverize",
+                        ChampionName = "Alistar",
+                        SpellName = "Pulverize",
+                        Slot = SpellSlot.Q,
+                        Delay = 0,
+                        Range = 365,
+                        Radius = 365,
+                        MissileSpeed = 0,
+                        DangerValue = 2,
+                        IsDangerous = true,
+                        MissileSpellName = "Pulverize"
+                    }
+                },
+                new CircularMissileSkillshot
+                {
+                    SpellData = new SpellData
+                    {
+                        DisplayName = "Curse of the Sad Mummy",
+                        ChampionName = "Amumu",
+                        SpellName = "CurseoftheSadMummy",
+                        Slot = SpellSlot.R,
+                        Delay = 250,
+                        Range = 560,
+                        Radius = 560,
+                        MissileSpeed = 0,
+                        DangerValue = 5,
+                        MissileSpellName = "CurseoftheSadMummy",
+                        IsDangerous = true
+                    }
+                },
                 new LinearMissileSkillshot
                 {
                     SpellData = new SpellData
@@ -149,7 +200,23 @@ namespace YasuoBuddy.EvadePlus
                 //        MissileSpellName = "Incinerate"
                 //    }
                 //},
-                
+                new CircularMissileSkillshot
+                {
+                    SpellData = new SpellData
+                    {
+                        DisplayName = "Summon: Tibbers",
+                        ChampionName = "Annie",
+                        SpellName = "InfernalGuardian",
+                        Slot = SpellSlot.R,
+                        Delay = 250,
+                        Range = 600,
+                        Radius = 290,
+                        MissileSpeed = 0,
+                        DangerValue = 5,
+                        IsDangerous = true,
+                        MissileSpellName = "InfernalGuardian"
+                    }
+                },
                 new LinearMissileSkillshot
                 {
                     SpellData = new SpellData
@@ -251,7 +318,23 @@ namespace YasuoBuddy.EvadePlus
                         MissileSpellName = "BrandBlazeMissile"
                     }
                 },
-                
+                new CircularMissileSkillshot
+                {
+                    SpellData = new SpellData
+                    {
+                        DisplayName = "Pillar of Flame",
+                        ChampionName = "Brand",
+                        SpellName = "BrandFissure",
+                        Slot = SpellSlot.W,
+                        Delay = 850,
+                        Range = 1100,
+                        Radius = 250,
+                        MissileSpeed = 0,
+                        DangerValue = 2,
+                        IsDangerous = false,
+                        MissileSpellName = "BrandFissure"
+                    }
+                },
                 new LinearMissileSkillshot
                 {
                     SpellData = new SpellData
@@ -335,7 +418,23 @@ namespace YasuoBuddy.EvadePlus
                 //        MissileSpellName = "CassiopeiaPetrifyingGaze"
                 //    }
                 //},
-                
+                new CircularMissileSkillshot
+                {
+                    SpellData = new SpellData
+                    {
+                        DisplayName = "Noxious Blast",
+                        ChampionName = "Cassiopeia",
+                        SpellName = "CassiopeiaNoxiousBlast",
+                        Slot = SpellSlot.Q,
+                        Delay = 825,
+                        Range = 600,
+                        Radius = 200,
+                        MissileSpeed = 0,
+                        DangerValue = 2,
+                        IsDangerous = false,
+                        MissileSpellName = "CassiopeiaNoxiousBlast"
+                    }
+                },
                 //new CircularMissileSkillshot
                 //{
                 //    SpellData = new SpellData
@@ -365,7 +464,24 @@ namespace YasuoBuddy.EvadePlus
                 //        DangerValue = 3,
                 //        MissileSpellName = "FeralScream"
                 //    }
-                
+                //},
+                new CircularMissileSkillshot
+                {
+                    SpellData = new SpellData
+                    {
+                        DisplayName = "Rupture",
+                        ChampionName = "Chogath",
+                        SpellName = "Rupture",
+                        Slot = SpellSlot.Q,
+                        Delay = 1200,
+                        Range = 950,
+                        Radius = 250,
+                        MissileSpeed = 0,
+                        DangerValue = 3,
+                        IsDangerous = false,
+                        MissileSpellName = "Rupture"
+                    }
+                },
                 new LinearMissileSkillshot
                 {
                     SpellData = new SpellData
@@ -514,6 +630,41 @@ namespace YasuoBuddy.EvadePlus
                         MissileSpellName = "ekkoqmis"
                     }
                 },
+                new CircularMissileSkillshot
+                {
+                    SpellData = new SpellData
+                    {
+                        DisplayName = "Parallel Convergence",
+                        ChampionName = "Ekko",
+                        SpellName = "EkkoW",
+                        Slot = SpellSlot.W,
+                        Delay = 3750,
+                        Range = 1600,
+                        Radius = 375,
+                        MissileSpeed = 1650,
+                        DangerValue = 3,
+                        IsDangerous = false,
+                        AddHitbox = false,
+                        MissileSpellName = "EkkoW"
+                    }
+                },
+                new CircularMissileSkillshot
+                {
+                    SpellData = new SpellData
+                    {
+                        DisplayName = "Chronobreak",
+                        ChampionName = "Ekko",
+                        SpellName = "EkkoR",
+                        Slot = SpellSlot.R,
+                        Delay = 250,
+                        Range = 1600,
+                        Radius = 375,
+                        MissileSpeed = 1650,
+                        DangerValue = 3,
+                        IsDangerous = false,
+                        MissileSpellName = "EkkoR"
+                    }
+                },
                 new LinearMissileSkillshot
                 {
                     SpellData = new SpellData
@@ -529,6 +680,23 @@ namespace YasuoBuddy.EvadePlus
                         DangerValue = 4,
                         IsDangerous = true,
                         MissileSpellName = "EliseHumanE"
+                    }
+                },
+                new CircularMissileSkillshot
+                {
+                    SpellData = new SpellData
+                    {
+                        DisplayName = "Agony's Embrace",
+                        ChampionName = "Evelynn",
+                        SpellName = "EvelynnR",
+                        Slot = SpellSlot.R,
+                        Delay = 250,
+                        Range = 650,
+                        Radius = 350,
+                        MissileSpeed = 0,
+                        DangerValue = 5,
+                        IsDangerous = true,
+                        MissileSpellName = "EvelynnR"
                     }
                 },
                 new LinearMissileSkillshot
@@ -619,7 +787,40 @@ namespace YasuoBuddy.EvadePlus
                         MissileSpellName = "GalioRighteousGust"
                     }
                 },
-                
+                new CircularMissileSkillshot
+                {
+                    SpellData = new SpellData
+                    {
+                        DisplayName = "Resolute Smite",
+                        ChampionName = "Galio",
+                        SpellName = "GalioResoluteSmite",
+                        Slot = SpellSlot.Q,
+                        Delay = 250,
+                        Range = 1040,
+                        Radius = 235,
+                        MissileSpeed = 1200,
+                        DangerValue = 2,
+                        IsDangerous = false,
+                        MissileSpellName = "GalioResoluteSmite"
+                    }
+                },
+                new CircularMissileSkillshot
+                {
+                    SpellData = new SpellData
+                    {
+                        DisplayName = "Idol of Durand",
+                        ChampionName = "Galio",
+                        SpellName = "GalioIdolOfDurand",
+                        Slot = SpellSlot.R,
+                        Delay = 250,
+                        Range = 600,
+                        Radius = 600,
+                        MissileSpeed = 0,
+                        DangerValue = 3,
+                        AddHitbox = false,
+                        MissileSpellName = ""
+                    }
+                },
                 new LinearMissileSkillshot
                 {
                     SpellData = new SpellData
@@ -635,6 +836,24 @@ namespace YasuoBuddy.EvadePlus
                         DangerValue = 2,
                         IsDangerous = false,
                         MissileSpellName = "gnarbigq"
+                    }
+                },
+                new CircularMissileSkillshot
+                {
+                    SpellData = new SpellData
+                    {
+                        DisplayName = "GNAR!",
+                        ChampionName = "Gnar",
+                        SpellName = "GnarR",
+                        Slot = SpellSlot.R,
+                        Delay = 250,
+                        Range = 500,
+                        Radius = 500,
+                        MissileSpeed = 0,
+                        DangerValue = 5,
+                        IsDangerous = true,
+                        AddHitbox = false,
+                        MissileSpellName = "GnarR"
                     }
                 },
                 new LinearMissileSkillshot
@@ -738,6 +957,23 @@ namespace YasuoBuddy.EvadePlus
                         IsDangerous = false,
                         MissileSpellName = "GragasQ",
                         ToggleParticleName = "Gragas_.+_Q_(Enemy|Ally)"
+                    }
+                },
+                new LinearMissileSkillshot
+                {
+                    SpellData = new SpellData
+                    {
+                        DisplayName = "Body Slam",
+                        ChampionName = "Gragas",
+                        SpellName = "GragasE",
+                        Slot = SpellSlot.E,
+                        Delay = 0,
+                        Range = 950,
+                        Radius = 200,
+                        MissileSpeed = 1200,
+                        DangerValue = 2,
+                        IsDangerous = false,
+                        MissileSpellName = "GragasE"
                     }
                 },
                 new CircularMissileSkillshot

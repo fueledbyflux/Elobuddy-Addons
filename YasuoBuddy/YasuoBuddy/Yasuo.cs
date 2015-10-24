@@ -68,7 +68,6 @@ namespace YasuoBuddy
             FleeMenu.Add("Evade.W", new CheckBox("Use W to Evade"));
             
             EvadePlus.Program.Main(null);
-            TargetedSpells.SpellDetectorWindwaller.Init();
 
             DrawMenu = Menu.AddSubMenu("Draw", "yasuoDraw");
             DrawMenu.AddGroupLabel("Draw Settings");
@@ -87,6 +86,7 @@ namespace YasuoBuddy
 
             DrawMenu.AddLabel("When Spell is Down Colour = ");
             DrawMenu.AddColourItem("Draw.Down", 7);
+            
 
             EventManager.Init();
             Game.OnTick += Game_OnTick;

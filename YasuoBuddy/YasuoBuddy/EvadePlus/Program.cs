@@ -9,9 +9,12 @@ namespace YasuoBuddy.EvadePlus
 
         public static void Main(string[] args)
         {
-            _skillshotDetector = new SkillshotDetector();
-            Evade = new EvadePlus(_skillshotDetector);
-            EvadeMenu.CreateMenu();
+            Loading.OnLoadingComplete += delegate
+            {
+                _skillshotDetector = new SkillshotDetector();
+                Evade = new EvadePlus(_skillshotDetector);
+                EvadeMenu.CreateMenu();
+            };
         }
     }
 }

@@ -111,12 +111,12 @@ namespace YasuoBuddy.EvadePlus.SkillshotTypes
         {
             if (Missile == null)
             {
-                if (Environment.TickCount > TimeDetected + SpellData.Delay + 50)
+                if (Environment.TickCount > TimeDetected + SpellData.Delay + 250)
                     IsValid = false;
             }
             else
             {
-                if (Environment.TickCount > TimeDetected + 9000)
+                if (Environment.TickCount > TimeDetected + 6000)
                     IsValid = false;
             }
         }
@@ -141,7 +141,7 @@ namespace YasuoBuddy.EvadePlus.SkillshotTypes
         public override Geometry.Polygon ToPolygon(float extrawidth = 0)
         {
             if (SpellData.AddHitbox)
-                extrawidth += Player.Instance.BoundingRadius/2;
+                extrawidth += Player.Instance.BoundingRadius;
 
             return new Geometry.Polygon.Circle(Position, SpellData.Radius + extrawidth);
         }

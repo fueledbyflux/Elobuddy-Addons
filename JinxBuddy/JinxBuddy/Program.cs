@@ -226,14 +226,14 @@ namespace JinxBuddy
                     // Regular Q Logic
                     if (Events.FishBonesActive)
                     {
-                        if (target.Distance(Player.Instance) <= Events.MinigunRange(target))
+                        if (target.Distance(Player.Instance) <= Player.Instance.GetAutoAttackRange(target) - Events.FishBonesBonus)
                         {
                             Q.Cast();
                         }
                     }
                     else
                     {
-                        if (target.Distance(Player.Instance) > Events.MinigunRange(target))
+                        if (target.Distance(Player.Instance) > Player.Instance.GetAutoAttackRange(target))
                         {
                             Q.Cast();
                         }
@@ -313,14 +313,14 @@ namespace JinxBuddy
             // Regular Q Logic
             if (target != null && ComboMenu["useQCombo"].Cast<CheckBox>().CurrentValue && Events.FishBonesActive)
             {
-                if (target.Distance(Player.Instance) <= Events.MinigunRange(target))
+                if (target.Distance(Player.Instance) <= Player.Instance.GetAutoAttackRange(target) - Events.FishBonesBonus)
                 {
                     Q.Cast();
                 }
             }
             else if(target != null && ComboMenu["useQCombo"].Cast<CheckBox>().CurrentValue)
             {
-                if (target.Distance(Player.Instance) > Events.MinigunRange(target))
+                if (target.Distance(Player.Instance) > Player.Instance.GetAutoAttackRange(target))
                 {
                     Q.Cast();
                 }

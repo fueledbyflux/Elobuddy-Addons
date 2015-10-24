@@ -9,16 +9,44 @@ namespace YasuoBuddy.EvadePlus
 {
     internal class EvadeMenu
     {
+        public static Menu MainMenu { get; private set; }
         public static Menu SkillshotMenu { get; private set; }
         public static Menu SpellMenu { get; private set; }
         public static Menu DrawMenu { get; private set; }
         public static Menu ControlsMenu { get; private set; }
 
-        private static readonly Dictionary<string, EvadeSkillshot> MenuSkillshots =
+        public static readonly Dictionary<string, EvadeSkillshot> MenuSkillshots =
             new Dictionary<string, EvadeSkillshot>();
 
         public static void CreateMenu()
         {
+            if (MainMenu != null)
+            {
+                return;
+            }
+
+            MainMenu = EloBuddy.SDK.Menu.MainMenu.AddMenu("YasuoEvade", "YasuoEvade");
+
+            // Set up main menu
+            MainMenu.AddGroupLabel("General Settings");
+            MainMenu.Add("fowDetection", new CheckBox("Enable FOW detection"));
+            MainMenu.Add("processSpellDetection", new CheckBox("Enable Process Spell Detection"));
+            MainMenu.Add("limitDetectionRange", new CheckBox("Limit Spell Detection Range"));
+            MainMenu.Add("recalculatePosition", new CheckBox("Allow recalculation of evade position", false));
+            MainMenu.Add("moveToInitialPosition", new CheckBox("Move to desired position after evade.", false));
+            MainMenu.Add("alwaysEvade", new CheckBox("Evade always, even when not enough time is available", false));
+            MainMenu.Add("serverTimeBuffer", new Slider("Server Time Buffer", 30));
+            MainMenu.AddSeparator();
+            MainMenu.AddSeparator();
+
+            MainMenu.AddGroupLabel("Humanizer");
+            MainMenu.Add("skillshotActivationDelay", new Slider("Skillshot Activation Delay", 0, 0, 400));
+            MainMenu.AddSeparator(10);
+            MainMenu.Add("extraEvadeRange", new Slider("Extra Evade Range", 50, 0, 100));
+            MainMenu.Add("randomizeExtraEvadeRange", new CheckBox("Randomize Extra Evade Range", false));
+
+            TargetedSpells.SpellDetectorWindwaller.Init();
+
             // Set up skillshot menu
             var heroes = EntityManager.Heroes.Enemies;
             var heroNames = heroes.Select(obj => obj.ChampionName).ToArray();
@@ -30,7 +58,7 @@ namespace YasuoBuddy.EvadePlus
                         s.SpellData.ChampionName == "AllChampions" &&
                         heroes.Any(obj => obj.Spellbook.Spells.Select(c => c.Name).Contains(s.SpellData.SpellName))));
 
-            SkillshotMenu = Yasuo.Menu.AddSubMenu("Skillshots");
+            SkillshotMenu = MainMenu.AddSubMenu("Skillshots");
             SkillshotMenu.AddLabel(string.Format("Skillshots Loaded {0}", skillshots.Count));
             SkillshotMenu.AddSeparator();
 
@@ -46,8 +74,10 @@ namespace YasuoBuddy.EvadePlus
                 SkillshotMenu.AddGroupLabel(c.DisplayText);
                 SkillshotMenu.Add(skillshotString + "/enable", new CheckBox("Dodge"));
                 SkillshotMenu.Add(skillshotString + "/draw", new CheckBox("Draw"));
-
-                if (c is LinearMissileSkillshot) SkillshotMenu.Add(skillshotString + "/w", new CheckBox("Evade With W"));
+                if (c is LinearMissileSkillshot)
+                {
+                    SkillshotMenu.Add(skillshotString + "/wEvade", new CheckBox("W Evade"));
+                }
 
                 var dangerous = new CheckBox("Dangerous", c.SpellData.IsDangerous);
                 dangerous.OnValueChange += delegate(ValueBase<bool> sender, ValueBase<bool>.ValueChangeArgs args)
@@ -66,8 +96,22 @@ namespace YasuoBuddy.EvadePlus
                 SkillshotMenu.AddSeparator();
             }
 
+            // Set up spell menu
+            SpellMenu = MainMenu.AddSubMenu("Spells");
+            SpellMenu.AddGroupLabel("Flash");
+            SpellMenu.Add("flash", new Slider("Danger Value", 5, 0, 5));
+
+            // Set up draw menu
+            DrawMenu = MainMenu.AddSubMenu("Drawings");
+            DrawMenu.AddGroupLabel("Evade Drawings");
+            DrawMenu.Add("drawEvadePoint", new CheckBox("Draw Evade Point"));
+            DrawMenu.Add("drawEvadeStatus", new CheckBox("Draw Evade Status"));
+            DrawMenu.Add("drawDangerPolygon", new CheckBox("Draw Danger Polygon", false));
+            DrawMenu.AddSeparator();
+            DrawMenu.Add("drawPath", new CheckBox("Draw Autpathing Path"));
+
             // Set up controls menu
-            ControlsMenu = Yasuo.Menu.AddSubMenu("Controls");
+            ControlsMenu = MainMenu.AddSubMenu("Controls");
             ControlsMenu.AddGroupLabel("Controls");
             ControlsMenu.Add("enableEvade", new KeyBind("Enable Evade", true, KeyBind.BindTypes.PressToggle, 'M'));
             ControlsMenu.Add("dodgeOnlyDangerous", new KeyBind("Dodge Only Dangerous", false, KeyBind.BindTypes.HoldActive));
@@ -80,8 +124,8 @@ namespace YasuoBuddy.EvadePlus
 
         public static bool IsSkillshotW(EvadeSkillshot skillshot)
         {
-            if (skillshot is CircularMissileSkillshot) return false;
-            var valueBase = SkillshotMenu[skillshot + "/w"];
+            if (!(skillshot is LinearMissileSkillshot)) return false;
+            var valueBase = SkillshotMenu[skillshot + "/wEvade"];
             return valueBase != null && valueBase.Cast<CheckBox>().CurrentValue;
         }
 
