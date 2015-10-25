@@ -32,7 +32,6 @@ namespace RecallTracker
         private static Sprite TopSprite { get; set; }
         private static Sprite BottomSprite { get; set; }
         private static Sprite BackSprite { get; set; }
-        private static Sprite TempBar { get; set; }
         private static Text Text { get; set; }
         private static Text TextTwo { get; set; }
 
@@ -59,12 +58,10 @@ namespace RecallTracker
             TextureLoader.Load("top", Resources.TopHUD);
             TextureLoader.Load("bottom", Resources.BottomHUD);
             TextureLoader.Load("back", Resources.Back);
-            TextureLoader.Load("tempBar", Resources.TempBar);
 
-            TopSprite = new Sprite(TextureLoader["top"]);
-            BottomSprite = new Sprite(TextureLoader["bottom"]);
-            BackSprite = new Sprite(TextureLoader["back"]);
-            TempBar = new Sprite(TextureLoader["tempBar"]);
+            TopSprite = new Sprite(() => TextureLoader["top"]);
+            BottomSprite = new Sprite(() => TextureLoader["bottom"]);
+            BackSprite = new Sprite(() => TextureLoader["back"]);
 
             Text = new Text("", new Font(FontFamily.GenericSansSerif, 8, FontStyle.Bold)) { Color = System.Drawing.Color.AntiqueWhite };
             TextTwo = new Text("", new Font(FontFamily.GenericSansSerif, 8, FontStyle.Bold)) { Color = System.Drawing.Color.AntiqueWhite };
@@ -77,8 +74,8 @@ namespace RecallTracker
         {
             if (!Recalls.Any() && !Menu["alwaysDrawFrame"].Cast<CheckBox>().CurrentValue) return;
 
-            int x = 1626 + Menu["recallX"].Cast<Slider>().CurrentValue;
-            int y = 600 + Menu["recallY"].Cast<Slider>().CurrentValue;
+            int x = (int) ((Drawing.Width * 0.846875) + Menu["recallX"].Cast<Slider>().CurrentValue);
+            int y = (int) (Drawing.Height * 0.5555555555555556) + Menu["recallY"].Cast<Slider>().CurrentValue;
 
             TopSprite.Draw(new Vector2(x + 1, y));
             int bonus = 0;

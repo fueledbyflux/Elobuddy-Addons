@@ -83,16 +83,6 @@ namespace RecallTracker.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap TempBar {
-            get {
-                object obj = ResourceManager.GetObject("TempBar", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
         internal static System.Drawing.Bitmap TopHUD {
             get {
                 object obj = ResourceManager.GetObject("TopHUD", resourceCulture);

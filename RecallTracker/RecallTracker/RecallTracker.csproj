@@ -81,9 +81,6 @@
     <None Include="Resources\BottomHUD.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\TempBar.png" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\TopHUD.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
