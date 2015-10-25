@@ -17,7 +17,7 @@ namespace JinxBuddy
     {
         public static Spell.Active Q = new Spell.Active(SpellSlot.Q);
 
-        public static Spell.Skillshot W = new Spell.Skillshot(SpellSlot.W, 1450, SkillShotType.Linear, 600, 3300, 180)
+        public static Spell.Skillshot W = new Spell.Skillshot(SpellSlot.W, 1450, SkillShotType.Linear, 600, 3300, 100)
         {
             MinimumHitChance = HitChance.High, AllowedCollisionCount = 0
         };
