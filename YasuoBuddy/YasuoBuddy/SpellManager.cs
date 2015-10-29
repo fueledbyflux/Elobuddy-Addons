@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Net;
 using EloBuddy;
 using EloBuddy.SDK;
 using EloBuddy.SDK.Enumerations;
@@ -10,55 +11,51 @@ namespace YasuoBuddy
     {
         public static Spell.Targeted E = new Spell.Targeted(SpellSlot.E, 475);
         public static Spell.Active R = new Spell.Active(SpellSlot.R, 1200);
-
-        public static Spell.Skillshot Q()
+        private static readonly Spell.Skillshot Q1 = new Spell.Skillshot(SpellSlot.Q, 475, SkillShotType.Linear, 300, GetNewQSpeed(), 1)
         {
-            if (Player.Instance.HasWhirlwind())
-            {
-                return new Spell.Skillshot(SpellSlot.Q, 900, SkillShotType.Linear, 300, 1200, 50)
-                {
-                    AllowedCollisionCount = int.MaxValue
-                };
-            }
-            return new Spell.Skillshot(SpellSlot.Q, 475, SkillShotType.Linear, 300, GetNewQSpeed(), 1)
-            {
-                AllowedCollisionCount = int.MaxValue
-            };
-        }
+            AllowedCollisionCount = int.MaxValue
+        };
+        private static readonly Spell.Skillshot Q2 = new Spell.Skillshot(SpellSlot.Q, 900, SkillShotType.Linear, 300, 1200, 50)
+        {
+            AllowedCollisionCount = int.MaxValue
+        };
+        public static Spell.Skillshot Q { get { return Player.Instance.HasWhirlwind() ? Q2 : Q1; } }
 
         public static void StackQ()
         {
-            if (!Q().IsReady() || Player.Instance.HasWhirlwind()) return;
-            var target =
-                EntityManager.Heroes.Enemies.Where(
-                    a =>
-                        a.Distance(Player.Instance.Position) < 475 && !Player.Instance.IsDashing() ||
-                        Player.Instance.IsDashing() &&
-                        DashingManager.GetPlayerPosition(300).Distance(Q().GetPrediction(a).UnitPosition) < 450).OrderBy(TargetSelector.GetPriority).FirstOrDefault();
-            if (target != null)
+            if (!Q.IsReady() || Player.Instance.HasWhirlwind()) return;
+            var targets =
+                EntityManager.Heroes.Enemies.Where(a => a.Distance(Player.Instance.Position) < 475).Select(a => a as Obj_AI_Base);
+            foreach (var target in targets.ToList())
             {
+                if (target == null) continue;
                 if (!Player.Instance.IsDashing())
                 {
-                    Q().Cast(target);
+                    Q.Cast(target);
+                    break;
                 }
-                else
-                {
-                    Player.CastSpell(SpellSlot.Q);
-                }
+                if (!(DashingManager.GetPlayerPosition(300)
+                    .Distance(Prediction.Position.PredictUnitPosition(target, 300)) < 400)) continue;
+                Player.CastSpell(SpellSlot.Q);
+                break;
             }
-            var target2 =
-                EntityManager.MinionsAndMonsters.EnemyMinions.FirstOrDefault(a => a.Distance(Player.Instance.Position) <= 475 && !Player.Instance.IsDashing() ||
-                        Player.Instance.IsDashing() &&
-                        DashingManager.GetPlayerPosition(300).Distance(Q().GetPrediction(a).UnitPosition) < 450);
-            if (target2 != null)
+            targets = EntityManager.MinionsAndMonsters.CombinedAttackable.Where(a => a.Distance(Player.Instance.Position) <= 475).Select(a => a as Obj_AI_Base);
+            foreach (var target in targets.ToList())
             {
-                if (!Player.Instance.IsDashing())
+                if (target != null)
                 {
-                    Q().Cast(target2);
-                }
-                else
-                {
-                    Player.CastSpell(SpellSlot.Q);
+                    if (!Player.Instance.IsDashing())
+                    {
+                        Q.Cast(target);
+                        break;
+                    }
+                    if (
+                        DashingManager.GetPlayerPosition(300)
+                            .Distance(Prediction.Position.PredictUnitPosition(target, 300)) < 400)
+                    {
+                        Player.CastSpell(SpellSlot.Q);
+                        break;
+                    }
                 }
             }
         }

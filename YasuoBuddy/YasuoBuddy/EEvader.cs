@@ -6,6 +6,7 @@ using EloBuddy.SDK.Menu.Values;
 using SharpDX;
 using YasuoBuddy.EvadePlus;
 using YasuoBuddy.EvadePlus.SkillshotTypes;
+using Color = System.Drawing.Color;
 
 namespace YasuoBuddy
 {
@@ -14,34 +15,68 @@ namespace YasuoBuddy
         public static int WallCastT;
         public static Vector2 YasuoWallCastedPos;
         public static int WDelay;
+        public static GameObject Wall;
+        public static Geometry.Polygon.Rectangle WallPolygon;
+        private static int ResetWall;
+
+        public static void Init()
+        {
+            GameObject.OnCreate += GameObject_OnCreate;
+            Game.OnTick += delegate { UpdateTask(); };
+            Obj_AI_Base.OnProcessSpellCast += Obj_AI_Base_OnProcessSpellCast;
+            Drawing.OnDraw += Drawing_OnDraw;
+        }
+
+        private static void Drawing_OnDraw(EventArgs args)
+        {
+            if (WallPolygon != null)
+            {
+                WallPolygon.DrawPolygon(Color.AliceBlue);
+            }
+        }
+
+        private static void GameObject_OnCreate(GameObject sender, EventArgs args)
+        {
+            if (System.Text.RegularExpressions.Regex.IsMatch(
+                        sender.Name, "_w_windwall.\\.troy",
+                        System.Text.RegularExpressions.RegexOptions.IgnoreCase))
+            {
+                Wall = sender;
+            }
+        }
+
+        private static void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
+        {
+            if (sender.IsValid && sender.Team == ObjectManager.Player.Team && args.SData.Name == "YasuoWMovingWall")
+            {
+                EEvader.YasuoWallCastedPos = sender.ServerPosition.To2D();
+                ResetWall = Environment.TickCount + 4000;
+            }
+        }
 
         public static void UpdateTask()
         {
+            if (Program.Evade == null) return;
             Program.Evade.CacheSkillshots();
-
-            GameObject wall = null;
-            foreach (var gameObject in ObjectManager.Get<GameObject>())
+            if (ResetWall - Environment.TickCount > 3400 && Wall != null)
             {
-                if (gameObject.IsValid &&
-                    System.Text.RegularExpressions.Regex.IsMatch(
-                        gameObject.Name, "_w_windwall.\\.troy",
-                        System.Text.RegularExpressions.RegexOptions.IgnoreCase))
-                {
-                    wall = gameObject;
-                }
+                var level = Player.GetSpell(SpellSlot.W).Level;
+                var wallWidth = (300 + 50 * level);
+                var wallDirection = (Wall.Position.To2D() - YasuoWallCastedPos).Normalized().Perpendicular();
+                var wallStart = Wall.Position.To2D() + wallWidth / 2 * wallDirection;
+                var wallEnd = wallStart - wallWidth * wallDirection;
+                WallPolygon = new Geometry.Polygon.Rectangle(wallStart, wallEnd, 75);
             }
-            if (wall != null)
+            if (ResetWall < Environment.TickCount)
             {
-                var level = wall.Name.Substring(wall.Name.Length - 6, 1);
-                var wallWidth = (300 + 50*Convert.ToInt32(level));
-                var wallDirection = (wall.Position.To2D() - YasuoWallCastedPos).Normalized().Perpendicular();
-                var wallStart = wall.Position.To2D() + wallWidth/2*wallDirection;
-                var wallEnd = wallStart - wallWidth*wallDirection;
-                var wallPolygon = new Geometry.Polygon.Rectangle(wallStart, wallEnd, 75);
-
-                foreach (var activeSkillshot in EvadePlus.Program.Evade.SkillshotDetector.ActiveSkillshots.Where(a => (a is LinearMissileSkillshot) && EvadeMenu.IsSkillshotW(a)))
+                Wall = null;
+                WallPolygon = null;
+            }
+            if (Wall != null && YasuoWallCastedPos.IsValid() && WallPolygon != null)
+            {
+                foreach (var activeSkillshot in Program.Evade.SkillshotDetector.ActiveSkillshots.Where(a => (a is LinearMissileSkillshot) && EvadeMenu.IsSkillshotW(a)))
                 {
-                    if (wallPolygon.IsInside(activeSkillshot.GetPosition()))
+                    if (WallPolygon.IsInside(activeSkillshot.GetPosition()))
                     {
                         activeSkillshot.IsValid = false;
                     }
@@ -54,7 +89,7 @@ namespace YasuoBuddy
             {
                 if (Yasuo.FleeMenu["Evade.W"].Cast<CheckBox>().CurrentValue && Player.GetSpell(SpellSlot.W).State == SpellState.Ready)
                 {
-                    foreach (var activeSkillshot in EvadePlus.Program.Evade.SkillshotDetector.ActiveSkillshots.Where(a => a is LinearMissileSkillshot && EvadePlus.EvadeMenu.IsSkillshotW(a)))
+                    foreach (var activeSkillshot in Program.Evade.SkillshotDetector.ActiveSkillshots.Where(a => a is LinearMissileSkillshot && EvadePlus.EvadeMenu.IsSkillshotW(a)))
                     {
                         if (activeSkillshot.ToPolygon().IsInside(Player.Instance))
                         {

@@ -9,26 +9,20 @@ namespace YasuoBuddy
 {
     internal static class EventManager
     {
-        private static readonly Dictionary<Obj_AI_Base, long> _nonDashableUnits = new Dictionary<Obj_AI_Base, long>();
+        private static readonly Dictionary<Obj_AI_Base, long> NonDashableUnits = new Dictionary<Obj_AI_Base, long>();
 
         public static void Init()
         {
+            return;
             Obj_AI_Base.OnProcessSpellCast += Obj_AI_Base_OnProcessSpellCast;
             Game.OnUpdate += Game_OnUpdate;
         }
 
         private static void Game_OnUpdate(EventArgs args)
         {
-            foreach (var nonDashableUnit in _nonDashableUnits.ToList().Where(nonDashableUnit => nonDashableUnit.Value < Environment.TickCount || nonDashableUnit.Key == null))
+            foreach (var nonDashableUnit in NonDashableUnits.ToList().Where(nonDashableUnit => nonDashableUnit.Value < Environment.TickCount || nonDashableUnit.Key == null))
             {
-                try
-                {
-                    _nonDashableUnits.Remove(nonDashableUnit.Key);
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                }
+                NonDashableUnits.Remove(nonDashableUnit.Key);
             }
         }
 
@@ -37,13 +31,19 @@ namespace YasuoBuddy
             if (!sender.IsMe) return;
             if (args.SData.Name == Player.GetSpell(SpellSlot.E).Name)
             {
-                _nonDashableUnits.Add((Obj_AI_Base) args.Target, Environment.TickCount + SpellManager.EDelay());
+                try { 
+                    NonDashableUnits.Add((Obj_AI_Base) args.Target, Environment.TickCount + SpellManager.EDelay());
+                }
+                catch(Exception)
+                {
+                    NonDashableUnits[sender] = Environment.TickCount + SpellManager.EDelay();
+                }
             }
         }
 
         public static bool CanDash(this Obj_AI_Base unit)
         {
-            return !_nonDashableUnits.ContainsKey(unit);
+            return !unit.HasBuff("YasuoDashWrapper");
         }
     }
 }

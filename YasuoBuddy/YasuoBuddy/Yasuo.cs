@@ -4,6 +4,7 @@ using System.Linq;
 using System.Security.AccessControl;
 using EloBuddy;
 using EloBuddy.SDK;
+using EloBuddy.SDK.Constants;
 using EloBuddy.SDK.Events;
 using EloBuddy.SDK.Menu;
 using EloBuddy.SDK.Menu.Values;
@@ -13,7 +14,7 @@ namespace YasuoBuddy
 {
     internal class Yasuo
     {
-        public static Menu Menu, ComboMenu, HarassMenu, FarmMenu, FleeMenu, DrawMenu;
+        public static Menu Menu, ComboMenu, HarassMenu, FarmMenu, FleeMenu, DrawMenu, MiscSettings;
 
         private static void Main(string[] args)
         {
@@ -66,7 +67,15 @@ namespace YasuoBuddy
             FleeMenu.AddGroupLabel("Evade Settings");
             FleeMenu.Add("Evade.E", new CheckBox("Use E to Evade"));
             FleeMenu.Add("Evade.W", new CheckBox("Use W to Evade"));
-            
+
+            MiscSettings = Menu.AddSubMenu("Misc Settings");
+            MiscSettings.AddGroupLabel("KillSteal Settings");
+            MiscSettings.Add("KS.Q", new CheckBox("Use Q"));
+            MiscSettings.Add("KS.E", new CheckBox("Use E"));
+            MiscSettings.AddGroupLabel("Auto Q Settings");
+            MiscSettings.Add("Auto.Q3", new CheckBox("Use Q3"));
+            MiscSettings.Add("Auto.Active", new KeyBind("Auto Q Enemy", false, KeyBind.BindTypes.PressToggle, 'M'));
+
             EvadePlus.Program.Main(null);
 
             DrawMenu = Menu.AddSubMenu("Draw", "yasuoDraw");
@@ -90,24 +99,16 @@ namespace YasuoBuddy
 
             EventManager.Init();
             Game.OnTick += Game_OnTick;
-            Obj_AI_Base.OnProcessSpellCast += Obj_AI_Base_OnProcessSpellCast;
             Drawing.OnDraw += Drawing_OnDraw;
-        }
-
-        private static void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
-        {
-            if (sender.IsValid && sender.Team == ObjectManager.Player.Team && args.SData.Name == "YasuoWMovingWall")
-            {
-                EEvader.YasuoWallCastedPos = sender.ServerPosition.To2D();
-            }
+            EEvader.Init();
         }
 
         private static void Drawing_OnDraw(EventArgs args)
         {
             if (DrawMenu["Draw.Q"].Cast<CheckBox>().CurrentValue)
             {
-                Circle.Draw(SpellManager.Q().IsReady() ? DrawMenu.GetColour("Draw.Q.Colour") : DrawMenu.GetColour("Draw.Down"),
-                    SpellManager.Q().Range, Player.Instance.Position);
+                Circle.Draw(SpellManager.Q.IsReady() ? DrawMenu.GetColour("Draw.Q.Colour") : DrawMenu.GetColour("Draw.Down"),
+                    SpellManager.Q.Range, Player.Instance.Position);
             }
             if (DrawMenu["Draw.R"].Cast<CheckBox>().CurrentValue)
             {
@@ -123,7 +124,11 @@ namespace YasuoBuddy
 
         private static void Game_OnTick(EventArgs args)
         {
-            EEvader.UpdateTask();
+            StateManager.KillSteal();
+            if (MiscSettings["Auto.Active"].Cast<KeyBind>().CurrentValue)
+            {
+                StateManager.AutoQ();
+            }
             if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Flee))
             {
                 StateManager.Flee();
