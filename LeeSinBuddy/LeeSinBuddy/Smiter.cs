@@ -45,6 +45,10 @@ namespace LeeSinBuddy
 
         public static int GetSmiteDamage()
         {
+            if (Smite == null || !Smite.IsReady())
+            {
+                return 0;
+            }
             int level = ObjectManager.Player.Level;
             int[] smitedamage =
             {
@@ -93,7 +97,7 @@ namespace LeeSinBuddy
         {
             SetSmiteSlot();
 
-            if (!SmiteMenu["smiteEnabled"].Cast<KeyBind>().CurrentValue || !Smite.IsReady()) return;
+            if (!SmiteMenu["smiteEnabled"].Cast<KeyBind>().CurrentValue) return;
 
             var minion = ObjectManager.Get<Obj_AI_Base>().Where(a => SmiteableUnits.Contains(a.BaseSkinName) && SmiteMenu[a.BaseSkinName].Cast<CheckBox>() != null && SmiteMenu[a.BaseSkinName].Cast<CheckBox>().CurrentValue).OrderByDescending(a => a.MaxHealth).FirstOrDefault(a => a.IsValidTarget(1400));
             if (minion == null) return;

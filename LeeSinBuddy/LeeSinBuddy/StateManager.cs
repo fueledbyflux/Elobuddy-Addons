@@ -99,7 +99,7 @@ namespace LeeSinBuddy
 
         public static void LastHit()
         {
-            var minions = EntityManager.MinionsAndMonsters.GetLaneMinions().Where(a => a.Distance(Player.Instance) < 1400).OrderBy(a => a.Health);
+            var minions = EntityManager.MinionsAndMonsters.EnemyMinions.Where(a => a.Distance(Player.Instance) < 1400).OrderBy(a => a.Health);
             var minion =
                 minions.FirstOrDefault(
                     a => Extended.BuffedEnemy != null && a.NetworkId == Extended.BuffedEnemy.NetworkId) ??
@@ -120,7 +120,7 @@ namespace LeeSinBuddy
 
         public static void WaveClear()
         {
-            var minions = EntityManager.MinionsAndMonsters.GetLaneMinions().Where(a => a.Distance(Player.Instance) < 1400).OrderBy(a => a.Health);
+            var minions = EntityManager.MinionsAndMonsters.EnemyMinions.Where(a => a.Distance(Player.Instance) < 1400).OrderBy(a => a.Health);
             var minion = (Extended.BuffedEnemy != null && Extended.BuffedEnemy.IsValidTarget(1400)) ? Extended.BuffedEnemy : minions.FirstOrDefault();
             if (minion == null || Program.LastSpellTime + 200 > Environment.TickCount) return;
 
@@ -277,18 +277,21 @@ namespace LeeSinBuddy
                 Program.E.Cast();
                 return;
             }
-            var unit =
-                ObjectManager
-                    .Get<Obj_AI_Base>(
-                        ).FirstOrDefault(a => a.Distance(target) < Player.Instance.GetAutoAttackRange(target) && a.IsAlly &&
-                            a.Distance(target) < Player.Instance.Distance(target) && a.Distance(Player.Instance) < Program.W.Range);
 
-            if (ComboMenu["useW2"].Cast<CheckBox>().CurrentValue &&  target.Distance(_Player) <= Player.Instance.GetAutoAttackRange(target) && unit != null && Program.W.IsReady()
+            if (ComboMenu["useW2"].Cast<CheckBox>().CurrentValue &&  target.Distance(_Player) <= Player.Instance.GetAutoAttackRange(target) && Program.W.IsReady()
                 && Program.W.Instance().Name == Program.Spells["W2"])
             {
-                Player.CastSpell(SpellSlot.W, Player.Instance);
-                Program.LastSpellTime = Environment.TickCount;
-                return;
+                var unit =
+                    ObjectManager
+                        .Get<Obj_AI_Base>(
+                            ).FirstOrDefault(a => a.Distance(target) < Player.Instance.GetAutoAttackRange(target) && a.IsAlly &&
+                                a.Distance(target) < Player.Instance.Distance(target) && a.Distance(Player.Instance) < Program.W.Range);
+                if (unit != null)
+                {
+                    Player.CastSpell(SpellSlot.W, Player.Instance);
+                    Program.LastSpellTime = Environment.TickCount;
+                    return;
+                }
             }
             if (target.Distance(_Player) <= Player.Instance.GetAutoAttackRange(target) &&
                 ComboMenu["useW1"].Cast<CheckBox>().CurrentValue && Program.W.IsReady()
@@ -298,12 +301,19 @@ namespace LeeSinBuddy
                 Program.LastSpellTime = Environment.TickCount;
 
             }
-            if (ComboMenu["wCatchUp"].Cast<CheckBox>().CurrentValue && target.Distance(_Player) > 430 && unit != null  && Program.W.IsReady()
+            if (ComboMenu["wCatchUp"].Cast<CheckBox>().CurrentValue && target.Distance(_Player) > 430 && Program.W.IsReady()
                 && Program.W.Instance().Name == Program.Spells["W1"] && Program.LastSpellTime + 200 < Environment.TickCount)
             {
-                Player.CastSpell(SpellSlot.W, unit);
-                Program.LastSpellTime = Environment.TickCount;
-                return;
+                var unit =
+                       ObjectManager
+                           .Get<Obj_AI_Base>(
+                               ).FirstOrDefault(a => a.Distance(target) < Player.Instance.GetAutoAttackRange(target) && a.IsAlly &&
+                                   a.Distance(target) < Player.Instance.Distance(target) && a.Distance(Player.Instance) < Program.W.Range);
+                if (unit != null)
+                {
+                    Player.CastSpell(SpellSlot.W, unit);
+                    Program.LastSpellTime = Environment.TickCount;
+                }
             }
         }
 

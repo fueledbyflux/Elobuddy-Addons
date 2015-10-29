@@ -271,7 +271,7 @@ namespace LeeSinBuddy
         {
             if (args.Msg != 0x202) return;
             var enemyT =
-            ObjectManager.Get<AIHeroClient>()
+            EntityManager.Heroes.Enemies
                 .Where(
                     a =>
                         a.IsValid && a.Health > 0 && (a.IsEnemy) && a.Distance(Game.CursorPos) < 200)
