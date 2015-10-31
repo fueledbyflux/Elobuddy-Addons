@@ -28,6 +28,7 @@ namespace VayneBuddy
 
         public static void Gapcloser_OnGapCloser(AIHeroClient sender, Gapcloser.GapcloserEventArgs e)
         {
+            if (!Program.GapCloserMenu["enableGapCloser"].Cast<CheckBox>().CurrentValue) return;
             if (e.End.Distance(_Player) < 200 && sender.IsValidTarget())
             {
                 Program.E.Cast(sender);
@@ -47,8 +48,9 @@ namespace VayneBuddy
 
         public static void ObjAiBaseOnOnBasicAttack(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
+            if (!(sender is AIHeroClient)) return;
             var target = (AIHeroClient) sender;
-            if (Program.DrawMenu["antiKalista"].Cast<CheckBox>().CurrentValue && target != null && target.IsEnemy && target.Hero == Champion.Kalista && Program.Q.IsReady())
+            if (Program.DrawMenu["antiKalista"].Cast<CheckBox>().CurrentValue && target.IsEnemy && target.Hero == Champion.Kalista && Program.Q.IsReady())
             {
                 var pos = (_Player.Position.Extend(Game.CursorPos, 300).Distance(target) <=
                                    _Player.GetAutoAttackRange(target) &&
@@ -81,6 +83,7 @@ namespace VayneBuddy
 
         public static void Interrupter_OnInterruptableSpell(Obj_AI_Base sender, Interrupter.InterruptableSpellEventArgs e)
         {
+            if (!Program.InterruptorMenu["enableInterrupter"].Cast<CheckBox>().CurrentValue) return;
             var dangerLevel =
                 new[]
                 {
