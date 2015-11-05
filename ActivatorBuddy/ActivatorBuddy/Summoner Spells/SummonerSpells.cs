@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using ActivatorBuddy.Defencives;
 using EloBuddy;
 using EloBuddy.SDK;
 using EloBuddy.SDK.Menu;
@@ -14,9 +16,11 @@ namespace ActivatorBuddy.Summoner_Spells
         private static Spell.Targeted _ignite;
         private static Spell.Targeted _heal;
         private static Spell.Targeted _exhaust;
+        private static Spell.Active _barrier;
         public static Spell.Targeted Smite;
         private static Menu _summonerMenu;
         private static Menu _smiteMenu;
+        
 
         private static AIHeroClient _Player
         {
@@ -25,11 +29,10 @@ namespace ActivatorBuddy.Summoner_Spells
 
         public static void Init()
         {
-            _summonerMenu = Program.menu.AddSubMenu("Summoner Spells");
+            _summonerMenu = Program.Menu.AddSubMenu("Summoner Spells");
             if (HasSpell("summonerdot"))
             {
                 _summonerMenu.AddGroupLabel("Ignite Settings");
-                _summonerMenu.AddSeparator();
                 _summonerMenu.Add("useIgnite", new CheckBox("Use Ignite"));
                 _summonerMenu.Add("comboOnlyIgnite", new CheckBox("Combo Only"));
                 _summonerMenu.Add("drawIngiteRange", new CheckBox("Draw Ignite Range"));
@@ -41,7 +44,6 @@ namespace ActivatorBuddy.Summoner_Spells
             if (HasSpell("summonerexhaust"))
             {
                 _summonerMenu.AddGroupLabel("Exhaust Settings");
-                _summonerMenu.AddSeparator();
                 _summonerMenu.Add("useExhaust", new CheckBox("Use Exhaust"));
                 _summonerMenu.Add("comboOnlyExhaust", new CheckBox("Combo Only"));
                 _summonerMenu.Add("drawExhaustRange", new CheckBox("Draw Exhaust Range"));
@@ -53,29 +55,37 @@ namespace ActivatorBuddy.Summoner_Spells
                 _summonerMenu.AddSeparator();
                 _exhaust = new Spell.Targeted(ObjectManager.Player.GetSpellSlotFromName("summonerexhaust"), 650);
                 Game.OnTick += ExhaustEvent;
-                Chat.Print("Activator: Exhaust Loaded.", Color.LimeGreen);
+                Chat.Print("Activator: Exhaust Loaded.", Color.OrangeRed);
             }
             if (HasSpell("summonerheal"))
             {
                 _summonerMenu.AddGroupLabel("Heal Settings");
-                _summonerMenu.AddSeparator();
                 _summonerMenu.Add("useHeal", new CheckBox("Use Heal"));
                 _summonerMenu.Add("comboOnlyHeal", new CheckBox("Combo Only"));
                 _summonerMenu.Add("drawHealRange", new CheckBox("Draw Heal Range"));
-                _summonerMenu.Add("selfHealPercent", new Slider("Self Heal %", 40));
-                _summonerMenu.Add("allyHealPercent", new Slider("Ally Heal %", 20));
-                foreach (var source in ObjectManager.Get<AIHeroClient>().Where(a => a.IsAlly))
+                _summonerMenu.AddLabel("Champions");
+                foreach (var source in ObjectManager.Get<AIHeroClient>().Where(a => a.IsAlly && !a.IsMe))
                 {
                     _summonerMenu.Add(source.ChampionName + "heal", new CheckBox("Heal " + source.ChampionName, false));
                 }
                 _summonerMenu.AddSeparator();
                 _heal = new Spell.Targeted(ObjectManager.Player.GetSpellSlotFromName("summonerheal"), 850);
                 Game.OnTick += HealEvent;
-                Chat.Print("Activator: Heal Loaded.", Color.LimeGreen);
+                Chat.Print("Activator: Heal Loaded.", Color.Aqua);
+            }
+            if (HasSpell("summonerbarrier"))
+            {
+                _summonerMenu.AddGroupLabel("Barrier Settings");
+                _summonerMenu.Add("useBarrier", new CheckBox("Use Barrier"));
+                _summonerMenu.Add("comboOnlyBarrier", new CheckBox("Combo Only"));
+                _summonerMenu.AddSeparator();
+                _barrier = new Spell.Active(ObjectManager.Player.GetSpellSlotFromName("summonerbarrier"), int.MaxValue);
+                Game.OnTick += BarrierEvent;
+                Chat.Print("Activator: Barrier Loaded.", Color.GreenYellow);
             }
             if (HasSpell("smite"))
             {
-                _smiteMenu = Program.menu.AddSubMenu("Smite Settings");
+                _smiteMenu = Program.Menu.AddSubMenu("Smite Settings");
                 _smiteMenu.AddGroupLabel("Camps");
                 _smiteMenu.AddLabel("Epics");
                 _smiteMenu.Add("SRU_Baron", new CheckBox("Bazza (Baron)"));
@@ -99,18 +109,33 @@ namespace ActivatorBuddy.Summoner_Spells
 
                 Smite = new Spell.Targeted(ObjectManager.Player.GetSpellSlotFromName("summonersmite"), 500);
                 Game.OnTick += SmiteEvent;
-                Chat.Print("Activator: Smite Loaded.", Color.LimeGreen);
+                Chat.Print("Activator: Smite Loaded.", Color.Yellow);
             }
             Drawing.OnDraw += Drawing_OnDraw;
         }
 
+        private static void BarrierEvent(EventArgs args)
+        {
+            if (!_barrier.IsReady() || Player.Instance.IsDead) return;
+            if (!_summonerMenu["useBarrier"].Cast<CheckBox>().CurrentValue || _summonerMenu["comboOnlyBarrier"].Cast<CheckBox>().CurrentValue &&
+                !Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
+                return;
+            if (Player.Instance.InDanger(true) &&
+                Player.Instance.PredictedHealth() + 95 + (20*Player.Instance.Level) > 0)
+            {
+                _barrier.Cast();
+                return;
+            }
+        }
+
         private static void SmiteEvent(EventArgs args)
         {
+            Smiter.SetSmiteSlot();
+            if (!Smite.IsReady() || Player.Instance.IsDead) return;
             if (_smiteMenu["smiteActive"].Cast<KeyBind>().CurrentValue)
             {
-                Smiter.SetSmiteSlot();
                 var unit =
-                    ObjectManager.Get<Obj_AI_Base>()
+                    EntityManager.MinionsAndMonsters.Monsters
                         .Where(
                             a =>
                                 Smiter.SmiteableUnits.Contains(a.BaseSkinName) && a.Health < Smiter.GetSmiteDamage() &&
@@ -129,11 +154,10 @@ namespace ActivatorBuddy.Summoner_Spells
             {
                 foreach (
                     var target in
-                        ObjectManager.Get<AIHeroClient>()
-                            .Where(h => h.IsEnemy && h.IsValidTarget(Smite.Range) && h.Health <= 20 + 8 * _Player.Level))
+                        EntityManager.Heroes.Enemies
+                            .Where(h => h.IsValidTarget(Smite.Range) && h.Health <= 20 + 8 * _Player.Level))
                 {
                     Smite.Cast(target);
-                    Chat.Print("Smited son");
                     return;
                 }
             }
@@ -143,8 +167,8 @@ namespace ActivatorBuddy.Summoner_Spells
             {
                 foreach (
                     var target in
-                        ObjectManager.Get<AIHeroClient>()
-                            .Where(h => h.IsValidTarget(Smite.Range)).OrderBy(a => a.Distance(_Player)))
+                        EntityManager.Heroes.Enemies
+                            .Where(h => h.IsValidTarget(Smite.Range)).OrderByDescending(TargetSelector.GetPriority))
                 {
                     Smite.Cast(target);
                     return;
@@ -156,19 +180,16 @@ namespace ActivatorBuddy.Summoner_Spells
 
         private static void HealEvent(EventArgs args)
         {
+            if (!_heal.IsReady() || Player.Instance.IsDead) return;
             if (!_summonerMenu["useHeal"].Cast<CheckBox>().CurrentValue || _summonerMenu["comboOnlyHeal"].Cast<CheckBox>().CurrentValue &&
                 !Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
                 return;
             foreach (
                 var source in
                     from source in
-                        ObjectManager.Get<AIHeroClient>().Where(a => a.IsAlly && a.Distance(_Player) < _heal.Range)
-                    let minHealSlider = source.IsMe
-                        ? _summonerMenu["selfHealPercent"].Cast<Slider>().CurrentValue
-                        : _summonerMenu["allyHealPercent"].Cast<Slider>().CurrentValue
+                        ObjectManager.Get<AIHeroClient>().Where(a => a.IsAlly && a.Distance(_Player) < _heal.Range && !a.IsDead)
                     where
-                        _summonerMenu[source.ChampionName + "heal"].Cast<CheckBox>().CurrentValue &&
-                        source.HealthPercent <= minHealSlider
+                        (source.IsMe || _summonerMenu[source.ChampionName + "heal"].Cast<CheckBox>().CurrentValue) && source.InDanger(true) && source.PredictedHealth() + 75 + (15 * Player.Instance.Level) > 0
                     select source)
             {
                 _heal.Cast(source);
@@ -182,13 +203,14 @@ namespace ActivatorBuddy.Summoner_Spells
 
         private static void ExhaustEvent(EventArgs args)
         {
+            if (!_exhaust.IsReady() || Player.Instance.IsDead) return;
             if (!_summonerMenu["useExhaust"].Cast<CheckBox>().CurrentValue || _summonerMenu["comboOnlyExhaust"].Cast<CheckBox>().CurrentValue &&
                 !Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
                 return;
             foreach (
                 var enemy in
-                    ObjectManager.Get<AIHeroClient>()
-                        .Where(a => a.IsEnemy && a.IsValidTarget(_exhaust.Range))
+                    EntityManager.Heroes.Enemies
+                        .Where(a => a.IsValidTarget(_exhaust.Range))
                         .Where(enemy => _summonerMenu[enemy.ChampionName + "exhaust"].Cast<CheckBox>().CurrentValue))
             {
                 if (enemy.IsFacing(_Player))
@@ -209,14 +231,14 @@ namespace ActivatorBuddy.Summoner_Spells
 
         private static void IgniteEvent(EventArgs args)
         {
+            if (!_ignite.IsReady() || Player.Instance.IsDead) return;
             if (!_summonerMenu["useIgnite"].Cast<CheckBox>().CurrentValue || _summonerMenu["comboOnlyIgnite"].Cast<CheckBox>().CurrentValue &&
                 !Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo)) return;
             foreach (
                 var source in
-                    ObjectManager.Get<AIHeroClient>()
+                    EntityManager.Heroes.Enemies
                         .Where(
-                            a =>
-                                a.IsEnemy && a.IsValidTarget(_ignite.Range) &&
+                            a => a.IsValidTarget(_ignite.Range) &&
                                 a.Health < 50 + 20 * _Player.Level - (a.HPRegenRate / 5 * 3)))
             {
                 _ignite.Cast(source);

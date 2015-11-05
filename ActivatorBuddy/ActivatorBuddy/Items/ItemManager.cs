@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using EloBuddy;
 using EloBuddy.SDK;
+using EloBuddy.SDK.Constants;
 using EloBuddy.SDK.Menu;
 using EloBuddy.SDK.Menu.Values;
 
@@ -50,52 +51,49 @@ namespace ActivatorBuddy.Items
             new Item("quicksilverSashCleanse", int.MaxValue, CastType.SelfCast, ItemId.Quicksilver_Sash,
                 ItemType.Cleanse)
         };
+        public static SpellDataInst Cleanse { get { return Player.GetSpell(Player.Instance.GetSpellSlotFromName("summonerboost")); } }
 
         public static List<Item> ActiveItems = new List<Item>();
 
-        public static AIHeroClient _Player
-        {
-            get { return ObjectManager.Player; }
-        }
-
         public static void Init()
         {
-            var menu = Program.menu;
+            var menu = Program.Menu;
 
             OffensiveMenu = menu.AddSubMenu("Offensive Items", "offItems");
             OffensiveMenu.AddGroupLabel("Offensive Items");
             OffensiveMenu.AddLabel("(Activates With Combo)");
-            OffensiveMenu.AddSeparator();
+            OffensiveMenu.AddLabel("Blade Of The Ruined King");
             OffensiveMenu.Add("botrkManager", new CheckBox("Blade Of The Ruined King", true));
             OffensiveMenu.Add("botrkManagerMinMeHP", new Slider("Self HP %", 80));
             OffensiveMenu.Add("botrkManagerMinEnemyHP", new Slider("Enemy HP HP %", 80));
-            OffensiveMenu.AddSeparator();
+            OffensiveMenu.AddLabel("Cutlass");
             OffensiveMenu.Add("cutlassManager", new CheckBox("Cutlass", true));
             OffensiveMenu.Add("cutlassManagerMinMeHP", new Slider("Self HP %", 80));
             OffensiveMenu.Add("cutlassManagerMinEnemyHP", new Slider("Enemy HP HP %", 80));
 
-            if (_Player.IsMelee)
+            if (Player.Instance.IsMelee)
             {
-                OffensiveMenu.AddSeparator();
+                OffensiveMenu.AddLabel("Tiamat");
                 OffensiveMenu.Add("tiamatManager", new CheckBox("Use Tiamat", true));
                 OffensiveMenu.Add("tiamatManagerMinMeHP", new Slider("Self HP %", 99));
                 OffensiveMenu.Add("tiamatManagerMinEnemyHP", new Slider("Enemy HP HP %", 99));
-                OffensiveMenu.AddSeparator();
+                OffensiveMenu.AddLabel("Hydra");
                 OffensiveMenu.Add("hydraManager", new CheckBox("Use Hydra", true));
                 OffensiveMenu.Add("hydraManagerMinMeHP", new Slider("Self HP %", 99));
                 OffensiveMenu.Add("hydraManagerMinEnemyHP", new Slider("Enemy HP HP %", 99));
             }
 
+            OffensiveMenu.AddLabel("Gunblade");
             OffensiveMenu.Add("gunbladeManager", new CheckBox("Use Gunblade", true));
             OffensiveMenu.Add("gunbladeManagerMinMeHP", new Slider("Self HP %", 99));
             OffensiveMenu.Add("gunbladeManagerMinEnemyHP", new Slider("Enemy HP HP %", 99));
+            OffensiveMenu.AddLabel("GhostBlade");
             OffensiveMenu.Add("ghostbladeManager", new CheckBox("Use GhostBlade", true));
             OffensiveMenu.Add("ghostbladeManagerMinMeHP", new Slider("Self HP %", 99));
             OffensiveMenu.Add("ghostbladeManagerMinEnemyHP", new Slider("Enemy HP HP %", 99));
 
             PotionsMenu = menu.AddSubMenu("Potions", "potions");
             PotionsMenu.AddGroupLabel("Potion Items");
-            PotionsMenu.AddSeparator();
             PotionsMenu.Add("healthPotionManager", new CheckBox("Health Potion", true));
             PotionsMenu.Add("healthPotionManagerMinMeHP", new Slider("Min HP %", 20));
             PotionsMenu.AddSeparator();
@@ -105,6 +103,7 @@ namespace ActivatorBuddy.Items
             PotionsMenu.Add("flaskPotionManager", new CheckBox("Flask", true));
             PotionsMenu.Add("flaskPotionManagerMinMeHP", new Slider("Min HP %", 20));
             PotionsMenu.Add("flaskPotionManagerMinMeMana", new Slider("Min Mana %", 20));
+            OffensiveMenu.AddSeparator();
 
             Cleansers = menu.AddSubMenu("Cleansers", "cleansers");
             Cleansers.AddGroupLabel("Cleansers Settings");
@@ -116,14 +115,16 @@ namespace ActivatorBuddy.Items
             Cleansers.Add("rootActivator", new CheckBox("Root", true));
             Cleansers.Add("slowActivator", new CheckBox("Slow"));
             Cleansers.AddSeparator();
+            Cleansers.AddLabel("Cleanse Items / Summoner Spell");
             Cleansers.Add("mikaelsCleanser", new CheckBox("Mikael's Cruicble", true));
             Cleansers.Add("mercurialScimitarCleanser", new CheckBox("Mercurial Scimitar", true));
             Cleansers.Add("quicksilverSashCleanser", new CheckBox("Quicksilver Sash", true));
+            Cleansers.Add("summonerSpellCleanse", new CheckBox("Summoner Cleanse", true));
 
 
             foreach (var item in Items)
             {
-                if (ActiveItems.All(a => a.Name != item.Name) && _Player.InventoryItems.Any(a => a.Id == item.Id))
+                if (ActiveItems.All(a => a.Name != item.Name) && Player.Instance.InventoryItems.Any(a => a.Id == item.Id))
                 {
                     ActiveItems.Add(item);
                 }
@@ -133,6 +134,33 @@ namespace ActivatorBuddy.Items
             Game.OnTick += Game_OnTick;
             Shop.OnBuyItem += Shop_OnBuyItem;
             Shop.OnSellItem += Shop_OnSellItem;
+            Obj_AI_Base.OnSpellCast += Obj_AI_Base_OnSpellCast;
+        }
+
+        private static void Obj_AI_Base_OnSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
+        {
+            if (!sender.IsMe || !args.SData.IsAutoAttack() || !(args.Target is AIHeroClient) || args.Target.NetworkId != Orbwalker.LastTarget.NetworkId) return;
+
+            var target = (AIHeroClient) args.Target;
+            if (target == null) return;
+                
+
+            foreach (var item in ActiveItems)
+            {
+                if (Player.Instance.InventoryItems.All(a => a.Id != item.Id || !item.MeleeOnly)) continue;
+
+                var menuItem = OffensiveMenu[item.Name + "Manager"].Cast<CheckBox>();
+                var menuItemMe = OffensiveMenu[item.Name + "ManagerMinMeHP"].Cast<Slider>();
+                var menuItemEnemy = OffensiveMenu[item.Name + "ManagerMinEnemyHP"].Cast<Slider>();
+
+                if (!target.IsValidTarget() || target.Distance(Player.Instance) > item.Range || !menuItem.CurrentValue || menuItemMe.CurrentValue <= Player.Instance.HealthPercent || menuItemEnemy.CurrentValue <= target.HealthPercent)
+                    continue;
+
+                var spellSlot = Player.Instance.InventoryItems.FirstOrDefault(a => a.Id == item.Id);
+                if (spellSlot == null || !Player.GetSpell(spellSlot.SpellSlot).IsReady) continue;
+                Player.CastSpell(spellSlot.SpellSlot);
+                return;
+            }
         }
 
         private static void Shop_OnSellItem(AIHeroClient sender, ShopActionEventArgs args)
@@ -140,7 +168,7 @@ namespace ActivatorBuddy.Items
             Core.DelayAction(delegate
             {
                 var item = ActiveItems.FirstOrDefault(a => a.Id == (ItemId) args.Id);
-                if (item != null && _Player.InventoryItems.All(a => a.Id != item.Id))
+                if (item != null && Player.Instance.InventoryItems.All(a => a.Id != item.Id))
                 {
                     ActiveItems.Remove(item);
                 }
@@ -164,7 +192,7 @@ namespace ActivatorBuddy.Items
         {
             foreach (var item in ActiveItems)
             {
-                if (_Player.InventoryItems.All(a => a.Id != item.Id)) continue;
+                if (Player.Instance.InventoryItems.All(a => a.Id != item.Id || item.MeleeOnly)) continue;
                 switch (item.ItemType)
                 {
                     case ItemType.Offensive:
@@ -177,16 +205,14 @@ namespace ActivatorBuddy.Items
                         var menuItemMe = OffensiveMenu[item.Name + "ManagerMinMeHP"].Cast<Slider>();
                         var menuItemEnemy = OffensiveMenu[item.Name + "ManagerMinEnemyHP"].Cast<Slider>();
 
-                        if (!target.IsValidTarget() || target.Distance(_Player) > item.Range ||
-                            (item.MeleeOnly && !_Player.IsMelee) || !menuItem.CurrentValue ||
-                            menuItemMe.CurrentValue <= _Player.HealthPercent ||
-                            menuItemEnemy.CurrentValue <= target.HealthPercent) continue;
+                        if (!target.IsValidTarget() || target.Distance(Player.Instance) > item.Range || 
+                        (item.MeleeOnly && !Player.Instance.IsMelee) || !menuItem.CurrentValue || menuItemMe.CurrentValue <= Player.Instance.HealthPercent || menuItemEnemy.CurrentValue <= target.HealthPercent) continue;
 
                         switch (item.CastType)
                         {
                             case CastType.Targeted:
                             {
-                                var spellSlot = _Player.InventoryItems.FirstOrDefault(a => a.Id == item.Id);
+                                var spellSlot = Player.Instance.InventoryItems.FirstOrDefault(a => a.Id == item.Id);
                                 if (spellSlot != null && Player.GetSpell(spellSlot.SpellSlot).IsReady)
                                 {
                                     Player.CastSpell(spellSlot.SpellSlot, target);
@@ -195,7 +221,7 @@ namespace ActivatorBuddy.Items
                                 break;
                             case CastType.SelfCast:
                             {
-                                var spellSlot = _Player.InventoryItems.FirstOrDefault(a => a.Id == item.Id);
+                                var spellSlot = Player.Instance.InventoryItems.FirstOrDefault(a => a.Id == item.Id);
                                 if (spellSlot != null && Player.GetSpell(spellSlot.SpellSlot).IsReady)
                                 {
                                     Player.CastSpell(spellSlot.SpellSlot);
@@ -209,9 +235,9 @@ namespace ActivatorBuddy.Items
                     {
                         var menuItem = PotionsMenu[item.Name + "Manager"].Cast<CheckBox>();
                         var menuItemMe = PotionsMenu[item.Name + "ManagerMinMeHP"].Cast<Slider>();
-                        if (_Player.InFountain() || _Player.HasBuff(item.BuffName) || !menuItem.CurrentValue ||
-                            menuItemMe.CurrentValue < _Player.HealthPercent) continue;
-                        var spellSlot = _Player.InventoryItems.FirstOrDefault(a => a.Id == item.Id);
+                        if (Player.Instance.IsInShopRange() || Player.Instance.HasBuff(item.BuffName) || !menuItem.CurrentValue ||
+                            menuItemMe.CurrentValue < Player.Instance.HealthPercent) continue;
+                        var spellSlot = Player.Instance.InventoryItems.FirstOrDefault(a => a.Id == item.Id);
                         if (spellSlot != null && Player.GetSpell(spellSlot.SpellSlot).IsReady)
                         {
                             Player.CastSpell(spellSlot.SpellSlot);
@@ -222,9 +248,9 @@ namespace ActivatorBuddy.Items
                     {
                         var menuItem = PotionsMenu[item.Name + "Manager"].Cast<CheckBox>();
                         var menuItemMe = PotionsMenu[item.Name + "ManagerMinMeMana"].Cast<Slider>();
-                        if (_Player.InFountain() || _Player.HasBuff(item.BuffName) || !menuItem.CurrentValue ||
-                            menuItemMe.CurrentValue < _Player.ManaPercent) continue;
-                        var spellSlot = _Player.InventoryItems.FirstOrDefault(a => a.Id == item.Id);
+                        if (Player.Instance.IsInShopRange() || Player.Instance.HasBuff(item.BuffName) || !menuItem.CurrentValue ||
+                            menuItemMe.CurrentValue < Player.Instance.ManaPercent) continue;
+                        var spellSlot = Player.Instance.InventoryItems.FirstOrDefault(a => a.Id == item.Id);
                         if (spellSlot != null && Player.GetSpell(spellSlot.SpellSlot).IsReady)
                         {
                             Player.CastSpell(spellSlot.SpellSlot);
@@ -234,22 +260,32 @@ namespace ActivatorBuddy.Items
 
                     case ItemType.Cleanse:
                     {
-                        if (!Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo)) return;
-
-                        foreach (var buffInstance in _Player.Buffs)
+                        foreach (var buffInstance in Player.Instance.Buffs)
                         {
                             if (BuffTypes.ContainsKey(buffInstance.Type) &&
                                 Cleansers[BuffTypes[buffInstance.Type]].Cast<CheckBox>().CurrentValue)
                             {
-                                var spellSlot = _Player.InventoryItems.FirstOrDefault(a => a.Id == item.Id);
+                                var spellSlot = Player.Instance.InventoryItems.FirstOrDefault(a => a.Id == item.Id);
                                 if (spellSlot != null && Player.GetSpell(spellSlot.SpellSlot).IsReady)
                                 {
-                                    Player.CastSpell(spellSlot.SpellSlot, _Player);
+                                    Player.CastSpell(spellSlot.SpellSlot, Player.Instance);
                                 }
                             }
                         }
                     }
                         break;
+                }
+            }
+
+            if (Cleansers["summonerSpellCleanse"].Cast<CheckBox>().CurrentValue && Cleanse != null && Cleanse.State == SpellState.Ready)
+            {
+                foreach (var buffInstance in Player.Instance.Buffs)
+                {
+                    if (BuffTypes.ContainsKey(buffInstance.Type) &&
+                        Cleansers[BuffTypes[buffInstance.Type]].Cast<CheckBox>().CurrentValue)
+                    {
+                        Player.CastSpell(Cleanse.Slot);
+                    }
                 }
             }
         }
@@ -260,13 +296,6 @@ namespace ActivatorBuddy.Items
                 unit.Buffs.Any(
                     a =>
                         a.Name.ToLower().Contains(s.ToLower()) || a.DisplayName.ToLower().Contains(s.ToLower()));
-        }
-
-        public static bool InFountain(this AIHeroClient hero)
-        {
-            var fountainRange = 1050;
-            return hero.IsVisible
-                   && ObjectManager.Get<Obj_SpawnPoint>().Any(sp => hero.Distance(sp.Position) < fountainRange);
         }
     }
 }

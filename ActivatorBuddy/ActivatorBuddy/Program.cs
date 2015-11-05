@@ -8,7 +8,7 @@ namespace ActivatorBuddy
 {
     internal class Program
     {
-        public static Menu menu;
+        public static Menu Menu;
 
         private static void Main(string[] args)
         {
@@ -17,9 +17,10 @@ namespace ActivatorBuddy
 
         private static void Loading_OnLoadingComplete(EventArgs args)
         {
-            menu = MainMenu.AddMenu("Activator", "activatorMenu");
+            Menu = MainMenu.AddMenu("Activator", "activatorMenu");
             SummonerSpells.Init();
             ItemManager.Init();
+            Defencives.Defence.Init();
         }
     }
 }

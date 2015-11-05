@@ -56,6 +56,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Defencives\DangerousSpells.cs" />
+    <Compile Include="Defencives\Defence.cs" />
+    <Compile Include="Defencives\DefenceItems.cs" />
     <Compile Include="Items\Item.cs" />
     <Compile Include="Items\ItemManager.cs" />
     <Compile Include="Program.cs" />

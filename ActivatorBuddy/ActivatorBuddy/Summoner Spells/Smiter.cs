@@ -5,18 +5,6 @@ using SharpDX;
 
 namespace ActivatorBuddy.Summoner_Spells
 {
-    class SmiteBarPosition
-    {
-        public SmiteBarPosition(Vector2 healthBarPos, int distance = 62, int height = 4)
-        {
-            HealthBarPos = healthBarPos;
-            Distance = distance;
-            Height = height;
-        }
-        public Vector2 HealthBarPos;
-        public int Distance;
-        public int Height;
-    }
     class Smiter
     {
         public static readonly string[] SmiteableUnits =
@@ -59,33 +47,5 @@ namespace ActivatorBuddy.Summoner_Spells
             };
             return smitedamage.Max();
         }
-
-        /*
-        public static void DrawHpBarLine(SmiteBarPosition s, Obj_AI_Base unit)
-        {
-            var smiteDmg = ObjectManager.Player.GetSummonerSpellDamage(unit, DamageLibrary.SummonerSpells.Smite);
-            var bonusDistance = (smiteDmg/unit.MaxHealth)*s.Distance;
-            Drawing.DrawLine(s.HealthBarPos.X + bonusDistance, s.HealthBarPos.Y, s.HealthBarPos.X + bonusDistance, s.HealthBarPos.Y + s.Height, 2, Color.White);
-        }
-        public static SmiteBarPosition GetSmiteBarPosition(Obj_AI_Base unit)
-        {
-            var barPos = unit.HPBarPosition;
-            switch (unit.BaseSkinName)
-            {
-                case "SRU_Dragon":
-                    return new SmiteBarPosition(new Vector2(barPos.X - 62, barPos.Y-7), 124);
-                case "SRU_Baron":
-                    return new SmiteBarPosition(new Vector2(barPos.X - 62, barPos.Y), 124);
-                case "SRU_Red":
-                case "SRU_Blue":
-                    return new SmiteBarPosition(new Vector2(barPos.X - 72, barPos.Y), 144, 12);
-                case "SRU_Murkwolf":
-                case "SRU_Razorbeak":
-                case "SRU_Krug":
-                    return new SmiteBarPosition(new Vector2(barPos.X - 40, barPos.Y), 80);
-            }
-            return new SmiteBarPosition(unit.HPBarPosition);
-        }
-        */
     }
 }
