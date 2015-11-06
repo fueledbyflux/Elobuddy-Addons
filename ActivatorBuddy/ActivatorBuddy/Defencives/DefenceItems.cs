@@ -57,7 +57,7 @@ namespace ActivatorBuddy.Defencives
                     return true;
                 }
             }
-            if (Defence.DefenceMenu["Mikaels_Crucible"].Cast<CheckBox>().CurrentValue && Player.Instance.InventoryItems.Any(a => a.Id == ItemId.Mikaels_Crucible) && predHp + (150 + (0.1 * ally.Health)) > 0 && ally.Distance(Player.Instance) < 750) // Mikaels
+            if (Defence.DefenceMenu["Mikaels_Crucible_Heal"].Cast<CheckBox>().CurrentValue && Player.Instance.InventoryItems.Any(a => a.Id == ItemId.Mikaels_Crucible) && predHp + (150 + (0.1 * ally.Health)) > 0 && ally.Distance(Player.Instance) < 750) // Mikaels
             {
                 var spellSlot =
                 Player.Instance.InventoryItems.FirstOrDefault(a => a.Id == ItemId.Mikaels_Crucible);
