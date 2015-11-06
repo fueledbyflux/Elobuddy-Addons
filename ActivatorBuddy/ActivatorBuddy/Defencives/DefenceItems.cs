@@ -22,6 +22,7 @@ namespace ActivatorBuddy.Defencives
 
         public static bool ShieldItems(AIHeroClient ally)
         {
+            if (ally == null || ally.IsDead || ally.Health <= 0 || !ally.IsValid) return false;
             var predHp = ally.PredictedHealth();
             if (ally.IsMe && Defence.DefenceMenu["Archangels_Staff"].Cast<CheckBox>().CurrentValue && Player.Instance.InventoryItems.Any(a => (int) a.Id == 3040) && predHp + ShieldHeals[ItemId.Archangels_Staff].Invoke() > 0) // Seraphs
             {
@@ -72,6 +73,7 @@ namespace ActivatorBuddy.Defencives
 
         public static bool CleanseItems(AIHeroClient ally)
         {
+            if (ally == null || ally.IsDead || ally.Health <= 0 || !ally.IsValid) return false;
             if (!Player.Instance.InventoryItems.Any(a => (a.Id == ItemId.Quicksilver_Sash && Defence.DefenceMenu["Quicksilver_Sash"].Cast<CheckBox>().CurrentValue 
             || a.Id == ItemId.Dervish_Blade && Defence.DefenceMenu["Dervish_Blade"].Cast<CheckBox>().CurrentValue
             || a.Id == ItemId.Mercurial_Scimitar && Defence.DefenceMenu["Mercurial_Scimitar"].Cast<CheckBox>().CurrentValue
