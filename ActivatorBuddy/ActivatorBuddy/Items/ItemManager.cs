@@ -63,63 +63,63 @@ namespace ActivatorBuddy.Items
             OffensiveMenu.AddGroupLabel("Offensive Items");
             OffensiveMenu.AddLabel("(Activates With Combo)");
             OffensiveMenu.AddLabel("Blade Of The Ruined King");
-            OffensiveMenu.Add("botrkManager", new CheckBox("Blade Of The Ruined King", true));
+            OffensiveMenu.Add("botrkManager", new CheckBox("Blade Of The Ruined King"));
             OffensiveMenu.Add("botrkManagerMinMeHP", new Slider("Self HP %", 80));
             OffensiveMenu.Add("botrkManagerMinEnemyHP", new Slider("Enemy HP HP %", 80));
             OffensiveMenu.AddLabel("Cutlass");
-            OffensiveMenu.Add("cutlassManager", new CheckBox("Cutlass", true));
+            OffensiveMenu.Add("cutlassManager", new CheckBox("Cutlass"));
             OffensiveMenu.Add("cutlassManagerMinMeHP", new Slider("Self HP %", 80));
             OffensiveMenu.Add("cutlassManagerMinEnemyHP", new Slider("Enemy HP HP %", 80));
 
             if (Player.Instance.IsMelee)
             {
                 OffensiveMenu.AddLabel("Tiamat");
-                OffensiveMenu.Add("tiamatManager", new CheckBox("Use Tiamat", true));
+                OffensiveMenu.Add("tiamatManager", new CheckBox("Use Tiamat"));
                 OffensiveMenu.Add("tiamatManagerMinMeHP", new Slider("Self HP %", 99));
                 OffensiveMenu.Add("tiamatManagerMinEnemyHP", new Slider("Enemy HP HP %", 99));
                 OffensiveMenu.AddLabel("Hydra");
-                OffensiveMenu.Add("hydraManager", new CheckBox("Use Hydra", true));
+                OffensiveMenu.Add("hydraManager", new CheckBox("Use Hydra"));
                 OffensiveMenu.Add("hydraManagerMinMeHP", new Slider("Self HP %", 99));
                 OffensiveMenu.Add("hydraManagerMinEnemyHP", new Slider("Enemy HP HP %", 99));
             }
 
             OffensiveMenu.AddLabel("Gunblade");
-            OffensiveMenu.Add("gunbladeManager", new CheckBox("Use Gunblade", true));
+            OffensiveMenu.Add("gunbladeManager", new CheckBox("Use Gunblade"));
             OffensiveMenu.Add("gunbladeManagerMinMeHP", new Slider("Self HP %", 99));
             OffensiveMenu.Add("gunbladeManagerMinEnemyHP", new Slider("Enemy HP HP %", 99));
             OffensiveMenu.AddLabel("GhostBlade");
-            OffensiveMenu.Add("ghostbladeManager", new CheckBox("Use GhostBlade", true));
+            OffensiveMenu.Add("ghostbladeManager", new CheckBox("Use GhostBlade"));
             OffensiveMenu.Add("ghostbladeManagerMinMeHP", new Slider("Self HP %", 99));
             OffensiveMenu.Add("ghostbladeManagerMinEnemyHP", new Slider("Enemy HP HP %", 99));
 
             PotionsMenu = menu.AddSubMenu("Potions", "potions");
             PotionsMenu.AddGroupLabel("Potion Items");
-            PotionsMenu.Add("healthPotionManager", new CheckBox("Health Potion", true));
+            PotionsMenu.Add("healthPotionManager", new CheckBox("Health Potion"));
             PotionsMenu.Add("healthPotionManagerMinMeHP", new Slider("Min HP %", 20));
             PotionsMenu.AddSeparator();
-            PotionsMenu.Add("manaPotionManager", new CheckBox("Mana Potion", true));
+            PotionsMenu.Add("manaPotionManager", new CheckBox("Mana Potion"));
             PotionsMenu.Add("manaPotionManagerMinMeMana", new Slider("Min Mana %", 20));
             PotionsMenu.AddSeparator();
-            PotionsMenu.Add("flaskPotionManager", new CheckBox("Flask", true));
+            PotionsMenu.Add("flaskPotionManager", new CheckBox("Flask"));
             PotionsMenu.Add("flaskPotionManagerMinMeHP", new Slider("Min HP %", 20));
             PotionsMenu.Add("flaskPotionManagerMinMeMana", new Slider("Min Mana %", 20));
             OffensiveMenu.AddSeparator();
 
             Cleansers = menu.AddSubMenu("Cleansers", "cleansers");
             Cleansers.AddGroupLabel("Cleansers Settings");
-            Cleansers.Add("polymorphActivator", new CheckBox("PolyMorph", true));
-            Cleansers.Add("stunActivator", new CheckBox("Stun", true));
-            Cleansers.Add("tauntActivator", new CheckBox("Taunt", true));
-            Cleansers.Add("knockupActivator", new CheckBox("Knock-up", true));
-            Cleansers.Add("fearActivator", new CheckBox("Fear", true));
-            Cleansers.Add("rootActivator", new CheckBox("Root", true));
+            Cleansers.Add("polymorphActivator", new CheckBox("PolyMorph"));
+            Cleansers.Add("stunActivator", new CheckBox("Stun"));
+            Cleansers.Add("tauntActivator", new CheckBox("Taunt"));
+            Cleansers.Add("knockupActivator", new CheckBox("Knock-up"));
+            Cleansers.Add("fearActivator", new CheckBox("Fear"));
+            Cleansers.Add("rootActivator", new CheckBox("Root"));
             Cleansers.Add("slowActivator", new CheckBox("Slow"));
             Cleansers.AddSeparator();
             Cleansers.AddLabel("Cleanse Items / Summoner Spell");
-            Cleansers.Add("mikaelsCleanser", new CheckBox("Mikael's Cruicble", true));
-            Cleansers.Add("mercurialScimitarCleanser", new CheckBox("Mercurial Scimitar", true));
-            Cleansers.Add("quicksilverSashCleanser", new CheckBox("Quicksilver Sash", true));
-            Cleansers.Add("summonerSpellCleanse", new CheckBox("Summoner Cleanse", true));
+            Cleansers.Add("mikaelsCleanser", new CheckBox("Mikael's Cruicble"));
+            Cleansers.Add("mercurialScimitarCleanser", new CheckBox("Mercurial Scimitar"));
+            Cleansers.Add("quicksilverSashCleanser", new CheckBox("Quicksilver Sash"));
+            Cleansers.Add("summonerSpellCleanse", new CheckBox("Summoner Cleanse"));
 
 
             foreach (var item in Items)
@@ -129,7 +129,6 @@ namespace ActivatorBuddy.Items
                     ActiveItems.Add(item);
                 }
             }
-
 
             Game.OnTick += Game_OnTick;
             Shop.OnBuyItem += Shop_OnBuyItem;
