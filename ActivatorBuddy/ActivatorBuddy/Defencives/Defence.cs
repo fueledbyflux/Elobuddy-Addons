@@ -120,7 +120,7 @@ namespace ActivatorBuddy.Defencives
 
         private static void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
-            var caster = (AIHeroClient) sender;
+            var caster = sender as AIHeroClient;
             if (caster == null || sender.IsAlly || !SpellSlots.Contains(args.Slot) || !DamageEngine["ConsiderSpells"].Cast<CheckBox>().CurrentValue || !DamageEngine["TrackDamage"].Cast<CheckBox>().CurrentValue) return;
             foreach (var target in EntityManager.Heroes.Allies)
             {
