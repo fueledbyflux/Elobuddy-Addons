@@ -27,7 +27,7 @@ namespace ActivatorBuddy.Defencives
             if (ally.IsMe && Defence.DefenceMenu["Archangels_Staff"].Cast<CheckBox>().CurrentValue && Player.Instance.InventoryItems.Any(a => (int) a.Id == 3040) && predHp + ShieldHeals[ItemId.Archangels_Staff].Invoke() > 0) // Seraphs
             {
                 var spellSlot =
-                Player.Instance.InventoryItems.FirstOrDefault(a => (int) a.Id == 3040);
+                Player.Instance.InventoryItems.FirstOrDefault(a => (int) a.Id == 3040 && a.CanUseItem());
                 if (spellSlot != null)
                 {
                     Player.CastSpell(spellSlot.SpellSlot);
@@ -38,7 +38,7 @@ namespace ActivatorBuddy.Defencives
             if (Defence.DefenceMenu["Locket_of_the_Iron_Solari"].Cast<CheckBox>().CurrentValue && (ally.IsMe && Defence.DefenceMenu["Locket_of_the_Iron_Solari_self"].Cast<CheckBox>().CurrentValue || !ally.IsMe && Defence.DefenceMenu["Locket_of_the_Iron_Solari_ally"].Cast<CheckBox>().CurrentValue) && Player.Instance.InventoryItems.Any(a => a.Id == ItemId.Locket_of_the_Iron_Solari) && predHp + ShieldHeals[ItemId.Locket_of_the_Iron_Solari].Invoke() > 0 && ally.Distance(Player.Instance) < 600) // Locket
             {
                 var spellSlot =
-                Player.Instance.InventoryItems.FirstOrDefault(a => a.Id == ItemId.Locket_of_the_Iron_Solari);
+                Player.Instance.InventoryItems.FirstOrDefault(a => a.Id == ItemId.Locket_of_the_Iron_Solari && a.CanUseItem());
                 if (spellSlot != null)
                 {
                     Player.CastSpell(spellSlot.SpellSlot);
@@ -49,7 +49,7 @@ namespace ActivatorBuddy.Defencives
             if (Defence.DefenceMenu["Face_of_the_Mountain"].Cast<CheckBox>().CurrentValue && (ally.IsMe && Defence.DefenceMenu["Face_of_the_Mountain_self"].Cast<CheckBox>().CurrentValue || !ally.IsMe && Defence.DefenceMenu["Face_of_the_Mountain_ally"].Cast<CheckBox>().CurrentValue) && Player.Instance.InventoryItems.Any(a => a.Id == ItemId.Face_of_the_Mountain) && predHp + ShieldHeals[ItemId.Face_of_the_Mountain].Invoke() > 0 && ally.Distance(Player.Instance) < 700) // FOM
             {
                 var spellSlot =
-                Player.Instance.InventoryItems.FirstOrDefault(a => a.Id == ItemId.Face_of_the_Mountain);
+                Player.Instance.InventoryItems.FirstOrDefault(a => a.Id == ItemId.Face_of_the_Mountain && a.CanUseItem());
                 if (spellSlot != null)
                 {
                     Player.CastSpell(spellSlot.SpellSlot, ally);
@@ -60,7 +60,7 @@ namespace ActivatorBuddy.Defencives
             if (Defence.DefenceMenu["Mikaels_Crucible_Heal"].Cast<CheckBox>().CurrentValue && Player.Instance.InventoryItems.Any(a => a.Id == ItemId.Mikaels_Crucible) && predHp + (150 + (0.1 * ally.Health)) > 0 && ally.Distance(Player.Instance) < 750) // Mikaels
             {
                 var spellSlot =
-                Player.Instance.InventoryItems.FirstOrDefault(a => a.Id == ItemId.Mikaels_Crucible);
+                Player.Instance.InventoryItems.FirstOrDefault(a => a.Id == ItemId.Mikaels_Crucible && a.CanUseItem());
                 if (spellSlot != null)
                 {
                     Player.CastSpell(spellSlot.SpellSlot, ally);
@@ -108,10 +108,9 @@ namespace ActivatorBuddy.Defencives
         public static bool Zhonyas(AIHeroClient ally)
         {
             if (!ally.IsMe) return false;
-            if (Player.Instance.InventoryItems.Any(a => a.Id == ItemId.Zhonyas_Hourglass && Defence.DefenceMenu["Zhonyas_Hourglass"].Cast<CheckBox>().CurrentValue 
-            || ItemId.Wooglets_Witchcap == a.Id && Defence.DefenceMenu["Wooglets_Witchcap"].Cast<CheckBox>().CurrentValue) && (Player.Instance.InDanger(true) || Defence.Damages[Player.Instance.NetworkId].DangerousSpells.Any(a => a.Value.BonusDelay > 0 && (a.Key - Environment.TickCount) <= 2200 + Game.Ping) || Defence.Damages[Player.Instance.NetworkId].DangerousSpells.Any(a => a.Value.BonusDelay == 0)))
+            if (Player.Instance.InventoryItems.Any(a => a.Id == ItemId.Zhonyas_Hourglass && Defence.DefenceMenu["Zhonyas_Hourglass"].Cast<CheckBox>().CurrentValue || ItemId.Wooglets_Witchcap == a.Id && Defence.DefenceMenu["Wooglets_Witchcap"].Cast<CheckBox>().CurrentValue) && (Player.Instance.InDanger(true) || Defence.Damages[Player.Instance.NetworkId].DangerousSpells.Any(a => a.Value.BonusDelay > 0 && (a.Key - Environment.TickCount) <= 2200 + Game.Ping) || Defence.Damages[Player.Instance.NetworkId].DangerousSpells.Any(a => a.Value.BonusDelay == 0)))
             {
-                var spellSlot = Player.Instance.InventoryItems.FirstOrDefault(a => a.Id == ItemId.Zhonyas_Hourglass || a.Id == ItemId.Wooglets_Witchcap);
+                var spellSlot = Player.Instance.InventoryItems.FirstOrDefault(a => (a.Id == ItemId.Zhonyas_Hourglass || a.Id == ItemId.Wooglets_Witchcap) && a.CanUseItem());
                 if (spellSlot != null)
                 {
                     Player.CastSpell(spellSlot.SpellSlot);

@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Linq;
+using ActivatorBuddy.Defencives;
 using ActivatorBuddy.Items;
 using ActivatorBuddy.Summoner_Spells;
+using EloBuddy;
 using EloBuddy.SDK.Events;
 using EloBuddy.SDK.Menu;
 
@@ -20,7 +23,7 @@ namespace ActivatorBuddy
             Menu = MainMenu.AddMenu("Activator", "activatorMenu");
             SummonerSpells.Init();
             ItemManager.Init();
-            Defencives.Defence.Init();
+            Defence.Init();
         }
     }
 }

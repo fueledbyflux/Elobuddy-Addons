@@ -101,8 +101,9 @@ namespace ActivatorBuddy.Defencives
             if (sender.IsAlly || !DamageEngine["TrackDamage"].Cast<CheckBox>().CurrentValue || !DamageEngine["ConsiderAttacks"].Cast<CheckBox>().CurrentValue || sender.IsMinion() && !DamageEngine["ConsiderMinions"].Cast<CheckBox>().CurrentValue) return;
             if (Damages.ContainsKey(args.Target.NetworkId))
             {
-                Damages[args.Target.NetworkId].AddDamage(args.SData.Name, sender.GetAutoAttackDamage((Obj_AI_Base) args.Target),
-                    (((Obj_AI_Base) args.Target).IsMelee ? 2000 : args.Target.Distance(sender)/args.SData.MissileSpeed)*1000 + 500);
+                var target = (Obj_AI_Base) args.Target;
+                Damages[args.Target.NetworkId].AddDamage(args.SData.Name, sender.GetAutoAttackDamage(target),
+                    (target.IsMelee ? sender.AttackDelay : target.Distance(sender)/args.SData.MissileSpeed)*1000);
             }
         }
 
@@ -119,23 +120,23 @@ namespace ActivatorBuddy.Defencives
 
         private static void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
-            if (sender == null || sender.IsAlly || !(sender is AIHeroClient) || !SpellSlots.Contains(args.Slot) || !DamageEngine["ConsiderSpells"].Cast<CheckBox>().CurrentValue || !DamageEngine["TrackDamage"].Cast<CheckBox>().CurrentValue) return;
+            var caster = (AIHeroClient) sender;
+            if (caster == null || sender.IsAlly || !SpellSlots.Contains(args.Slot) || !DamageEngine["ConsiderSpells"].Cast<CheckBox>().CurrentValue || !DamageEngine["TrackDamage"].Cast<CheckBox>().CurrentValue) return;
             foreach (var target in EntityManager.Heroes.Allies)
             {
-                if (target == null || !Damages.ContainsKey(target.NetworkId)) return;
+                if (!Damages.ContainsKey(target.NetworkId)) return;
 
                 var dangerSpell =
                         DangerousSpells.Spells.FirstOrDefault(
-                            a => a.Champion == ((AIHeroClient)sender).Hero && args.Slot == a.Slot && DefenceMenu[a.Champion.ToString() + a.Slot].Cast<CheckBox>().CurrentValue);
+                            a => a.Champion == caster.Hero && args.Slot == a.Slot && DefenceMenu[a.Champion.ToString() + a.Slot].Cast<CheckBox>().CurrentValue);
                 if (dangerSpell != null)
                 {
                     Damages[target.NetworkId].DangerousSpells.Add(Environment.TickCount + (dangerSpell.BonusDelay > 0 ? dangerSpell.BonusDelay : 2000), dangerSpell);
                 }
 
-                if (args.Target != null && args.Target == target && DamageEngine["ConsiderTargeted"].Cast<CheckBox>().CurrentValue || DamageEngine["ConsiderSkillshots"].Cast<CheckBox>().CurrentValue && args.End != Vector3.Zero && args.End.Distance(target) < 200)
+                if (args.Target != null && args.Target.NetworkId == target.NetworkId && DamageEngine["ConsiderTargeted"].Cast<CheckBox>().CurrentValue || DamageEngine["ConsiderSkillshots"].Cast<CheckBox>().CurrentValue && args.End != Vector3.Zero && args.End.Distance(target) < 200)
                 {
-                    Damages[target.NetworkId].AddDamage(args.SData.Name,
-                        ((AIHeroClient) args.Target).GetSpellDamage(target, args.Slot),
+                    Damages[target.NetworkId].AddDamage(args.SData.Name, caster.GetSpellDamage(target, args.Slot),
                         args.SData.MissileSpeed > 100 ? (target.Distance(sender)/args.SData.MissileSpeed)*1000 : 1500);
                 }
             }
