@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using ActivatorBuddy.Summoner_Spells;
 using EloBuddy;
 using EloBuddy.SDK;
 using EloBuddy.SDK.Constants;
@@ -134,6 +135,8 @@ namespace ActivatorBuddy.Items
             Shop.OnBuyItem += Shop_OnBuyItem;
             Shop.OnSellItem += Shop_OnSellItem;
             Obj_AI_Base.OnSpellCast += Obj_AI_Base_OnSpellCast;
+
+            SummonerSpells.Init();
         }
 
         private static void Obj_AI_Base_OnSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)

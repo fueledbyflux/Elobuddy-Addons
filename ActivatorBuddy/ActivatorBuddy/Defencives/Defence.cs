@@ -2,6 +2,8 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using ActivatorBuddy.Items;
+using ActivatorBuddy.Summoner_Spells;
 using EloBuddy;
 using EloBuddy.SDK;
 using EloBuddy.SDK.Menu;
@@ -94,6 +96,8 @@ namespace ActivatorBuddy.Defencives
             Obj_AI_Base.OnProcessSpellCast += Obj_AI_Base_OnProcessSpellCast;
             Obj_AI_Base.OnBasicAttack += Obj_AI_Base_OnBasicAttack;
             Game.OnUpdate += GameOnOnUpdate;
+            
+            ItemManager.Init();
         }
 
         private static void Obj_AI_Base_OnBasicAttack(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)

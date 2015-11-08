@@ -21,8 +21,6 @@ namespace ActivatorBuddy
         private static void Loading_OnLoadingComplete(EventArgs args)
         {
             Menu = MainMenu.AddMenu("Activator", "activatorMenu");
-            SummonerSpells.Init();
-            ItemManager.Init();
             Defence.Init();
         }
     }
