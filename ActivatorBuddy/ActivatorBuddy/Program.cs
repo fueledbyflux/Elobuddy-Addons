@@ -4,6 +4,7 @@ using ActivatorBuddy.Defencives;
 using ActivatorBuddy.Items;
 using ActivatorBuddy.Summoner_Spells;
 using EloBuddy;
+using EloBuddy.SDK;
 using EloBuddy.SDK.Events;
 using EloBuddy.SDK.Menu;
 
@@ -21,7 +22,7 @@ namespace ActivatorBuddy
         private static void Loading_OnLoadingComplete(EventArgs args)
         {
             Menu = MainMenu.AddMenu("Activator", "activatorMenu");
-            Defence.Init();
+            Core.DelayAction(Defence.Init, 1500);
         }
     }
 }
