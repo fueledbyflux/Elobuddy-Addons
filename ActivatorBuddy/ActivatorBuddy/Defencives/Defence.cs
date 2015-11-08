@@ -29,7 +29,7 @@ namespace ActivatorBuddy.Defencives
 
         public static void Init()
         {
-            DefenceMenu = Program.Menu.AddSubMenu("Defensive Items");
+            DefenceMenu = Program.Menu.AddSubMenu("Defensive Items", "defmenuactiv");
 
             DefenceMenu.AddGroupLabel("Shield/Heal Items (self)");
             DefenceMenu.Add("Archangels_Staff", new CheckBox("Serahph's Embrace"));
@@ -58,16 +58,13 @@ namespace ActivatorBuddy.Defencives
             DefenceMenu.Add("Wooglets_Witchcap", new CheckBox("Wooglets Witchcap"));
 
             DefenceMenu.AddGroupLabel("Dangerous Spells");
-            int i = 0;
             foreach (var dangerousSpell in DangerousSpells.Spells.Where(a => EntityManager.Heroes.Enemies.Any(b => b.Hero == a.Champion)))
             {
                 DefenceMenu.Add(dangerousSpell.Champion.ToString() + dangerousSpell.Slot,
                     new CheckBox(dangerousSpell.Champion + ": " + dangerousSpell.Slot + (dangerousSpell.IsCleanseable ? " (Cleanseable)" : "")));
-                i++;
             }
-            if(i == 0) DefenceMenu.AddLabel("No champions ;(");
 
-            DamageEngine = Program.Menu.AddSubMenu("Damage Engine (Advanced)");
+            DamageEngine = Program.Menu.AddSubMenu("Damage Engine (Advanced)", "damageengineactiv");
 
             DamageEngine.AddGroupLabel("Danger Settings");
             DamageEngine.AddLabel("HP Tracking");

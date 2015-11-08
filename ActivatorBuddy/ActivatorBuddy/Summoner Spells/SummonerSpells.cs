@@ -21,11 +21,7 @@ namespace ActivatorBuddy.Summoner_Spells
         private static Menu _summonerMenu;
         private static Menu _smiteMenu;
         
-
-        private static AIHeroClient _Player
-        {
-            get { return ObjectManager.Player; }
-        }
+        
 
         public static void Init()
         {
@@ -155,7 +151,7 @@ namespace ActivatorBuddy.Summoner_Spells
                 foreach (
                     var target in
                         EntityManager.Heroes.Enemies
-                            .Where(h => h.IsValidTarget(Smite.Range) && h.Health <= 20 + 8 * _Player.Level))
+                            .Where(h => h.IsValidTarget(Smite.Range) && h.Health <= 20 + 8 * Player.Instance.Level))
                 {
                     Smite.Cast(target);
                     return;
@@ -187,7 +183,7 @@ namespace ActivatorBuddy.Summoner_Spells
             foreach (
                 var source in
                     from source in
-                        ObjectManager.Get<AIHeroClient>().Where(a => a.IsAlly && a.Distance(_Player) < _heal.Range && !a.IsDead)
+                        ObjectManager.Get<AIHeroClient>().Where(a => a.IsAlly && a.Distance(Player.Instance) < _heal.Range && !a.IsDead)
                     where
                         (source.IsMe || _summonerMenu[source.ChampionName + "heal"].Cast<CheckBox>().CurrentValue) && source.InDanger(true) && source.PredictedHealth() + 75 + (15 * Player.Instance.Level) > 0
                     select source)
@@ -213,9 +209,9 @@ namespace ActivatorBuddy.Summoner_Spells
                         .Where(a => a.IsValidTarget(_exhaust.Range))
                         .Where(enemy => _summonerMenu[enemy.ChampionName + "exhaust"].Cast<CheckBox>().CurrentValue))
             {
-                if (enemy.IsFacing(_Player))
+                if (enemy.IsFacing(Player.Instance))
                 {
-                    if (!(_Player.HealthPercent < 50)) continue;
+                    if (!(Player.Instance.HealthPercent < 50)) continue;
                     _exhaust.Cast(enemy);
                     return;
                 }
@@ -239,7 +235,7 @@ namespace ActivatorBuddy.Summoner_Spells
                     EntityManager.Heroes.Enemies
                         .Where(
                             a => a.IsValidTarget(_ignite.Range) &&
-                                a.Health < 50 + 20 * _Player.Level - (a.HPRegenRate / 5 * 3)))
+                                a.Health < 50 + 20 * Player.Instance.Level - (a.HPRegenRate / 5 * 3)))
             {
                 _ignite.Cast(source);
                 return;
@@ -255,21 +251,21 @@ namespace ActivatorBuddy.Summoner_Spells
             if (HasSpell("summonerexhaust") && _summonerMenu["drawExhaustRange"].Cast<CheckBox>().CurrentValue &&
                 _exhaust.IsReady())
             {
-                Circle.Draw(SharpDX.Color.OrangeRed, _exhaust.Range, _Player.Position);
+                Circle.Draw(SharpDX.Color.OrangeRed, _exhaust.Range, Player.Instance.Position);
             }
             if (HasSpell("summonerheal") && _summonerMenu["drawHealRange"].Cast<CheckBox>().CurrentValue &&
                 _heal.IsReady())
             {
-                Circle.Draw(SharpDX.Color.DeepSkyBlue, _heal.Range, _Player.Position);
+                Circle.Draw(SharpDX.Color.DeepSkyBlue, _heal.Range, Player.Instance.Position);
             }
             if (HasSpell("smite") && _smiteMenu["drawSmiteRange"].Cast<CheckBox>().CurrentValue && _smiteMenu["smiteActive"].Cast<KeyBind>().CurrentValue)
             {
-                Circle.Draw(SharpDX.Color.Yellow, Smite.Range, _Player.Position);
+                Circle.Draw(SharpDX.Color.Yellow, Smite.Range, Player.Instance.Position);
             }
             if (HasSpell("summonerdot") && _summonerMenu["drawIngiteRange"].Cast<CheckBox>().CurrentValue &&
                 _ignite.IsReady())
             {
-                Circle.Draw(SharpDX.Color.Red, _ignite.Range, _Player.Position);
+                Circle.Draw(SharpDX.Color.Red, _ignite.Range, Player.Instance.Position);
             }
         }
 
