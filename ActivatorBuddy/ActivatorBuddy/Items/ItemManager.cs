@@ -52,7 +52,8 @@ namespace ActivatorBuddy.Items
             new Item("quicksilverSashCleanse", int.MaxValue, CastType.SelfCast, ItemId.Quicksilver_Sash,
                 ItemType.Cleanse)
         };
-        public static SpellDataInst Cleanse { get { return Player.GetSpell(Player.Instance.GetSpellSlotFromName("summonerboost")); } }
+
+        public static Spell.Active Cleanse;
 
         public static List<Item> ActiveItems = new List<Item>();
 
@@ -122,6 +123,7 @@ namespace ActivatorBuddy.Items
             Cleansers.Add("quicksilverSashCleanser", new CheckBox("Quicksilver Sash"));
             Cleansers.Add("summonerSpellCleanse", new CheckBox("Summoner Cleanse"));
 
+            Cleanse = SummonerSpells.HasSpell("summonerboost") ? new Spell.Active(Player.Instance.GetSpellSlotFromName("summonerboost"), int.MaxValue) : null;
 
             foreach (var item in Items)
             {
@@ -135,8 +137,6 @@ namespace ActivatorBuddy.Items
             Shop.OnBuyItem += Shop_OnBuyItem;
             Shop.OnSellItem += Shop_OnSellItem;
             Obj_AI_Base.OnSpellCast += Obj_AI_Base_OnSpellCast;
-
-            SummonerSpells.Init();
         }
 
         private static void Obj_AI_Base_OnSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
@@ -279,7 +279,7 @@ namespace ActivatorBuddy.Items
                 }
             }
 
-            if (Cleansers["summonerSpellCleanse"].Cast<CheckBox>().CurrentValue && Cleanse != null && Cleanse.State == SpellState.Ready)
+            if (Cleansers["summonerSpellCleanse"].Cast<CheckBox>().CurrentValue && Cleanse != null && Cleanse.IsReady())
             {
                 foreach (var buffInstance in Player.Instance.Buffs)
                 {

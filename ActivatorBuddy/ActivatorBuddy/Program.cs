@@ -19,28 +19,12 @@ namespace ActivatorBuddy
             Loading.OnLoadingComplete += Loading_OnLoadingComplete;
         }
 
-        private static int _timeOff = -1;
-
         private static void Loading_OnLoadingComplete(EventArgs args)
         {
             Menu = MainMenu.AddMenu("Activator", "activatorMenu");
-            _timeOff = Environment.TickCount + 5000;
-            LoadMe();
-        }
-
-        private static void LoadMe()
-        {
-            Core.DelayAction(() =>
-            {
-                if (_timeOff < Environment.TickCount)
-                {
-                    Defence.Init();
-                }
-                else
-                {
-                    LoadMe();
-                }
-            }, 1000);
+            ItemManager.Init();
+            SummonerSpells.Init();
+            Defence.Init();
         }
     }
 }
