@@ -11,15 +11,14 @@ using EloBuddy.SDK.Menu.Values;
 using EloBuddy.SDK.Rendering;
 using SharpDX;
 using Color = System.Drawing.Color;
-using SpellData = RivenBuddy.DamageIndicator.SpellData;
 
 namespace RivenBuddy
 {
     internal class Program
     {
-        public static Menu Menu, ComboMenu, HarassMenu, MinionClear, Jungle, DrawMenu;
-        public static bool checkAA = false;
-        public static Text text = new Text("", new Font(FontFamily.GenericSansSerif, 9, FontStyle.Bold));
+        public static Menu Menu, ComboMenu, HarassMenu, MinionClear, Jungle, DrawMenu, HumanizerMenu;
+        public static bool CheckAa = false;
+        public static Text Text = new Text("", new Font(FontFamily.GenericSansSerif, 9, FontStyle.Bold));
         public static DamageIndicator.DamageIndicator Indicator;
         public static Spell.Skillshot R2;
 
@@ -111,6 +110,9 @@ namespace RivenBuddy
             DrawMenu.Add("draw.Combo", new CheckBox("Write Current Combo", false));
             DrawMenu.Add("draw.rState", new CheckBox("Write R State"));
 
+            HumanizerMenu = Menu.AddSubMenu("Humanizer Settings");
+            HumanizerMenu.Add("humanizerQSlow", new Slider("Humanizer Q Slow", 0, 0, 200));
+
             R2 = new Spell.Skillshot(SpellSlot.R, 900, SkillShotType.Cone, 250, 1600, 125);
             TargetSelector2.Init();
             SpellEvents.Init();
@@ -119,8 +121,6 @@ namespace RivenBuddy
             Game.OnUpdate += delegate { SpellManager.UpdateSpells(); };
             Player.OnIssueOrder += Player_OnIssueOrder;
             Indicator = new DamageIndicator.DamageIndicator();
-
-            //Chat.Print("RivenBuddy : Fully Loaded. by fluxy");
         }
 
         public static GameObject OrderTarget;
@@ -153,17 +153,8 @@ namespace RivenBuddy
         {
             var pos = Drawing.WorldToScreen(Player.Instance.Position);
             if (DrawMenu["draw.rState"].Cast<CheckBox>().CurrentValue)
-                text.Draw("Forced R: " + IsRActive, Color.AliceBlue, (int) pos.X - 45,
+                Text.Draw("Forced R: " + IsRActive, Color.AliceBlue, (int) pos.X - 45,
                     (int) pos.Y + 40);
-            /*
-            foreach (var position in WallJump.Spots.Where(a => a.Start.Distance(Player.Instance) < 400))
-            {
-                Circle.Draw(SharpDX.Color.OrangeRed,
-                    100, position.Start);
-                Circle.Draw(SharpDX.Color.DarkCyan,
-                     100, position.End);
-            }
-            */
 
             if (DrawMenu["draw.Combo"].Cast<CheckBox>().CurrentValue)
             {

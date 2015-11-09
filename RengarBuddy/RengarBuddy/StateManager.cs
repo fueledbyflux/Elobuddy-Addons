@@ -16,15 +16,7 @@ namespace RengarBuddy
 
         public static float GetCustomRange()
         {
-            if (Program.E.IsReady())
-            {
-                return Program.E.Range + 50;
-            }
-            if (Program.W.IsReady())
-            {
-                return Program.W.Range + 50;
-            }
-            return _Player.GetAutoAttackRange() + 50;
+            return new float[] { Program.E.IsReady() ? Program.E.Range : 0, Program.W.IsReady() ? Program.W.Range : 0, Player.Instance.GetAutoAttackRange()}.Max();
         }
 
         public static void Combo()
@@ -38,7 +30,7 @@ namespace RengarBuddy
                 }
                 return;
             }
-            var target = TargetSelector2.GetTarget(GetCustomRange(), DamageType.Physical);
+            var target = TargetSelector.GetTarget(GetCustomRange(), DamageType.Physical);
             switch ((int) _Player.Mana)
             {
                 case 5:
@@ -103,7 +95,7 @@ namespace RengarBuddy
 
         public static void Harass()
         {
-            var target = TargetSelector2.GetTarget(GetCustomRange(), DamageType.Physical);
+            var target = TargetSelector.GetTarget(GetCustomRange(), DamageType.Physical);
             switch ((int)_Player.Mana)
             {
                 case 5:

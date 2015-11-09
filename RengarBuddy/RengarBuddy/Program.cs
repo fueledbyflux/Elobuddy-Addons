@@ -34,9 +34,6 @@ namespace RengarBuddy
         {
             if (Player.Instance.ChampionName != Champion.Rengar.ToString()) return;
 
-            Bootstrap.Init(null);
-            TargetSelector2.init();
-
             Q = new Spell.Active(SpellSlot.Q);
             W = new Spell.Active(SpellSlot.W, 500);
             E = new Spell.Skillshot(SpellSlot.E, 1000, SkillShotType.Linear, 250, 1500, 70);
@@ -122,24 +119,16 @@ namespace RengarBuddy
             DrawMenu.Add("drawE", new CheckBox("Draw E"));
             
             Game.OnTick += Game_OnTick;
-            AIHeroClient.OnProcessSpellCast += AIHeroClient_OnProcessSpellCast;
+            Obj_AI_Base.OnProcessSpellCast += AIHeroClient_OnProcessSpellCast;
+            Obj_AI_Base.OnBasicAttack += Obj_AI_Base_OnBasicAttack;
             Drawing.OnDraw += Drawing_OnDraw;
-            GameObject.OnCreate += GameObject_OnCreate;
         }
 
-        private static void GameObject_OnCreate(GameObject sender, EventArgs args)
+        private static void Obj_AI_Base_OnBasicAttack(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
-            var to = TargetSelector.GetTarget(1000f, DamageType.Physical);
-            if (sender.Name == "BloodSlash.troy")
+            if (sender.IsMe && args.SData.IsAutoAttack() && Player.HasBuff("RengarR") && DisableAntiSkills)
             {
-                if (Q.IsReady())
-                {
-                    Q.Cast();
-                }
-                if (E.IsReady())
-                {
-                    E.Cast(to);
-                }
+                DisableAntiSkills = false;
             }
         }
 
@@ -161,16 +150,10 @@ namespace RengarBuddy
             {
                 Core.DelayAction(() => DisableAntiSkills = true, 300);
             }
-            if (sender.IsMe && args.SData.IsAutoAttack() && Player.HasBuff("RengarR") && DisableAntiSkills)
-            {
-                DisableAntiSkills = false;
-            }
-           
         }
 
         private static void Game_OnTick(EventArgs args)
         {
-            Orbwalker.ForcedTarget = Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo) && TargetSelector2.Target != null ? TargetSelector2.Target : null;
             if (!Player.HasBuff("RengarR") || Player.Instance.GetAutoAttackRange() < 200)
             {
                 DisableAntiSkills = false;

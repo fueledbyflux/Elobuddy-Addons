@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using ActivatorBuddy.Summoner_Spells;
 using EloBuddy;
@@ -137,11 +138,13 @@ namespace ActivatorBuddy.Items
             Shop.OnBuyItem += Shop_OnBuyItem;
             Shop.OnSellItem += Shop_OnSellItem;
             Obj_AI_Base.OnSpellCast += Obj_AI_Base_OnSpellCast;
+            
+            if(Player.Instance.Hero == Champion.Riven) Chat.Print("Tiamat/Hydra Disabled For Riven, it is inbuilt to RivenBuddy", Color.LimeGreen);
         }
 
         private static void Obj_AI_Base_OnSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
-            if (!sender.IsMe || !args.SData.IsAutoAttack() || !(args.Target is AIHeroClient) || args.Target.NetworkId != Orbwalker.LastTarget.NetworkId) return;
+            if (!sender.IsMe || !args.SData.IsAutoAttack() || !(args.Target is AIHeroClient) || args.Target.NetworkId != Orbwalker.LastTarget.NetworkId || Player.Instance.Hero == Champion.Riven) return;
 
             var target = (AIHeroClient) args.Target;
             if (target == null) return;

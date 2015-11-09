@@ -70,10 +70,8 @@ namespace RivenBuddy
             Combo();
         }
 
-        public static void Combo()
+        public static void Combo(bool state = true)
         {
-            // Queuer Stuff start\
-
             var target = TargetSelector2.GetTarget(500, DamageType.Physical);
 
             if (target == null)
@@ -89,11 +87,11 @@ namespace RivenBuddy
             }
             if (Queuer.Queue.Any())
             {
-                Queuer.DoQueue(target);
+                if(state) Queuer.DoQueue(target);
                 return;
             }
 
-            // Queuer Stuff End
+            float THealth = state ? target.Health : target.Health - Player.Instance.GetAutoAttackDamage(target, true);
 
             var comboDmg = DamageHandler.ComboDamage(target, true);
             if (Program.ComboMenu["combo.useQ"].Cast<CheckBox>().CurrentValue &&
@@ -110,10 +108,10 @@ namespace RivenBuddy
                 &&
                 (Program.IsRActive ||
                  target.IsValidTarget(SpellManager.Spells[SpellSlot.E].Range + SpellManager.Spells[SpellSlot.W].Range)
-                 && comboDmg < target.Health &&
+                 && comboDmg < THealth &&
                  comboDmg +
                  Player.Instance.CalculateDamageOnUnit(target, DamageType.Physical,
-                     (int) DamageHandler.RDamage(target, comboDmg)) >= target.Health))
+                     (int) DamageHandler.RDamage(target, comboDmg)) >= THealth))
             {
                 Queuer.Queue.Add("E");
                 Queuer.Queue.Add("R1");
@@ -130,9 +128,9 @@ namespace RivenBuddy
             if (SpellManager.Spells[SpellSlot.R].IsReady() &&
                 Program.ComboMenu["combo.useR"].Cast<CheckBox>().CurrentValue &&
                 (Program.IsRActive ||
-                 comboDmg < target.Health &&
+                 comboDmg < THealth &&
                  comboDmg + Player.Instance.CalculateDamageOnUnit(target, DamageType.Physical,
-                     (int) DamageHandler.RDamage(target, comboDmg)) >= target.Health) && !SpellEvents.HasR)
+                     (int) DamageHandler.RDamage(target, comboDmg)) >= THealth) && !SpellEvents.HasR)
             {
                 if (Program.ComboMenu["combo.eR1"].Cast<CheckBox>().CurrentValue && SpellManager.Spells[SpellSlot.E].IsReady() && SpellManager.Spells[SpellSlot.R].IsReady())
                 {
@@ -151,7 +149,7 @@ namespace RivenBuddy
                 Program.ComboMenu["combo.useR2"].Cast<CheckBox>().CurrentValue)
             {
                 if (Player.Instance.CalculateDamageOnUnit(target, DamageType.Physical,
-                    (int) DamageHandler.RDamage(target)) >= target.Health)
+                    (int) DamageHandler.RDamage(target)) >= THealth)
                 {
                     if (Program.ComboMenu["combo.eR2"].Cast<CheckBox>().CurrentValue &&
                         SpellManager.Spells[SpellSlot.E].IsReady() && SpellManager.Spells[SpellSlot.R].IsReady())
@@ -167,7 +165,7 @@ namespace RivenBuddy
                     }
                 }
                 if (Player.Instance.CalculateDamageOnUnit(target, DamageType.Physical,
-                    (int) (DamageHandler.RDamage(target) + DamageHandler.QDamage())) >= target.Health)
+                    (int) (DamageHandler.RDamage(target) + DamageHandler.QDamage())) >= THealth)
                 {
                     if (Program.ComboMenu["combo.qR2"].Cast<CheckBox>().CurrentValue &&
                         SpellManager.Spells[SpellSlot.R].IsReady() && SpellManager.Spells[SpellSlot.Q].IsReady())
@@ -278,7 +276,7 @@ namespace RivenBuddy
             }
         }
 
-        public static void Harass()
+        public static void Harass(bool state = true)
         {
             var target = TargetSelector2.GetTarget(500, DamageType.Physical);
 
@@ -293,9 +291,10 @@ namespace RivenBuddy
                 Target = target;
                 Queuer.Queue = new List<string>();
             }
+
             if (Queuer.Queue.Any())
             {
-                Queuer.DoQueue(target);
+                if (state) Queuer.DoQueue(target);
                 return;
             }
 
@@ -369,7 +368,7 @@ namespace RivenBuddy
             }
         }
 
-        public static void WaveClear()
+        public static void WaveClear(bool state = true)
         {
             var target = EntityManager.MinionsAndMonsters.GetLaneMinions(EntityManager.UnitTeam.Enemy, Player.Instance.Position,
                 SpellManager.Spells[SpellSlot.Q].Range + 100).OrderBy(a => a.Health).FirstOrDefault();
@@ -385,9 +384,10 @@ namespace RivenBuddy
                 Target = null;
                 Queuer.Queue = new List<string>();
             }
+
             if (Queuer.Queue.Any())
             {
-                Queuer.DoQueue(target);
+                if (state) Queuer.DoQueue(target);
                 return;
             }
 
@@ -419,7 +419,7 @@ namespace RivenBuddy
             }
         }
 
-        public static void LastHit()
+        public static void LastHit(bool state = true)
         {
             var target = EntityManager.MinionsAndMonsters.GetLaneMinions(EntityManager.UnitTeam.Enemy, Player.Instance.Position,
                 SpellManager.Spells[SpellSlot.Q].Range).OrderBy(a => a.Health).FirstOrDefault();
@@ -435,9 +435,10 @@ namespace RivenBuddy
                 Target = target;
                 Queuer.Queue = new List<string>();
             }
+
             if (Queuer.Queue.Any())
             {
-                Queuer.DoQueue(target);
+                if (state) Queuer.DoQueue(target);
                 return;
             }
 
@@ -467,7 +468,7 @@ namespace RivenBuddy
             }
         }
 
-        public static void Jungle()
+        public static void Jungle(bool state = true)
         {
             var target = EntityManager.MinionsAndMonsters.GetJungleMonsters(Player.Instance.Position,
                 SpellManager.Spells[SpellSlot.Q].Range + 300).OrderByDescending(a => a.MaxHealth).FirstOrDefault();
@@ -483,9 +484,10 @@ namespace RivenBuddy
                 Target = target;
                 Queuer.Queue = new List<string>();
             }
+
             if (Queuer.Queue.Any())
             {
-                Queuer.DoQueue(target);
+                if (state) Queuer.DoQueue(target);
                 return;
             }
 
@@ -495,8 +497,11 @@ namespace RivenBuddy
             {
                 Queuer.Queue.Add("AA");
                 Queuer.Queue.Add("E");
-                Queuer.Queue.Add("H");
-                Queuer.Queue.Add("AA");
+                if (Queuer.tiamat != null && Queuer.tiamat.CanUseItem())
+                {
+                    Queuer.Queue.Add("H");
+                    Queuer.Queue.Add("AA");
+                }
                 return;
             }
 

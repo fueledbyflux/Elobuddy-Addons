@@ -50,15 +50,15 @@ namespace RivenBuddy
             switch (args.Animation)
             {
                 case "Spell1a":
-                   // t = 291;
+                    t = 291;
                     QCount = 1;
                     break;
                 case "Spell1b":
-                    //t = 291;
+                    t = 291;
                     QCount = 2;
                     break;
                 case "Spell1c":
-                    //t = 393;
+                    t = 393;
                     QCount = 0;
                     break;
                 case "Spell2":
@@ -82,46 +82,103 @@ namespace RivenBuddy
         private static void Obj_AI_Base_OnSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
             if (!sender.IsMe) return;
-            if (args.SData.IsAutoAttack())
-            {
-                Queuer.Remove("AA");
-                if (Queuer.Queue.Any() && Queuer.Queue[0] == "Q")
-                {
-                    var target = args.Target as Obj_AI_Base;
-                    if (target != null && (SpellManager.Spells[SpellSlot.R].IsReady() &&
-                    Player.Instance.CalculateDamageOnUnit(target, DamageType.Physical,
-                    (int) DamageHandler.RDamage(target)) >= target.Health && SpellEvents.HasR2 &&
-                    Program.ComboMenu["combo.useR2"].Cast<CheckBox>().CurrentValue))
-                    {
-                        Queuer.Queue = new List<string>();
-                        return;
-                    }
-                    Player.CastSpell(SpellSlot.Q, args.Target.Position);
-                    Queuer.Remove("Q");
-                    Orbwalker.ResetAutoAttack();
-                }
-                else if (!Queuer.Queue.Any() && Queuer.tiamat != null && Queuer.tiamat.CanUseItem() && Program.ComboMenu["combo.hydra"].Cast<CheckBox>().CurrentValue && Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo) && args.Target is AIHeroClient)
-                {
-                    Queuer.tiamat.Cast();
-                    Orbwalker.ResetAutoAttack();
-                }
-            }
             if (args.SData.Name.ToLower().Contains("itemtiamatcleave"))
             {
                 Queuer.Remove("H");
                 Orbwalker.ResetAutoAttack();
             }
-            if (Orbwalker.ActiveModesFlags == Orbwalker.ActiveModes.None &&
-                !Program.ComboMenu["combo.alwaysCancelQ"].Cast<CheckBox>().CurrentValue) return;
             if (args.SData.Name.ToLower().Contains("riventricleave"))
             {
                 Orbwalker.ResetAutoAttack();
-                if (QCount == 2)
+            }
+            switch (args.SData.Name.ToLower())
+            {
+                case "riventricleave": //Q
+                    Queuer.Remove("Q");
+                    break;
+
+                case "rivenmartyr": //W
+                    Queuer.Remove("W");
+                    break;
+
+                case "rivenfeint": //E
+                    Queuer.Remove("E");
+                    break;
+
+                case "rivenfengshuiengine": //R1
+                    Queuer.Remove("R1");
+                    HasR = true;
+                    HasR2 = true;
+                    break;
+
+                case "rivenizunablade": //R2
+                    Queuer.Remove("R2");
+                    HasR2 = false;
+                    break;
+            }
+            if (args.SData.IsAutoAttack())
+            {
+                Queuer.Remove("AA");
+                if (Program.HumanizerMenu["humanizerQSlow"].Cast<Slider>().CurrentValue == 0)
                 {
-                    Core.DelayAction(CancelAnimation, 362 + Game.Ping);
+                    if (Queuer.Queue.Any() && Queuer.Queue[0] == "Q")
+                    {
+                        var target = args.Target as Obj_AI_Base;
+                        if (target != null && (SpellManager.Spells[SpellSlot.R].IsReady() &&
+                                               Player.Instance.CalculateDamageOnUnit(target, DamageType.Physical,
+                                                   (int)DamageHandler.RDamage(target)) >= target.Health && HasR2 &&
+                                               Program.ComboMenu["combo.useR2"].Cast<CheckBox>().CurrentValue &&
+                                               target.Health > Player.Instance.GetAutoAttackDamage(target, true)))
+                        {
+                            Program.R2.Cast(target);
+                            Queuer.Queue = new List<string>();
+                            return;
+                        }
+                        Player.CastSpell(SpellSlot.Q, args.Target.Position);
+                        Queuer.Remove("Q");
+                        Orbwalker.ResetAutoAttack();
+                        ReQueue();
+                    }
+                    else if (!Queuer.Queue.Any() && Queuer.tiamat != null && Queuer.tiamat.CanUseItem() &&
+                             Program.ComboMenu["combo.hydra"].Cast<CheckBox>().CurrentValue &&
+                             Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo) &&
+                             args.Target is AIHeroClient)
+                    {
+                        Queuer.tiamat.Cast();
+                        Orbwalker.ResetAutoAttack();
+                    }
                     return;
                 }
-                Core.DelayAction(CancelAnimation, 250 + Game.Ping);
+                Core.DelayAction(() =>
+                {
+                    if (Queuer.Queue.Any() && Queuer.Queue[0] == "Q")
+                    {
+                        var target = args.Target as Obj_AI_Base;
+                        if (target != null && (SpellManager.Spells[SpellSlot.R].IsReady() &&
+                                               Player.Instance.CalculateDamageOnUnit(target, DamageType.Physical,
+                                                   (int) DamageHandler.RDamage(target)) >= target.Health && HasR2 &&
+                                               Program.ComboMenu["combo.useR2"].Cast<CheckBox>().CurrentValue &&
+                                               target.Health > Player.Instance.GetAutoAttackDamage(target, true)))
+                        {
+                            Program.R2.Cast(target);
+                            Queuer.Queue = new List<string>();
+                            return;
+                        }
+                        Player.CastSpell(SpellSlot.Q, args.Target.Position);
+                        Queuer.Remove("Q");
+                        Orbwalker.ResetAutoAttack();
+                        ReQueue();
+                    }
+                    else if (!Queuer.Queue.Any() && Queuer.tiamat != null && Queuer.tiamat.CanUseItem() &&
+                             Program.ComboMenu["combo.hydra"].Cast<CheckBox>().CurrentValue &&
+                             Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo) &&
+                             args.Target is AIHeroClient)
+                    {
+                        Queuer.tiamat.Cast();
+                        Orbwalker.ResetAutoAttack();
+                    }
+                }, Program.HumanizerMenu["humanizerQSlow"].Cast<Slider>().CurrentValue);
+
             }
         }
 
@@ -194,21 +251,18 @@ namespace RivenBuddy
                 case "rivenmartyr": //W
                     LastCast["W"] = Environment.TickCount;
                     if (PassiveStacks <= 2) PassiveStacks++;
-                    Queuer.Remove("W");
                     break;
 
 
                 case "rivenfeint": //E
                     LastCast["E"] = Environment.TickCount;
                     if (PassiveStacks <= 2) PassiveStacks++;
-                    Queuer.Remove("E");
                     break;
 
 
                 case "rivenfengshuiengine": //R1
                     LastCast["R1"] = Environment.TickCount;
                     if (PassiveStacks <= 2) PassiveStacks++;
-                    Queuer.Remove("R1");
                     HasR = true;
                     HasR2 = true;
                     break;
@@ -217,9 +271,42 @@ namespace RivenBuddy
                 case "rivenizunablade": //R2
                     LastCast["R2"] = Environment.TickCount;
                     if (PassiveStacks <= 2) PassiveStacks++;
-                    Queuer.Remove("R2");
                     HasR2 = false;
                     break;
+            }
+        }
+
+        private static void ReQueue()
+        {
+            if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
+            {
+                States.Combo(false);
+                return;
+            }
+            if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Harass))
+            {
+                States.Harass(false);
+                return;
+            }
+            if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.JungleClear))
+            {
+                States.Jungle(false);
+                return;
+            }
+            if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear))
+            {
+                var target = EntityManager.MinionsAndMonsters.GetJungleMonsters(Player.Instance.Position,
+                    SpellManager.Spells[SpellSlot.Q].Range + 300).OrderByDescending(a => a.MaxHealth).FirstOrDefault();
+                if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.JungleClear) && target == null)
+                {
+                    States.WaveClear(false);
+                    return;
+                }
+            }
+            if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LastHit))
+            {
+                States.LastHit(false);
+                return;
             }
         }
     }
