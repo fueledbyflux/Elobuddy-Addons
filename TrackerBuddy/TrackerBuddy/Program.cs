@@ -20,8 +20,8 @@ namespace TrackerBuddy
 {
     internal static class Program
     {
-        private const int OffsetHudX = -31; //31
-        private const int OffsetHudY = 16; //11
+        private const int OffsetHudX = -21; //31
+        private const int OffsetHudY = 2; //11
 
         private const int OffsetSpellsX = OffsetHudX + 22;
         private const int OffsetSpellsY = OffsetHudY + 11;
@@ -29,8 +29,8 @@ namespace TrackerBuddy
         private const int OffsetSummonersX = OffsetHudX + 4; //9
         private const int OffsetSummonersY = OffsetHudY + 2; //5
 
-        private const int OffsetXpX = OffsetHudX + 40; //44
-        private const int OffsetXpY = OffsetHudY + -51; //53
+        private const int OffsetXpX = 0; //44
+        private const int OffsetXpY = -6; //53
 
         public static readonly TextureLoader TextureLoader = new TextureLoader();
 
@@ -95,7 +95,7 @@ namespace TrackerBuddy
             MainBar = new Sprite(() => Mode == 1 ? TextureLoader["hud2"] : TextureLoader["hud"]);
 
             // Load summoner spells dynamically
-            foreach (var summoner in HeroManager.AllHeroes.SelectMany(o => o.Spellbook.Spells.Where(s => Summoners.Contains(s.Slot))).Select(o => o.Name.ToLower()))
+            foreach (var summoner in EntityManager.Heroes.AllHeroes.SelectMany(o => o.Spellbook.Spells.Where(s => Summoners.Contains(s.Slot))).Select(o => o.Name.ToLower()))
             {
 
                 var summonerName = summoner;
@@ -182,7 +182,7 @@ namespace TrackerBuddy
         {
             foreach (var unit in HeroManager.AllHeroes.Where(o => !o.IsMe && o.IsHPBarRendered).Where(o => o.IsAlly ? DrawAllies : DrawEnemies))
             {
-                var HPBarPos = new Vector2(unit.HPBarPosition.X, unit.HPBarPosition.Y);
+                var HPBarPos = new Vector2(unit.HPBarPosition.X, unit.HPBarPosition.Y + (Mode == 1 ? -1 : 0));
                 // Summoner spells
                 foreach (var summonerSpell in Summoners)
                 {
@@ -229,18 +229,22 @@ namespace TrackerBuddy
                 if (Exp)
                 {
                     Drawing.DrawLine(new Vector2(HPBarPos.X - OffsetXpX, HPBarPos.Y - OffsetXpY),
+                           new Vector2(HPBarPos.X - OffsetXpX + 104,
+                               HPBarPos.Y - OffsetXpY), 3, System.Drawing.Color.DarkGray);
+                    Drawing.DrawLine(new Vector2(HPBarPos.X - OffsetXpX, HPBarPos.Y - OffsetXpY),
                         new Vector2(HPBarPos.X - OffsetXpX + 104*(unit.Experience.XPPercentage/100),
                             HPBarPos.Y - OffsetXpY), 3, System.Drawing.Color.DarkOrange);
+                    
                 }
 
                 // Draw the main hud
-                MainBar.Draw(new Vector2((HPBarPos.X + OffsetHudX), (HPBarPos.Y + OffsetHudY + Mode * 2 - (Exp ? 0 : 1))));
+                MainBar.Draw(new Vector2((HPBarPos.X + OffsetHudX), (HPBarPos.Y + OffsetHudY - (Exp ? 0 : 1))));
             }
         }
 
         private static Vector2 GetSpellOffset(this Obj_AI_Base hero, SpellSlot slot)
         {
-            var normalPos = new Vector2(hero.HPBarPosition.X + OffsetSpellsX, hero.HPBarPosition.Y + OffsetSpellsY + Mode * 2 - (Exp ? 0 : 3));
+            var normalPos = new Vector2(hero.HPBarPosition.X + OffsetSpellsX, hero.HPBarPosition.Y + OffsetSpellsY + (Mode == 1 ? -4 : 0) - (Exp ? 0 : 3));
             switch (slot)
             {
                 case SpellSlot.W:
@@ -255,7 +259,7 @@ namespace TrackerBuddy
 
         private static Vector2 GetSummonerOffset(this Obj_AI_Base hero, SpellSlot slot)
         {
-            var normalPos = new Vector2(hero.HPBarPosition.X + OffsetSummonersX, hero.HPBarPosition.Y + OffsetSummonersY + Mode * 2 - (Exp ? 0 : 3));
+            var normalPos = new Vector2(hero.HPBarPosition.X + OffsetSummonersX, hero.HPBarPosition.Y + OffsetSummonersY + (Mode == 1 ? -4 : 0) - (Exp ? 0 : 3));
             return slot == SpellSlot.Summoner2 ? new Vector2(normalPos.X, normalPos.Y + 17) : normalPos;
         }
 
