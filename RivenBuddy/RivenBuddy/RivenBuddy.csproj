@@ -65,8 +65,6 @@
     <Compile Include="SpellEvents.cs" />
     <Compile Include="SpellManager.cs" />
     <Compile Include="States.cs" />
-    <Compile Include="TargetSelector2.cs" />
-    <Compile Include="WallJump.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

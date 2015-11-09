@@ -60,8 +60,8 @@ namespace RivenBuddy
         public class DamageIndicator
         {
             private readonly float _barLength = 104;
-            private readonly float _xOffset = -9;
-            private readonly float _yOffset = +22;
+            private readonly float _xOffset = 2;
+            private readonly float _yOffset = 9;
             private Dictionary<string, SpellData> _damageItems = new Dictionary<string, SpellData>();
             public float CheckDistance = 1200;
 
@@ -117,7 +117,7 @@ namespace RivenBuddy
                                          : (DamageHandler.ComboDamage(aiHeroClient) /aiHeroClient.MaxHealth));
                         Line.DrawLine(Color.FromArgb(100, Color.Aqua), 9f, new Vector2(pos.X, pos.Y),
                             new Vector2((float) (pos.X + (damage > fullbar ? fullbar : damage)), pos.Y));
-                        Line.DrawLine(Color.Black, 3, new Vector2((float) (pos.X + (damage > fullbar ? fullbar : damage) + 1), pos.Y - 4), new Vector2((float) (pos.X + (damage > fullbar ? fullbar : damage) + 1), pos.Y + 5));
+                        Line.DrawLine(Color.Black, 9, new Vector2((float) (pos.X + (damage > fullbar ? fullbar : damage) - 2), pos.Y), new Vector2((float) (pos.X + (damage > fullbar ? fullbar : damage) + 2), pos.Y));
                 }
             }
         }

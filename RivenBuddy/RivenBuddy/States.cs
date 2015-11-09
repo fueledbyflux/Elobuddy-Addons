@@ -13,7 +13,7 @@ namespace RivenBuddy
 
         public static void Burst()
         {
-            var target = TargetSelector2.GetTarget(SpellManager.Spells[SpellSlot.E].Range + SpellManager.Spells[SpellSlot.W].Range + 400, DamageType.Physical);
+            var target = TargetSelector.GetTarget(SpellManager.Spells[SpellSlot.E].Range + SpellManager.Spells[SpellSlot.W].Range + 400, DamageType.Physical);
 
             Orbwalker.ForcedTarget = target;
             Orbwalker.OrbwalkTo(Game.CursorPos);
@@ -72,7 +72,7 @@ namespace RivenBuddy
 
         public static void Combo(bool state = true)
         {
-            var target = TargetSelector2.GetTarget(500, DamageType.Physical);
+            var target = TargetSelector.GetTarget(500, DamageType.Physical);
 
             if (target == null)
             {
@@ -91,7 +91,7 @@ namespace RivenBuddy
                 return;
             }
 
-            float THealth = state ? target.Health : target.Health - Player.Instance.GetAutoAttackDamage(target, true);
+            float health = state ? target.Health : target.Health - Player.Instance.GetAutoAttackDamage(target, true);
 
             var comboDmg = DamageHandler.ComboDamage(target, true);
             if (Program.ComboMenu["combo.useQ"].Cast<CheckBox>().CurrentValue &&
@@ -108,10 +108,10 @@ namespace RivenBuddy
                 &&
                 (Program.IsRActive ||
                  target.IsValidTarget(SpellManager.Spells[SpellSlot.E].Range + SpellManager.Spells[SpellSlot.W].Range)
-                 && comboDmg < THealth &&
+                 && comboDmg < health &&
                  comboDmg +
                  Player.Instance.CalculateDamageOnUnit(target, DamageType.Physical,
-                     (int) DamageHandler.RDamage(target, comboDmg)) >= THealth))
+                     (int) DamageHandler.RDamage(target, comboDmg)) >= health))
             {
                 Queuer.Queue.Add("E");
                 Queuer.Queue.Add("R1");
@@ -128,9 +128,9 @@ namespace RivenBuddy
             if (SpellManager.Spells[SpellSlot.R].IsReady() &&
                 Program.ComboMenu["combo.useR"].Cast<CheckBox>().CurrentValue &&
                 (Program.IsRActive ||
-                 comboDmg < THealth &&
+                 comboDmg < health &&
                  comboDmg + Player.Instance.CalculateDamageOnUnit(target, DamageType.Physical,
-                     (int) DamageHandler.RDamage(target, comboDmg)) >= THealth) && !SpellEvents.HasR)
+                     (int) DamageHandler.RDamage(target, comboDmg)) >= health) && !SpellEvents.HasR)
             {
                 if (Program.ComboMenu["combo.eR1"].Cast<CheckBox>().CurrentValue && SpellManager.Spells[SpellSlot.E].IsReady() && SpellManager.Spells[SpellSlot.R].IsReady())
                 {
@@ -149,7 +149,7 @@ namespace RivenBuddy
                 Program.ComboMenu["combo.useR2"].Cast<CheckBox>().CurrentValue)
             {
                 if (Player.Instance.CalculateDamageOnUnit(target, DamageType.Physical,
-                    (int) DamageHandler.RDamage(target)) >= THealth)
+                    (int) DamageHandler.RDamage(target)) >= health)
                 {
                     if (Program.ComboMenu["combo.eR2"].Cast<CheckBox>().CurrentValue &&
                         SpellManager.Spells[SpellSlot.E].IsReady() && SpellManager.Spells[SpellSlot.R].IsReady())
@@ -165,7 +165,7 @@ namespace RivenBuddy
                     }
                 }
                 if (Player.Instance.CalculateDamageOnUnit(target, DamageType.Physical,
-                    (int) (DamageHandler.RDamage(target) + DamageHandler.QDamage())) >= THealth)
+                    (int) (DamageHandler.RDamage(target) + DamageHandler.QDamage())) >= health)
                 {
                     if (Program.ComboMenu["combo.qR2"].Cast<CheckBox>().CurrentValue &&
                         SpellManager.Spells[SpellSlot.R].IsReady() && SpellManager.Spells[SpellSlot.Q].IsReady())
@@ -278,7 +278,7 @@ namespace RivenBuddy
 
         public static void Harass(bool state = true)
         {
-            var target = TargetSelector2.GetTarget(500, DamageType.Physical);
+            var target = TargetSelector.GetTarget(500, DamageType.Physical);
 
             if (target == null)
             {

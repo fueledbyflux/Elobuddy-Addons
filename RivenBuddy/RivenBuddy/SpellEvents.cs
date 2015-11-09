@@ -30,14 +30,6 @@ namespace RivenBuddy
             Obj_AI_Base.OnProcessSpellCast += Obj_AI_Base_OnProcessSpellCast;
             Obj_AI_Base.OnPlayAnimation += Obj_AI_Base_OnPlayAnimation;
             Obj_AI_Base.OnSpellCast += Obj_AI_Base_OnSpellCast;
-            Player.OnBasicAttack += Player_OnBasicAttack;
-            Game.OnUpdate += delegate { UpdateSpells(); };
-        }
-
-        private static void Player_OnBasicAttack(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
-        {
-            if (!sender.IsMe) return;
-
         }
 
         private static void Obj_AI_Base_OnPlayAnimation(Obj_AI_Base sender, GameObjectPlayAnimationEventArgs args)

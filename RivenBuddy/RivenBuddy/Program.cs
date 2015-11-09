@@ -114,13 +114,17 @@ namespace RivenBuddy
             HumanizerMenu.Add("humanizerQSlow", new Slider("Humanizer Q Slow", 0, 0, 200));
 
             R2 = new Spell.Skillshot(SpellSlot.R, 900, SkillShotType.Cone, 250, 1600, 125);
-            TargetSelector2.Init();
             SpellEvents.Init();
             Game.OnUpdate += Game_OnUpdate;
             Drawing.OnDraw += Drawing_OnDraw;
-            Game.OnUpdate += delegate { SpellManager.UpdateSpells(); };
             Player.OnIssueOrder += Player_OnIssueOrder;
             Indicator = new DamageIndicator.DamageIndicator();
+        }
+        private static void Game_OnUpdate(EventArgs args)
+        {
+            SpellManager.UpdateSpells();
+            SpellEvents.UpdateSpells();
+            TickTask();
         }
 
         public static GameObject OrderTarget;
@@ -183,7 +187,7 @@ namespace RivenBuddy
             }
         }
 
-        private static void Game_OnUpdate(EventArgs args)
+        private static void TickTask()
         {
             Orbwalker.ForcedTarget = null;
             Queuer.tiamat =
