@@ -24,7 +24,6 @@ namespace RivenBuddy
             public DamageIndicator()
             {
                 Drawing.OnEndScene += Drawing_OnDraw;
-                //Chat.Print("Damage Indicator By Fluxy - Loaded", Color.Red);
             }
 
             private void Drawing_OnDraw(EventArgs args)
@@ -35,11 +34,9 @@ namespace RivenBuddy
                 {
                     if (!aiHeroClient.IsHPBarRendered || !aiHeroClient.VisibleOnScreen) continue;
 
-                    var pos = new Vector2(aiHeroClient.HPBarPosition.X + _xOffset,
-                        aiHeroClient.HPBarPosition.Y + _yOffset);
-                    
-                        var fullbar = (_barLength)*(aiHeroClient.HealthPercent/100);
-                        var damage = (_barLength)*
+                    var pos = new Vector2(aiHeroClient.HPBarPosition.X + _xOffset, aiHeroClient.HPBarPosition.Y + _yOffset);
+                    var fullbar = (_barLength)*(aiHeroClient.HealthPercent/100);
+                    var damage = (_barLength)*
                                      ((DamageHandler.ComboDamage(aiHeroClient)/aiHeroClient.MaxHealth) > 1
                                          ? 1
                                          : (DamageHandler.ComboDamage(aiHeroClient) /aiHeroClient.MaxHealth));

@@ -103,7 +103,6 @@ namespace RivenBuddy
                         Player.CastSpell(SpellSlot.Q, args.Target.Position);
                         Queuer.Remove("Q");
                         if(QCount < 2) Orbwalker.ResetAutoAttack();
-                        //ReQueue();
                     }
                     else if (!Queuer.Queue.Any() && Queuer.Tiamat != null && Queuer.Tiamat.CanUseItem() &&
                              Program.ComboMenu["combo.hydra"].Cast<CheckBox>().CurrentValue &&
@@ -133,7 +132,6 @@ namespace RivenBuddy
                         Player.CastSpell(SpellSlot.Q, args.Target.Position);
                         Queuer.Remove("Q");
                         Orbwalker.ResetAutoAttack();
-                        //ReQueue();
                     }
                     else if (!Queuer.Queue.Any() && Queuer.Tiamat != null && Queuer.Tiamat.CanUseItem() &&
                              Program.ComboMenu["combo.hydra"].Cast<CheckBox>().CurrentValue &&

@@ -19,10 +19,15 @@ namespace RivenBuddy
             {SpellSlot.R, new Spell.Active(SpellSlot.R, 900)}
         };
 
+        private static readonly Spell.Skillshot Q1 = new Spell.Skillshot(SpellSlot.Q, 300, SkillShotType.Circular);
+        private static readonly Spell.Skillshot Q2 = new Spell.Skillshot(SpellSlot.Q, 325, SkillShotType.Circular);
+        private static readonly Spell.Active W1 = new Spell.Active(SpellSlot.W, 250);
+        private static readonly Spell.Active W2 = new Spell.Active(SpellSlot.W, 275);
+
         public static void UpdateSpells()
         {
-            Spells[SpellSlot.Q] = SpellEvents.HasR ? new Spell.Skillshot(SpellSlot.Q, 325, SkillShotType.Circular) : new Spell.Skillshot(SpellSlot.Q, 300, SkillShotType.Circular);
-            Spells[SpellSlot.W] = SpellEvents.HasR ?  new Spell.Active(SpellSlot.W, 275) : new Spell.Active(SpellSlot.W, 250);
+            Spells[SpellSlot.Q] = SpellEvents.HasR ? Q2 : Q1;
+            Spells[SpellSlot.W] = SpellEvents.HasR ?  W2 : W1;
         }
     }
 }

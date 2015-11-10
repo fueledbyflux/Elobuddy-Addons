@@ -113,14 +113,57 @@ namespace RivenBuddy
             HumanizerMenu.Add("humanizerQSlow", new Slider("Humanizer Q Slow", 0, 0, 200));
 
             R2 = new Spell.Skillshot(SpellSlot.R, 900, SkillShotType.Cone, 250, 1600, 125);
-            States.flash = Player.Spells.FirstOrDefault(a => a.SData.Name == "summonerflash");
+            States.Flash = Player.Spells.FirstOrDefault(a => a.SData.Name == "summonerflash");
+
+            Queuer.Tiamat =
+                ObjectManager.Player.InventoryItems.FirstOrDefault(
+                    a => a.Id == ItemId.Tiamat_Melee_Only || a.Id == ItemId.Ravenous_Hydra_Melee_Only);
+
             SpellEvents.Init();
             Drawing.OnDraw += Drawing_OnDraw;
             Player.OnIssueOrder += Player_OnIssueOrder;
             Indicator = new DamageIndicator.DamageIndicator();
+            Shop.OnBuyItem += Shop_OnBuyItem;
+            Shop.OnSellItem += Shop_OnSellItem;
+            Shop.OnUndo += Shop_OnUndo;
+            Player.OnSwapItem += Player_OnSwapItem;
             Game.OnUpdate += Game_OnUpdate;
-            
         }
+
+        private static void Player_OnSwapItem(AIHeroClient sender, PlayerSwapItemEventArgs args)
+        {
+            if (!sender.IsMe) return;
+            Queuer.Tiamat =
+                ObjectManager.Player.InventoryItems.FirstOrDefault(
+                    a => a.Id == ItemId.Tiamat_Melee_Only || a.Id == ItemId.Ravenous_Hydra_Melee_Only);
+        }
+
+        private static void Shop_OnUndo(ShopUndoPurchaseEventArgs args)
+        {
+            Queuer.Tiamat =
+                ObjectManager.Player.InventoryItems.FirstOrDefault(
+                    a => a.Id == ItemId.Tiamat_Melee_Only || a.Id == ItemId.Ravenous_Hydra_Melee_Only);
+        }
+
+        private static void Shop_OnSellItem(AIHeroClient sender, ShopActionEventArgs args)
+        {
+            if (!sender.IsMe) return;
+            Queuer.Tiamat =
+                ObjectManager.Player.InventoryItems.FirstOrDefault(
+                    a => a.Id == ItemId.Tiamat_Melee_Only || a.Id == ItemId.Ravenous_Hydra_Melee_Only);
+        }
+
+        private static void Shop_OnBuyItem(AIHeroClient sender, ShopActionEventArgs args)
+        {
+            if (!sender.IsMe) return;
+            if (args.Id == (int) ItemId.Tiamat_Melee_Only || args.Id == (int) ItemId.Ravenous_Hydra_Melee_Only)
+            {
+                Queuer.Tiamat =
+                    ObjectManager.Player.InventoryItems.FirstOrDefault(
+                        a => a.Id == ItemId.Tiamat_Melee_Only || a.Id == ItemId.Ravenous_Hydra_Melee_Only);
+            }
+        }
+
         private static void Game_OnUpdate(EventArgs args)
         {
             SpellManager.UpdateSpells();
@@ -191,10 +234,6 @@ namespace RivenBuddy
         private static void TickTask()
         {
             Orbwalker.ForcedTarget = null;
-
-            Queuer.Tiamat =
-                ObjectManager.Player.InventoryItems.FirstOrDefault(
-                    a => a.Id == ItemId.Tiamat_Melee_Only || a.Id == ItemId.Ravenous_Hydra_Melee_Only);
             if (BurstActive)
             {
                 States.Burst();
@@ -240,9 +279,9 @@ namespace RivenBuddy
                 States.Flee();
                 return;
             }
-            if (Orbwalker.ActiveModesFlags == Orbwalker.ActiveModes.None && !BurstActive)
+            if (Orbwalker.ActiveModesFlags == Orbwalker.ActiveModes.None && !BurstActive && Queuer.Queue.Any())
             {
-                Queuer.Queue = new List<string>();
+                Queuer.Queue.Clear();
             }
         }
     }

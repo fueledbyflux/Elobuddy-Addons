@@ -103,9 +103,9 @@ namespace RivenBuddy
 
         public static void CastFlash(Vector3 position)
         {
-            if (States.flash != null && position.IsValid() && States.flash.IsReady)
+            if (States.Flash != null && position.IsValid() && States.Flash.IsReady)
             {
-                Player.CastSpell(States.flash.Slot, position);
+                Player.CastSpell(States.Flash.Slot, position);
                 Remove("FL");
             }
             else

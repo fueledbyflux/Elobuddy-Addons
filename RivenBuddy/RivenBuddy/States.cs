@@ -10,7 +10,7 @@ namespace RivenBuddy
     internal class States
     {
         public static Obj_AI_Base Target;
-        public static SpellDataInst flash;
+        public static SpellDataInst Flash;
 
         public static void Burst()
         {
@@ -22,13 +22,13 @@ namespace RivenBuddy
             if (target == null)
             {
                 Target = null;
-                Queuer.Queue = new List<string>();
+                Queuer.Queue.Clear();
                 return;
             }
             if (Target == null || target.NetworkId != Target.NetworkId)
             {
                 Target = target;
-                Queuer.Queue = new List<string>();
+                Queuer.Queue.Clear();
             }
             if (Queuer.Queue.Any())
             {
@@ -40,7 +40,7 @@ namespace RivenBuddy
                 SpellManager.Spells[SpellSlot.W].IsReady() &&
                 SpellManager.Spells[SpellSlot.E].IsReady() &&
                 SpellManager.Spells[SpellSlot.R].IsReady() &&
-                !SpellEvents.HasR && flash != null && flash.IsReady)
+                !SpellEvents.HasR && Flash != null && Flash.IsReady)
             {
                 Queuer.Queue.Add("E");
                 Queuer.Queue.Add("R1");
@@ -52,7 +52,7 @@ namespace RivenBuddy
                 Queuer.Queue.Add("Q");
                 return;
             }
-            if (target.IsValidTarget(SpellManager.Spells[SpellSlot.E].Range + SpellManager.Spells[SpellSlot.W].Range) && (!Program.ComboMenu["burst.flash"].Cast<CheckBox>().CurrentValue || flash == null || !flash.IsReady) &&
+            if (target.IsValidTarget(SpellManager.Spells[SpellSlot.E].Range + SpellManager.Spells[SpellSlot.W].Range) && (!Program.ComboMenu["burst.flash"].Cast<CheckBox>().CurrentValue || Flash == null || !Flash.IsReady) &&
                 SpellManager.Spells[SpellSlot.Q].IsReady() &&
                 SpellManager.Spells[SpellSlot.W].IsReady() &&
                 SpellManager.Spells[SpellSlot.E].IsReady() &&
@@ -77,13 +77,13 @@ namespace RivenBuddy
             if (target == null)
             {
                 Target = null;
-                Queuer.Queue = new List<string>();
+                Queuer.Queue.Clear();
                 return;
             }
             if (Target == null || target.NetworkId != Target.NetworkId)
             {
                 Target = target;
-                Queuer.Queue = new List<string>();
+                Queuer.Queue.Clear();
             }
             if (Queuer.Queue.Any())
             {
@@ -178,8 +178,7 @@ namespace RivenBuddy
             if (Q && W && E &&
                 SpellManager.Spells[SpellSlot.Q].IsReady() && SpellManager.Spells[SpellSlot.E].IsReady() &&
                 SpellManager.Spells[SpellSlot.W].IsReady() && Queuer.Tiamat != null && Queuer.Tiamat.CanUseItem()
-                &&
-                target.IsValidTarget(SpellManager.Spells[SpellSlot.E].Range + SpellManager.Spells[SpellSlot.W].Range +
+                && target.IsValidTarget(SpellManager.Spells[SpellSlot.E].Range + SpellManager.Spells[SpellSlot.W].Range +
                                      ObjectManager.Player.BoundingRadius + target.BoundingRadius))
             {
                 Queuer.Queue.Add("E");
@@ -222,7 +221,7 @@ namespace RivenBuddy
 
             if (Q && SpellManager.Spells[SpellSlot.Q].IsReady() && Orbwalker.CanAutoAttack)
             {
-                if (SpellManager.Spells[SpellSlot.Q].IsInRange(target))
+                if (Player.Instance.IsInAutoAttackRange(target))
                 {
                     Queuer.Queue.Add("AA");
                     Queuer.Queue.Add("Q");
@@ -253,7 +252,7 @@ namespace RivenBuddy
             }
             else
             {
-                Queuer.Queue = new List<string>();
+                Queuer.Queue.Clear();
             }
         }
 
@@ -264,13 +263,13 @@ namespace RivenBuddy
             if (target == null)
             {
                 Target = null;
-                Queuer.Queue = new List<string>();
+                Queuer.Queue.Clear();
                 return;
             }
             if (Target == null || target.NetworkId != Target.NetworkId)
             {
                 Target = target;
-                Queuer.Queue = new List<string>();
+                Queuer.Queue.Clear();
             }
 
             if (Queuer.Queue.Any())
@@ -345,7 +344,7 @@ namespace RivenBuddy
             }
             else
             {
-                Queuer.Queue = new List<string>();
+                Queuer.Queue.Clear();
             }
         }
 
@@ -357,13 +356,13 @@ namespace RivenBuddy
             if (target == null)
             {
                 Target = null;
-                Queuer.Queue = new List<string>();
+                Queuer.Queue.Clear();
                 return;
             }
             if (Target == null || target.NetworkId != Target.NetworkId)
             {
                 Target = null;
-                Queuer.Queue = new List<string>();
+                Queuer.Queue.Clear();
             }
 
             if (Queuer.Queue.Any())
@@ -408,13 +407,13 @@ namespace RivenBuddy
             if (target == null)
             {
                 Target = null;
-                Queuer.Queue = new List<string>();
+                Queuer.Queue.Clear();
                 return;
             }
             if (Target == null || target.NetworkId != Target.NetworkId)
             {
                 Target = target;
-                Queuer.Queue = new List<string>();
+                Queuer.Queue.Clear();
             }
 
             if (Queuer.Queue.Any())
@@ -457,13 +456,13 @@ namespace RivenBuddy
             if (target == null)
             {
                 Target = null;
-                Queuer.Queue = new List<string>();
+                Queuer.Queue.Clear();
                 return;
             }
             if (Target == null || target.NetworkId != Target.NetworkId)
             {
                 Target = target;
-                Queuer.Queue = new List<string>();
+                Queuer.Queue.Clear();
             }
 
             if (Queuer.Queue.Any())
