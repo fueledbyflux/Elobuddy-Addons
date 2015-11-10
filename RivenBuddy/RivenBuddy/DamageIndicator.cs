@@ -13,90 +13,18 @@ namespace RivenBuddy
 {
     namespace DamageIndicator
     {
-        public class SpellData
-        {
-            private readonly DamageType _damageType = DamageType.Physical;
-            private readonly int _flatDamage = -1;
-            private readonly bool _onlyIfActive;
-            private readonly SpellSlot _spellSlot = SpellSlot.Unknown;
-            private readonly DamageLibrary.SpellStages _stage = DamageLibrary.SpellStages.Default;
-            public Color Color = Color.FromArgb(100, Color.Aqua);
-
-            public SpellData(int flatDamage, DamageType damageType, Color c)
-            {
-                _flatDamage = flatDamage;
-                _damageType = damageType;
-            }
-
-            public SpellData(SpellSlot spellSlot, bool checkIfActive, DamageLibrary.SpellStages spellStage, Color c)
-            {
-                _onlyIfActive = checkIfActive;
-                _spellSlot = spellSlot;
-                _stage = spellStage;
-                Color = c;
-            }
-
-            public void SetColor(Color c)
-            {
-                Color = c;
-            }
-
-            public float CalculateDamage(AIHeroClient target, AIHeroClient source = null)
-            {
-                if (source == null) source = Player.Instance;
-                if (_spellSlot != SpellSlot.Unknown &&
-                    (!_onlyIfActive || _onlyIfActive && source.Spellbook.GetSpell(_spellSlot).State == SpellState.Ready))
-                {
-                    return source.GetSpellDamage(target, _spellSlot, _stage);
-                }
-                if (_flatDamage != -1)
-                {
-                    return source.CalculateDamageOnUnit(target, _damageType, _flatDamage);
-                }
-                return 0;
-            }
-        }
 
         public class DamageIndicator
         {
             private readonly float _barLength = 104;
             private readonly float _xOffset = 2;
             private readonly float _yOffset = 9;
-            private Dictionary<string, SpellData> _damageItems = new Dictionary<string, SpellData>();
-            public float CheckDistance = 1200;
+            public float CheckDistance = 1500;
 
             public DamageIndicator()
             {
                 Drawing.OnEndScene += Drawing_OnDraw;
                 //Chat.Print("Damage Indicator By Fluxy - Loaded", Color.Red);
-            }
-
-            public void Add(string s, SpellData data)
-            {
-                if (_damageItems.ContainsKey(s))
-                {
-                    Logger.Log(LogLevel.Error,
-                        "Damage Indicator: Cannot Add '{0}', already added. Please Use Update to change the values.", s);
-                    return;
-                }
-                _damageItems.Add(s, data);
-            }
-
-            public void Update(string s, SpellData data)
-            {
-                if (_damageItems.ContainsKey(s))
-                {
-                    _damageItems[s] = data;
-                }
-                else
-                {
-                    Logger.Log(LogLevel.Error, "Damage Indicator: No Item of '{0}' is not found, cannot update", s);
-                }
-            }
-
-            public void Reset()
-            {
-                _damageItems = new Dictionary<string, SpellData>();
             }
 
             private void Drawing_OnDraw(EventArgs args)
@@ -105,7 +33,7 @@ namespace RivenBuddy
 
                 foreach (var aiHeroClient in EntityManager.Heroes.Enemies)
                 {
-                    if (!aiHeroClient.IsHPBarRendered) continue;
+                    if (!aiHeroClient.IsHPBarRendered || !aiHeroClient.VisibleOnScreen) continue;
 
                     var pos = new Vector2(aiHeroClient.HPBarPosition.X + _xOffset,
                         aiHeroClient.HPBarPosition.Y + _yOffset);

@@ -18,8 +18,6 @@ namespace RivenBuddy
             Orbwalker.ForcedTarget = target;
             Orbwalker.OrbwalkTo(Game.CursorPos);
 
-            var flash = Player.Spells.FirstOrDefault(a => a.SData.Name == "summonerflash");
-
             if (target == null)
             {
                 Target = null;
@@ -36,6 +34,9 @@ namespace RivenBuddy
                 Queuer.DoQueue(target);
                 return;
             }
+
+            var flash = Player.Spells.FirstOrDefault(a => a.SData.Name == "summonerflash");
+
             if (Program.ComboMenu["burst.flash"].Cast<CheckBox>().CurrentValue && SpellManager.Spells[SpellSlot.Q].IsReady() &&
                 SpellManager.Spells[SpellSlot.W].IsReady() &&
                 SpellManager.Spells[SpellSlot.E].IsReady() &&
@@ -87,18 +88,20 @@ namespace RivenBuddy
             }
             if (Queuer.Queue.Any())
             {
-                if(state) Queuer.DoQueue(target);
+                if (state) Queuer.DoQueue(target);
                 return;
             }
 
             float health = state ? target.Health : target.Health - Player.Instance.GetAutoAttackDamage(target, true);
 
+            var Q = Program.ComboMenu["combo.useQ"].Cast<CheckBox>().CurrentValue;
+            var W = Program.ComboMenu["combo.useW"].Cast<CheckBox>().CurrentValue;
+            var E = Program.ComboMenu["combo.useE"].Cast<CheckBox>().CurrentValue;
+            var R1 = Program.ComboMenu["combo.useR"].Cast<CheckBox>().CurrentValue;
+            var R2 = Program.ComboMenu["combo.useR2"].Cast<CheckBox>().CurrentValue;
+
             var comboDmg = DamageHandler.ComboDamage(target, true);
-            if (Program.ComboMenu["combo.useQ"].Cast<CheckBox>().CurrentValue &&
-                Program.ComboMenu["combo.useW"].Cast<CheckBox>().CurrentValue &&
-                Program.ComboMenu["combo.useE"].Cast<CheckBox>().CurrentValue &&
-                Program.ComboMenu["combo.useR"].Cast<CheckBox>().CurrentValue &&
-                Program.ComboMenu["combo.useR2"].Cast<CheckBox>().CurrentValue &&
+            if (Q && W && E && R1 && R2 &&
                 SpellManager.Spells[SpellSlot.Q].IsReady() &&
                 SpellManager.Spells[SpellSlot.W].IsReady() &&
                 SpellManager.Spells[SpellSlot.E].IsReady() &&
@@ -126,7 +129,7 @@ namespace RivenBuddy
             }
 
             if (SpellManager.Spells[SpellSlot.R].IsReady() &&
-                Program.ComboMenu["combo.useR"].Cast<CheckBox>().CurrentValue &&
+                R1 &&
                 (Program.IsRActive ||
                  comboDmg < health &&
                  comboDmg + Player.Instance.CalculateDamageOnUnit(target, DamageType.Physical,
@@ -146,7 +149,7 @@ namespace RivenBuddy
             }
 
             if (SpellManager.Spells[SpellSlot.R].IsReady() && SpellEvents.HasR2 &&
-                Program.ComboMenu["combo.useR2"].Cast<CheckBox>().CurrentValue)
+                R2)
             {
                 if (Player.Instance.CalculateDamageOnUnit(target, DamageType.Physical,
                     (int) DamageHandler.RDamage(target)) >= health)
@@ -177,9 +180,7 @@ namespace RivenBuddy
                 }
             }
 
-            if (Program.ComboMenu["combo.useQ"].Cast<CheckBox>().CurrentValue &&
-                Program.ComboMenu["combo.useW"].Cast<CheckBox>().CurrentValue &&
-                Program.ComboMenu["combo.useE"].Cast<CheckBox>().CurrentValue &&
+            if (Q && W && E &&
                 SpellManager.Spells[SpellSlot.Q].IsReady() && SpellManager.Spells[SpellSlot.E].IsReady() &&
                 SpellManager.Spells[SpellSlot.W].IsReady() && Queuer.tiamat != null && Queuer.tiamat.CanUseItem()
                 &&
@@ -197,9 +198,7 @@ namespace RivenBuddy
                 Queuer.Queue.Add("Q");
                 return;
             }
-            if (Program.ComboMenu["combo.useQ"].Cast<CheckBox>().CurrentValue &&
-                Program.ComboMenu["combo.useW"].Cast<CheckBox>().CurrentValue &&
-                Program.ComboMenu["combo.useE"].Cast<CheckBox>().CurrentValue &&
+            if (Q && W && E &&
                 SpellManager.Spells[SpellSlot.Q].IsReady() && SpellManager.Spells[SpellSlot.E].IsReady() &&
                 SpellManager.Spells[SpellSlot.W].IsReady() && (Queuer.tiamat == null || !Queuer.tiamat.CanUseItem())
                 &&
@@ -213,13 +212,12 @@ namespace RivenBuddy
                 Queuer.Queue.Add("Q");
                 return;
             }
-            if (Program.ComboMenu["combo.useW"].Cast<CheckBox>().CurrentValue &&
-                Program.ComboMenu["combo.useQ"].Cast<CheckBox>().CurrentValue &&
+            if (Q && W &&
                 SpellManager.Spells[SpellSlot.Q].IsReady() && SpellEvents.QCount == 2 &&
                 SpellManager.Spells[SpellSlot.W].IsReady()
                 &&
                 target.IsValidTarget(SpellManager.Spells[SpellSlot.Q].Range +
-                                     SpellManager.Spells[SpellSlot.W].getTrueRange(target)))
+                                     SpellManager.Spells[SpellSlot.W].GetTrueRange(target)))
             {
                 Queuer.Queue.Add("AA");
                 Queuer.Queue.Add("Q");
@@ -229,15 +227,14 @@ namespace RivenBuddy
                 Queuer.Queue.Add("AA");
                 return;
             }
-            if (SpellManager.Spells[SpellSlot.W].IsReady() && SpellManager.Spells[SpellSlot.W].inRange(target))
+            if (W && SpellManager.Spells[SpellSlot.W].IsReady() && SpellManager.Spells[SpellSlot.W].InRange(target))
             {
                 if (Program.ComboMenu["combo.hydra"].Cast<CheckBox>().CurrentValue) Queuer.Queue.Add("H");
                 Queuer.Queue.Add("W");
                 return;
             }
 
-            if (Program.ComboMenu["combo.useQ"].Cast<CheckBox>().CurrentValue &&
-                SpellManager.Spells[SpellSlot.Q].IsReady() && Orbwalker.CanAutoAttack)
+            if (Q && SpellManager.Spells[SpellSlot.Q].IsReady() && Orbwalker.CanAutoAttack)
             {
                 if (SpellManager.Spells[SpellSlot.Q].IsInRange(target))
                 {
@@ -253,10 +250,8 @@ namespace RivenBuddy
                 Queuer.Queue.Add("Q");
                 return;
             }
-            if (Program.ComboMenu["combo.useW"].Cast<CheckBox>().CurrentValue &&
-                Program.ComboMenu["combo.useE"].Cast<CheckBox>().CurrentValue &&
-                SpellManager.Spells[SpellSlot.E].IsReady() && SpellManager.Spells[SpellSlot.W].IsReady() &&
-                target.IsValidTarget(SpellManager.Spells[SpellSlot.W].getTrueRange(target) +
+            if (W && E && SpellManager.Spells[SpellSlot.E].IsReady() && SpellManager.Spells[SpellSlot.W].IsReady() &&
+                target.IsValidTarget(SpellManager.Spells[SpellSlot.W].GetTrueRange(target) +
                                      SpellManager.Spells[SpellSlot.E].Range))
             {
                 Queuer.Queue.Add("E");
@@ -264,7 +259,7 @@ namespace RivenBuddy
                 Queuer.Queue.Add("W");
                 return;
             }
-            if (Program.ComboMenu["combo.useE"].Cast<CheckBox>().CurrentValue &&
+            if (E &&
                 SpellManager.Spells[SpellSlot.E].IsReady() &&
                 !target.IsValidTarget(Player.Instance.GetAutoAttackRange(target)))
             {
@@ -319,7 +314,7 @@ namespace RivenBuddy
                 SpellManager.Spells[SpellSlot.W].IsReady()
                 &&
                 target.IsValidTarget(SpellManager.Spells[SpellSlot.Q].Range +
-                                     SpellManager.Spells[SpellSlot.W].getTrueRange(target)))
+                                     SpellManager.Spells[SpellSlot.W].GetTrueRange(target)))
             {
                 Queuer.Queue.Add("AA");
                 Queuer.Queue.Add("Q");
@@ -340,7 +335,7 @@ namespace RivenBuddy
                 }
             }
             if (Program.HarassMenu["harass.useW"].Cast<CheckBox>().CurrentValue &&
-                SpellManager.Spells[SpellSlot.W].IsReady() && SpellManager.Spells[SpellSlot.W].inRange(target))
+                SpellManager.Spells[SpellSlot.W].IsReady() && SpellManager.Spells[SpellSlot.W].InRange(target))
             {
                 if(Program.HarassMenu["harass.hydra"].Cast<CheckBox>().CurrentValue) Queuer.Queue.Add("H");
                 Queuer.Queue.Add("W");
@@ -349,7 +344,7 @@ namespace RivenBuddy
             if (Program.HarassMenu["harass.useE"].Cast<CheckBox>().CurrentValue &&
                 Program.HarassMenu["harass.useW"].Cast<CheckBox>().CurrentValue &&
                 SpellManager.Spells[SpellSlot.E].IsReady() && SpellManager.Spells[SpellSlot.W].IsReady() &&
-                target.IsValidTarget(SpellManager.Spells[SpellSlot.W].getTrueRange(target) +
+                target.IsValidTarget(SpellManager.Spells[SpellSlot.W].GetTrueRange(target) +
                                      SpellManager.Spells[SpellSlot.E].Range))
             {
                 Queuer.Queue.Add("E");
@@ -524,12 +519,12 @@ namespace RivenBuddy
 
         public static void Flee()
         {
-            if (SpellEvents.LastCast["Q"] + 600 < Environment.TickCount && SpellEvents.LastCast["Q"] + 1400 > Environment.TickCount && Player.GetSpell(SpellSlot.E).State == SpellState.Ready)
+            if ((SpellManager.Spells[SpellSlot.Q].IsReady() && SpellEvents.QCount == 2 || !SpellManager.Spells[SpellSlot.Q].IsReady()) && SpellManager.Spells[SpellSlot.E].IsReady())
             {
                 Player.CastSpell(SpellSlot.E, Game.CursorPos);
                 SpellEvents.LastCast["Q"] = Environment.TickCount;
             }
-            if (SpellEvents.LastCast["E"] + 600 < Environment.TickCount && SpellEvents.LastCast["E"] + 600 < Environment.TickCount && Player.GetSpell(SpellSlot.Q).State == SpellState.Ready)
+            if (SpellManager.Spells[SpellSlot.Q].IsReady() && (SpellEvents.QCount >= 2 && !SpellManager.Spells[SpellSlot.E].IsReady() || !SpellManager.Spells[SpellSlot.E].IsReady()))
             {
                 Player.CastSpell(SpellSlot.Q, Game.CursorPos);
                 SpellEvents.LastCast["Q"] = Environment.TickCount;

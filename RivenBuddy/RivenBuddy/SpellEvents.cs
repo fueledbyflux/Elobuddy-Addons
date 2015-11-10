@@ -13,7 +13,6 @@ namespace RivenBuddy
     {
         public static Dictionary<string, long> LastCast = new Dictionary<string, long>();
         public static int QCount;
-        public static int PassiveStacks;
         public static bool HasR;
         public static bool HasR2;
 
@@ -82,31 +81,6 @@ namespace RivenBuddy
             if (args.SData.Name.ToLower().Contains("riventricleave"))
             {
                 Orbwalker.ResetAutoAttack();
-            }
-            switch (args.SData.Name.ToLower())
-            {
-                case "riventricleave": //Q
-                    Queuer.Remove("Q");
-                    break;
-
-                case "rivenmartyr": //W
-                    Queuer.Remove("W");
-                    break;
-
-                case "rivenfeint": //E
-                    Queuer.Remove("E");
-                    break;
-
-                case "rivenfengshuiengine": //R1
-                    Queuer.Remove("R1");
-                    HasR = true;
-                    HasR2 = true;
-                    break;
-
-                case "rivenizunablade": //R2
-                    Queuer.Remove("R2");
-                    HasR2 = false;
-                    break;
             }
             if (args.SData.IsAutoAttack())
             {
@@ -215,46 +189,31 @@ namespace RivenBuddy
                 HasR = false; // Reset R
                 HasR2 = false; // Reset R2
             }
-            if (PassiveStacks != 0 && LastCast["PAS"] + 4000 < Environment.TickCount) PassiveStacks = 0; // Reset Passive
             if (LastCast["Q"] + 3470 < Environment.TickCount) QCount = 0; // Reset Passive
         }
 
         private static void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
             if (!sender.IsMe) return;
-            if (args.SData.Name.ToLower().Contains("attack"))
-            {
-                if (PassiveStacks > 0) PassiveStacks--;
-                LastCast["AA"] = Environment.TickCount;
-            }
             switch (args.SData.Name.ToLower())
             {
                 case "riventricleave": //Q
                     LastCast["Q"] = Environment.TickCount;
                     Queuer.Remove("Q");
-                    if (PassiveStacks <= 2) PassiveStacks++;
-
-                    // Managing Q Stacks
-                    if (QCount <= 1) QCount++;
-                    else QCount = 0;
                     break;
-
-
+                    
                 case "rivenmartyr": //W
                     LastCast["W"] = Environment.TickCount;
-                    if (PassiveStacks <= 2) PassiveStacks++;
                     break;
 
 
                 case "rivenfeint": //E
                     LastCast["E"] = Environment.TickCount;
-                    if (PassiveStacks <= 2) PassiveStacks++;
                     break;
 
 
                 case "rivenfengshuiengine": //R1
                     LastCast["R1"] = Environment.TickCount;
-                    if (PassiveStacks <= 2) PassiveStacks++;
                     HasR = true;
                     HasR2 = true;
                     break;
@@ -262,7 +221,6 @@ namespace RivenBuddy
 
                 case "rivenizunablade": //R2
                     LastCast["R2"] = Environment.TickCount;
-                    if (PassiveStacks <= 2) PassiveStacks++;
                     HasR2 = false;
                     break;
             }

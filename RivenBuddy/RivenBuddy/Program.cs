@@ -17,7 +17,6 @@ namespace RivenBuddy
     internal class Program
     {
         public static Menu Menu, ComboMenu, HarassMenu, MinionClear, Jungle, DrawMenu, HumanizerMenu;
-        public static bool CheckAa = false;
         public static Text Text = new Text("", new Font(FontFamily.GenericSansSerif, 9, FontStyle.Bold));
         public static DamageIndicator.DamageIndicator Indicator;
         public static Spell.Skillshot R2;
@@ -39,7 +38,7 @@ namespace RivenBuddy
 
         private static void Loading_OnLoadingComplete(EventArgs args)
         {
-            if (Player.Instance.ChampionName != Champion.Riven.ToString()) return;
+            if (Player.Instance.Hero != Champion.Riven) return;
 
             Menu = MainMenu.AddMenu("RivenBuddy", "rivenbuddy");
             Menu.AddGroupLabel("Riven Buddy");
@@ -197,18 +196,27 @@ namespace RivenBuddy
             if (BurstActive)
             {
                 States.Burst();
+                return;
             }
             if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
             {
                 States.Combo();
+                return;
             }
             if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Harass))
             {
                 States.Harass();
+                return;
             }
             if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.JungleClear))
             {
-                States.Jungle();
+                var target = EntityManager.MinionsAndMonsters.GetJungleMonsters(Player.Instance.Position,
+                       SpellManager.Spells[SpellSlot.Q].Range + 300).OrderByDescending(a => a.MaxHealth).FirstOrDefault();
+                if (target != null)
+                {
+                    States.Jungle();
+                    return;
+                }
             }
             if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear))
             {
@@ -217,15 +225,18 @@ namespace RivenBuddy
                 if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.JungleClear) && target == null)
                 {
                     States.WaveClear();
+                    return;
                 }
             }
             if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LastHit))
             {
                 States.LastHit();
+                return;
             }
             if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Flee))
             {
                 States.Flee();
+                return;
             }
             if (Orbwalker.ActiveModesFlags == Orbwalker.ActiveModes.None && !BurstActive)
             {
