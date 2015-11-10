@@ -113,11 +113,13 @@ namespace RivenBuddy
             HumanizerMenu.Add("humanizerQSlow", new Slider("Humanizer Q Slow", 0, 0, 200));
 
             R2 = new Spell.Skillshot(SpellSlot.R, 900, SkillShotType.Cone, 250, 1600, 125);
+            States.flash = Player.Spells.FirstOrDefault(a => a.SData.Name == "summonerflash");
             SpellEvents.Init();
-            Game.OnUpdate += Game_OnUpdate;
             Drawing.OnDraw += Drawing_OnDraw;
             Player.OnIssueOrder += Player_OnIssueOrder;
             Indicator = new DamageIndicator.DamageIndicator();
+            Game.OnUpdate += Game_OnUpdate;
+            
         }
         private static void Game_OnUpdate(EventArgs args)
         {
@@ -161,7 +163,7 @@ namespace RivenBuddy
 
             if (DrawMenu["draw.Combo"].Cast<CheckBox>().CurrentValue)
             {
-                var s = Queuer.Queue.Aggregate("", (current, VARIABLE) => current + (" " + VARIABLE));
+                var s = Queuer.Queue.Aggregate("", (current, variable) => current + (" " + variable));
                 Drawing.DrawText(100, 100, Color.Wheat, s);
             }
             if (DrawMenu["draw.Q"].Cast<CheckBox>().CurrentValue)
@@ -189,10 +191,10 @@ namespace RivenBuddy
         private static void TickTask()
         {
             Orbwalker.ForcedTarget = null;
-            Queuer.tiamat =
+
+            Queuer.Tiamat =
                 ObjectManager.Player.InventoryItems.FirstOrDefault(
                     a => a.Id == ItemId.Tiamat_Melee_Only || a.Id == ItemId.Ravenous_Hydra_Melee_Only);
-            
             if (BurstActive)
             {
                 States.Burst();

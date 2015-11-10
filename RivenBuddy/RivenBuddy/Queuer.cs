@@ -11,7 +11,7 @@ namespace RivenBuddy
     internal class Queuer
     {
         public static List<string> Queue = new List<string>();
-        public static InventorySlot tiamat;
+        public static InventorySlot Tiamat;
 
         public static void DoQueue(Obj_AI_Base target)
         {
@@ -103,10 +103,9 @@ namespace RivenBuddy
 
         public static void CastFlash(Vector3 position)
         {
-            var flash = Player.Spells.FirstOrDefault(a => a.SData.Name == "summonerflash");
-            if (flash != null && position.IsValid() && flash.IsReady)
+            if (States.flash != null && position.IsValid() && States.flash.IsReady)
             {
-                Player.CastSpell(flash.Slot, position);
+                Player.CastSpell(States.flash.Slot, position);
                 Remove("FL");
             }
             else
@@ -117,9 +116,15 @@ namespace RivenBuddy
 
         public static void CastTiamat()
         {
-            if (tiamat != null && tiamat.CanUseItem())
+            if (Tiamat == null)
             {
-                tiamat.Cast();
+                Tiamat =
+                    ObjectManager.Player.InventoryItems.FirstOrDefault(
+                        a => a.Id == ItemId.Tiamat_Melee_Only || a.Id == ItemId.Ravenous_Hydra_Melee_Only);
+            }
+            if (Tiamat != null && Tiamat.CanUseItem())
+            {
+                Tiamat.Cast();
             }
             else
             {

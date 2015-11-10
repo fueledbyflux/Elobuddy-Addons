@@ -10,6 +10,7 @@ namespace RivenBuddy
     internal class States
     {
         public static Obj_AI_Base Target;
+        public static SpellDataInst flash;
 
         public static void Burst()
         {
@@ -34,8 +35,6 @@ namespace RivenBuddy
                 Queuer.DoQueue(target);
                 return;
             }
-
-            var flash = Player.Spells.FirstOrDefault(a => a.SData.Name == "summonerflash");
 
             if (Program.ComboMenu["burst.flash"].Cast<CheckBox>().CurrentValue && SpellManager.Spells[SpellSlot.Q].IsReady() &&
                 SpellManager.Spells[SpellSlot.W].IsReady() &&
@@ -121,10 +120,6 @@ namespace RivenBuddy
                 Queuer.Queue.Add("Q");
                 Queuer.Queue.Add("H");
                 Queuer.Queue.Add("W");
-                Queuer.Queue.Add("AA");
-                Queuer.Queue.Add("Q");
-                Queuer.Queue.Add("AA");
-                Queuer.Queue.Add("Q");
                 return;
             }
 
@@ -182,7 +177,7 @@ namespace RivenBuddy
 
             if (Q && W && E &&
                 SpellManager.Spells[SpellSlot.Q].IsReady() && SpellManager.Spells[SpellSlot.E].IsReady() &&
-                SpellManager.Spells[SpellSlot.W].IsReady() && Queuer.tiamat != null && Queuer.tiamat.CanUseItem()
+                SpellManager.Spells[SpellSlot.W].IsReady() && Queuer.Tiamat != null && Queuer.Tiamat.CanUseItem()
                 &&
                 target.IsValidTarget(SpellManager.Spells[SpellSlot.E].Range + SpellManager.Spells[SpellSlot.W].Range +
                                      ObjectManager.Player.BoundingRadius + target.BoundingRadius))
@@ -190,17 +185,11 @@ namespace RivenBuddy
                 Queuer.Queue.Add("E");
                 Queuer.Queue.Add("H");
                 Queuer.Queue.Add("W");
-                Queuer.Queue.Add("AA");
-                Queuer.Queue.Add("Q");
-                Queuer.Queue.Add("AA");
-                Queuer.Queue.Add("Q");
-                Queuer.Queue.Add("AA");
-                Queuer.Queue.Add("Q");
                 return;
             }
             if (Q && W && E &&
                 SpellManager.Spells[SpellSlot.Q].IsReady() && SpellManager.Spells[SpellSlot.E].IsReady() &&
-                SpellManager.Spells[SpellSlot.W].IsReady() && (Queuer.tiamat == null || !Queuer.tiamat.CanUseItem())
+                SpellManager.Spells[SpellSlot.W].IsReady() && (Queuer.Tiamat == null || !Queuer.Tiamat.CanUseItem())
                 &&
                 target.IsValidTarget(SpellManager.Spells[SpellSlot.E].Range +
                                      ObjectManager.Player.GetAutoAttackRange(target)))
@@ -208,8 +197,6 @@ namespace RivenBuddy
                 Queuer.Queue.Add("E");
                 Queuer.Queue.Add("H");
                 Queuer.Queue.Add("W");
-                Queuer.Queue.Add("AA");
-                Queuer.Queue.Add("Q");
                 return;
             }
             if (Q && W &&
@@ -224,7 +211,6 @@ namespace RivenBuddy
                 Queuer.Queue.Add("AA");
                 Queuer.Queue.Add("H");
                 Queuer.Queue.Add("W");
-                Queuer.Queue.Add("AA");
                 return;
             }
             if (W && SpellManager.Spells[SpellSlot.W].IsReady() && SpellManager.Spells[SpellSlot.W].InRange(target))
@@ -297,7 +283,7 @@ namespace RivenBuddy
                 Program.HarassMenu["harass.useW"].Cast<CheckBox>().CurrentValue &&
                 Program.HarassMenu["harass.useE"].Cast<CheckBox>().CurrentValue &&
                 SpellManager.Spells[SpellSlot.Q].IsReady() && SpellManager.Spells[SpellSlot.E].IsReady() &&
-                SpellManager.Spells[SpellSlot.W].IsReady() && (Queuer.tiamat == null || !Queuer.tiamat.CanUseItem())
+                SpellManager.Spells[SpellSlot.W].IsReady() && (Queuer.Tiamat == null || !Queuer.Tiamat.CanUseItem())
                 &&
                 target.IsValidTarget(SpellManager.Spells[SpellSlot.E].Range +
                                      ObjectManager.Player.GetAutoAttackRange(target)))
@@ -408,9 +394,9 @@ namespace RivenBuddy
                 return;
             }
 
-            if (Queuer.tiamat != null && Queuer.tiamat.CanUseItem() && target.IsValidTarget(300) && Program.MinionClear["waveclear.hydra"].Cast<CheckBox>().CurrentValue)
+            if (Queuer.Tiamat != null && Queuer.Tiamat.CanUseItem() && target.IsValidTarget(300) && Program.MinionClear["waveclear.hydra"].Cast<CheckBox>().CurrentValue)
             {
-                Queuer.tiamat.Cast();
+                Queuer.Tiamat.Cast();
             }
         }
 
@@ -492,7 +478,7 @@ namespace RivenBuddy
             {
                 Queuer.Queue.Add("AA");
                 Queuer.Queue.Add("E");
-                if (Queuer.tiamat != null && Queuer.tiamat.CanUseItem())
+                if (Queuer.Tiamat != null && Queuer.Tiamat.CanUseItem())
                 {
                     Queuer.Queue.Add("H");
                     Queuer.Queue.Add("AA");

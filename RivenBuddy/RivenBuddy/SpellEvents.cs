@@ -33,7 +33,7 @@ namespace RivenBuddy
 
         private static void Obj_AI_Base_OnPlayAnimation(Obj_AI_Base sender, GameObjectPlayAnimationEventArgs args)
         {
-            if (!sender.IsMe || Orbwalker.ActiveModesFlags == Orbwalker.ActiveModes.None && !Program.ComboMenu["combo.alwaysCancelQ"].Cast<CheckBox>().CurrentValue)
+            if (!sender.IsMe)
             {
                 return;
             }
@@ -64,7 +64,7 @@ namespace RivenBuddy
                     t = 150;
                     break;
             }
-            if (t != 0)
+            if (t != 0 && (Orbwalker.ActiveModesFlags != Orbwalker.ActiveModes.None || Program.ComboMenu["combo.alwaysCancelQ"].Cast<CheckBox>().CurrentValue))
             {
                 Core.DelayAction(CancelAnimation, t - Game.Ping);
             }
@@ -102,15 +102,15 @@ namespace RivenBuddy
                         }
                         Player.CastSpell(SpellSlot.Q, args.Target.Position);
                         Queuer.Remove("Q");
-                        Orbwalker.ResetAutoAttack();
-                        ReQueue();
+                        if(QCount < 2) Orbwalker.ResetAutoAttack();
+                        //ReQueue();
                     }
-                    else if (!Queuer.Queue.Any() && Queuer.tiamat != null && Queuer.tiamat.CanUseItem() &&
+                    else if (!Queuer.Queue.Any() && Queuer.Tiamat != null && Queuer.Tiamat.CanUseItem() &&
                              Program.ComboMenu["combo.hydra"].Cast<CheckBox>().CurrentValue &&
                              Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo) &&
                              args.Target is AIHeroClient)
                     {
-                        Queuer.tiamat.Cast();
+                        Queuer.Tiamat.Cast();
                         Orbwalker.ResetAutoAttack();
                     }
                     return;
@@ -133,14 +133,14 @@ namespace RivenBuddy
                         Player.CastSpell(SpellSlot.Q, args.Target.Position);
                         Queuer.Remove("Q");
                         Orbwalker.ResetAutoAttack();
-                        ReQueue();
+                        //ReQueue();
                     }
-                    else if (!Queuer.Queue.Any() && Queuer.tiamat != null && Queuer.tiamat.CanUseItem() &&
+                    else if (!Queuer.Queue.Any() && Queuer.Tiamat != null && Queuer.Tiamat.CanUseItem() &&
                              Program.ComboMenu["combo.hydra"].Cast<CheckBox>().CurrentValue &&
                              Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo) &&
                              args.Target is AIHeroClient)
                     {
-                        Queuer.tiamat.Cast();
+                        Queuer.Tiamat.Cast();
                         Orbwalker.ResetAutoAttack();
                     }
                 }, Program.HumanizerMenu["humanizerQSlow"].Cast<Slider>().CurrentValue);
@@ -156,7 +156,7 @@ namespace RivenBuddy
 
         public static void UpdateSpells()
         {
-            if (LastCast["Q"] + 3450 < Environment.TickCount && Program.ComboMenu["combo.keepQAlive"].Cast<CheckBox>().CurrentValue && QCount > 0 && !Player.Instance.IsRecalling())
+            if (LastCast["Q"] + 3480 < Environment.TickCount && Program.ComboMenu["combo.keepQAlive"].Cast<CheckBox>().CurrentValue && QCount > 0 && !Player.Instance.IsRecalling())
             {
                 Player.CastSpell(SpellSlot.Q, Game.CursorPos);
                 Core.DelayAction(Program.IssueLastOrder, 291);
@@ -170,26 +170,12 @@ namespace RivenBuddy
                 }
             }
 
-            if (LastCast["Q"] + 1000 < Environment.TickCount && Orbwalker.DisableMovement)
-                Orbwalker.DisableMovement = false;
-
-            if ((Queuer.Queue.Any() && Queuer.Queue[0] == "Q" || Queuer.Queue.Count > 1 && Queuer.Queue[1] == "Q" && Orbwalker.CanAutoAttack) &&
-                (Player.GetSpell(SpellSlot.Q).IsReady || Player.GetSpell(SpellSlot.Q).Cooldown <= 0.25) && QCount > 0 && States.Target != null && States.Target.IsValidTarget())
-            {
-                Orbwalker.ResetAutoAttack();
-                Orbwalker.DisableMovement = true;
-            }
-            else
-            {
-                Orbwalker.DisableMovement = false;
-            }
-
             if (HasR && LastCast["R1"] + 15000 < Environment.TickCount)
             {
                 HasR = false; // Reset R
                 HasR2 = false; // Reset R2
             }
-            if (LastCast["Q"] + 3470 < Environment.TickCount) QCount = 0; // Reset Passive
+            if (LastCast["Q"] + 3500 < Environment.TickCount) QCount = 0; // Reset Passive
         }
 
         private static void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
@@ -223,40 +209,6 @@ namespace RivenBuddy
                     LastCast["R2"] = Environment.TickCount;
                     HasR2 = false;
                     break;
-            }
-        }
-
-        private static void ReQueue()
-        {
-            if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
-            {
-                States.Combo(false);
-                return;
-            }
-            if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Harass))
-            {
-                States.Harass(false);
-                return;
-            }
-            if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.JungleClear))
-            {
-                States.Jungle(false);
-                return;
-            }
-            if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear))
-            {
-                var target = EntityManager.MinionsAndMonsters.GetJungleMonsters(Player.Instance.Position,
-                    SpellManager.Spells[SpellSlot.Q].Range + 300).OrderByDescending(a => a.MaxHealth).FirstOrDefault();
-                if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.JungleClear) && target == null)
-                {
-                    States.WaveClear(false);
-                    return;
-                }
-            }
-            if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LastHit))
-            {
-                States.LastHit(false);
-                return;
             }
         }
     }
