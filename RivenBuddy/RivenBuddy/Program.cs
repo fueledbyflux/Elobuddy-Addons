@@ -117,7 +117,7 @@ namespace RivenBuddy
 
             Queuer.Tiamat =
                 ObjectManager.Player.InventoryItems.FirstOrDefault(
-                    a => a.Id == ItemId.Tiamat_Melee_Only || a.Id == ItemId.Ravenous_Hydra_Melee_Only);
+                    a => a.Id == ItemId.Tiamat_Melee_Only || a.DisplayName.ToLower().Contains("hydra"));
 
             SpellEvents.Init();
             Drawing.OnDraw += Drawing_OnDraw;
@@ -128,6 +128,13 @@ namespace RivenBuddy
             Shop.OnUndo += Shop_OnUndo;
             Player.OnSwapItem += Player_OnSwapItem;
             Game.OnUpdate += Game_OnUpdate;
+
+            var c = ObjectManager.Player.InventoryItems.FirstOrDefault(
+                a => a.Id == ItemId.Tiamat_Melee_Only || a.DisplayName.ToLower().Contains("hydra"));
+            if (c != null)
+            {
+                Chat.Print(c.Id + " : " + c.DisplayName);
+            }
         }
 
         private static void Player_OnSwapItem(AIHeroClient sender, PlayerSwapItemEventArgs args)
@@ -135,14 +142,14 @@ namespace RivenBuddy
             if (!sender.IsMe) return;
             Queuer.Tiamat =
                 ObjectManager.Player.InventoryItems.FirstOrDefault(
-                    a => a.Id == ItemId.Tiamat_Melee_Only || a.Id == ItemId.Ravenous_Hydra_Melee_Only);
+                    a => a.Id == ItemId.Tiamat_Melee_Only || a.DisplayName.ToLower().Contains("hydra"));
         }
 
         private static void Shop_OnUndo(ShopUndoPurchaseEventArgs args)
         {
             Queuer.Tiamat =
                 ObjectManager.Player.InventoryItems.FirstOrDefault(
-                    a => a.Id == ItemId.Tiamat_Melee_Only || a.Id == ItemId.Ravenous_Hydra_Melee_Only);
+                    a => a.Id == ItemId.Tiamat_Melee_Only || a.DisplayName.ToLower().Contains("hydra"));
         }
 
         private static void Shop_OnSellItem(AIHeroClient sender, ShopActionEventArgs args)
@@ -150,18 +157,15 @@ namespace RivenBuddy
             if (!sender.IsMe) return;
             Queuer.Tiamat =
                 ObjectManager.Player.InventoryItems.FirstOrDefault(
-                    a => a.Id == ItemId.Tiamat_Melee_Only || a.Id == ItemId.Ravenous_Hydra_Melee_Only);
+                    a => a.Id == ItemId.Tiamat_Melee_Only || a.DisplayName.ToLower().Contains("hydra"));
         }
 
         private static void Shop_OnBuyItem(AIHeroClient sender, ShopActionEventArgs args)
         {
             if (!sender.IsMe) return;
-            if (args.Id == (int) ItemId.Tiamat_Melee_Only || args.Id == (int) ItemId.Ravenous_Hydra_Melee_Only)
-            {
                 Queuer.Tiamat =
                     ObjectManager.Player.InventoryItems.FirstOrDefault(
-                        a => a.Id == ItemId.Tiamat_Melee_Only || a.Id == ItemId.Ravenous_Hydra_Melee_Only);
-            }
+                        a => a.Id == ItemId.Tiamat_Melee_Only || a.DisplayName.ToLower().Contains("hydra"));
         }
 
         private static void Game_OnUpdate(EventArgs args)

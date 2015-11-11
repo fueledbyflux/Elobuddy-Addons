@@ -70,9 +70,15 @@ namespace RivenBuddy
             Combo();
         }
 
+        public static float DynamicRange()
+        {
+            var bonus = SpellManager.Spells[SpellSlot.E].IsReady() ? SpellManager.Spells[SpellSlot.E].Range : 0;
+            return new[] {Player.Instance.GetAutoAttackRange(), SpellManager.Spells[SpellSlot.Q].IsReady() ? SpellManager.Spells[SpellSlot.Q].Range : 0 }.Max() + bonus;
+        }
+
         public static void Combo(bool state = true)
         {
-            var target = TargetSelector.GetTarget(500, DamageType.Physical);
+            var target = TargetSelector.GetTarget(DynamicRange(), DamageType.Physical);
 
             if (target == null)
             {
@@ -197,21 +203,7 @@ namespace RivenBuddy
                     }
                 }
             }
-            
-            if (Q && W &&
-                SpellManager.Spells[SpellSlot.Q].IsReady() && SpellEvents.QCount == 2 &&
-                SpellManager.Spells[SpellSlot.W].IsReady()
-                &&
-                target.IsValidTarget(SpellManager.Spells[SpellSlot.Q].Range +
-                                     SpellManager.Spells[SpellSlot.W].GetTrueRange(target)))
-            {
-                Queuer.Queue.Add("AA");
-                Queuer.Queue.Add("Q");
-                Queuer.Queue.Add("AA");
-                Queuer.Queue.Add("H");
-                Queuer.Queue.Add("W");
-                return;
-            }
+
             if (W && SpellManager.Spells[SpellSlot.W].IsReady() && SpellManager.Spells[SpellSlot.W].InRange(target))
             {
                 if (Program.ComboMenu["combo.hydra"].Cast<CheckBox>().CurrentValue) Queuer.Queue.Add("H");

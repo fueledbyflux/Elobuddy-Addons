@@ -111,6 +111,7 @@ namespace RivenBuddy
                     {
                         Queuer.Tiamat.Cast();
                         Orbwalker.ResetAutoAttack();
+                        ReQueue();
                     }
                     return;
                 }
@@ -132,6 +133,7 @@ namespace RivenBuddy
                         Player.CastSpell(SpellSlot.Q, args.Target.Position);
                         Queuer.Remove("Q");
                         Orbwalker.ResetAutoAttack();
+                        ReQueue();
                     }
                     else if (!Queuer.Queue.Any() && Queuer.Tiamat != null && Queuer.Tiamat.CanUseItem() &&
                              Program.ComboMenu["combo.hydra"].Cast<CheckBox>().CurrentValue &&
@@ -209,5 +211,39 @@ namespace RivenBuddy
                     break;
             }
         }
+        private static void ReQueue()
+        {
+            if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
+            {
+                States.Combo(false);
+                return;
+            }
+            if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Harass))
+            {
+                States.Harass(false);
+                return;
+            }
+            if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.JungleClear))
+            {
+                States.Jungle(false);
+                return;
+            }
+            if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear))
+            {
+                var target = EntityManager.MinionsAndMonsters.GetJungleMonsters(Player.Instance.Position,
+                    SpellManager.Spells[SpellSlot.Q].Range + 300).OrderByDescending(a => a.MaxHealth).FirstOrDefault();
+                if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.JungleClear) && target == null)
+                {
+                    States.WaveClear(false);
+                    return;
+                }
+            }
+            if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LastHit))
+            {
+                States.LastHit(false);
+                return;
+            }
+        }
+
     }
 }
