@@ -130,9 +130,32 @@ namespace RivenBuddy
                  comboDmg + Player.Instance.CalculateDamageOnUnit(target, DamageType.Physical,
                      (int) DamageHandler.RDamage(target, comboDmg)) >= health) && !SpellEvents.HasR)
             {
+                if (target.IsValidTarget(SpellManager.Spells[SpellSlot.Q].Range + SpellManager.Spells[SpellSlot.E].Range) && Queuer.Tiamat != null && Queuer.Tiamat.CanUseItem() && SpellManager.Spells[SpellSlot.Q].IsReady() && SpellManager.Spells[SpellSlot.E].IsReady() && SpellManager.Spells[SpellSlot.R].IsReady())
+                {
+                    Queuer.Queue.Add("E");
+                    Queuer.Queue.Add("H");
+                    Queuer.Queue.Add("R1");
+                    Queuer.Queue.Add("Q");
+                    return;
+                }
                 if (Program.ComboMenu["combo.eR1"].Cast<CheckBox>().CurrentValue && SpellManager.Spells[SpellSlot.E].IsReady() && SpellManager.Spells[SpellSlot.R].IsReady())
                 {
                     Queuer.Queue.Add("E");
+                    Queuer.Queue.Add("R1");
+                    return;
+                }
+                if (Program.ComboMenu["combo.eR1"].Cast<CheckBox>().CurrentValue && target.IsValidTarget(SpellManager.Spells[SpellSlot.Q].Range + SpellManager.Spells[SpellSlot.E].Range) && Queuer.Tiamat != null && Queuer.Tiamat.CanUseItem() && SpellManager.Spells[SpellSlot.Q].IsReady() && SpellManager.Spells[SpellSlot.E].IsReady() && SpellManager.Spells[SpellSlot.R].IsReady())
+                {
+                    Queuer.Queue.Add("E");
+                    Queuer.Queue.Add("H");
+                    Queuer.Queue.Add("Q");
+                    Queuer.Queue.Add("R1");
+                    return;
+                }
+                if (target.IsValidTarget(SpellManager.Spells[SpellSlot.Q].Range + SpellManager.Spells[SpellSlot.E].Range) && SpellManager.Spells[SpellSlot.Q].IsReady() && SpellManager.Spells[SpellSlot.E].IsReady() && SpellManager.Spells[SpellSlot.R].IsReady())
+                {
+                    Queuer.Queue.Add("E");
+                    Queuer.Queue.Add("Q");
                     Queuer.Queue.Add("R1");
                     return;
                 }
@@ -174,30 +197,7 @@ namespace RivenBuddy
                     }
                 }
             }
-
-            if (Q && W && E &&
-                SpellManager.Spells[SpellSlot.Q].IsReady() && SpellManager.Spells[SpellSlot.E].IsReady() &&
-                SpellManager.Spells[SpellSlot.W].IsReady() && Queuer.Tiamat != null && Queuer.Tiamat.CanUseItem()
-                && target.IsValidTarget(SpellManager.Spells[SpellSlot.E].Range + SpellManager.Spells[SpellSlot.W].Range +
-                                     ObjectManager.Player.BoundingRadius + target.BoundingRadius))
-            {
-                Queuer.Queue.Add("E");
-                Queuer.Queue.Add("H");
-                Queuer.Queue.Add("W");
-                return;
-            }
-            if (Q && W && E &&
-                SpellManager.Spells[SpellSlot.Q].IsReady() && SpellManager.Spells[SpellSlot.E].IsReady() &&
-                SpellManager.Spells[SpellSlot.W].IsReady() && (Queuer.Tiamat == null || !Queuer.Tiamat.CanUseItem())
-                &&
-                target.IsValidTarget(SpellManager.Spells[SpellSlot.E].Range +
-                                     ObjectManager.Player.GetAutoAttackRange(target)))
-            {
-                Queuer.Queue.Add("E");
-                Queuer.Queue.Add("H");
-                Queuer.Queue.Add("W");
-                return;
-            }
+            
             if (Q && W &&
                 SpellManager.Spells[SpellSlot.Q].IsReady() && SpellEvents.QCount == 2 &&
                 SpellManager.Spells[SpellSlot.W].IsReady()
@@ -219,20 +219,16 @@ namespace RivenBuddy
                 return;
             }
 
-            if (Q && SpellManager.Spells[SpellSlot.Q].IsReady() && Orbwalker.CanAutoAttack)
-            {
-                if (Player.Instance.IsInAutoAttackRange(target))
-                {
-                    Queuer.Queue.Add("AA");
-                    Queuer.Queue.Add("Q");
-                    return;
-                }
-            }
-            if (!target.IsValidTarget(Player.Instance.GetAutoAttackRange(target)) &&
-                target.IsValidTarget(Player.Instance.GetAutoAttackRange(target) + SpellManager.Spells[SpellSlot.Q].Range) && Program.ComboMenu["combo.useQGapClose"].Cast<CheckBox>().CurrentValue)
+            if (Q && SpellManager.Spells[SpellSlot.Q].IsReady() && Orbwalker.CanAutoAttack && Player.Instance.IsInAutoAttackRange(target))
             {
                 Queuer.Queue.Add("AA");
                 Queuer.Queue.Add("Q");
+                return;
+            }
+            if (!target.IsValidTarget(Player.Instance.GetAutoAttackRange(target)) && target.IsValidTarget(Player.Instance.GetAutoAttackRange(target) + SpellManager.Spells[SpellSlot.Q].Range) && Program.ComboMenu["combo.useQGapClose"].Cast<CheckBox>().CurrentValue)
+            {
+                Queuer.Queue.Add("Q");
+                Queuer.Queue.Add("AA");
                 return;
             }
             if (W && E && SpellManager.Spells[SpellSlot.E].IsReady() && SpellManager.Spells[SpellSlot.W].IsReady() &&
