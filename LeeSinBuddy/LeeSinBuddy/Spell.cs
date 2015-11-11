@@ -26,7 +26,7 @@ namespace LeeSinBuddy
             if (pred.CollisionObjects.Count() == 1 && Smiter.Smite.IsReady() && Smiter.SmiteMenu["smiteQ"].Cast<CheckBox>().CurrentValue)
             {
                 var unit = pred.CollisionObjects[0];
-                if ((unit.IsMinion() || EntityManager.MinionsAndMonsters.Monsters.Any(a => a.NetworkId == unit.NetworkId)) && unit.Health <= Smiter.GetSmiteDamage() && unit.IsValidTarget(Smiter.Smite.Range))
+                if ((unit.IsMinion() || EntityManager.MinionsAndMonsters.CombinedAttackable.Any(a => a.NetworkId == unit.NetworkId)) && unit.Health <= Smiter.GetSmiteDamage() && unit.IsValidTarget(Smiter.Smite.Range))
                 {
                     Program.Q.Cast(pred.CastPosition);
                     Core.DelayAction(delegate { Smiter.Smite.Cast(unit); }, 250);

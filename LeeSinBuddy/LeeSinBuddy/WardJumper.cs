@@ -122,10 +122,13 @@ namespace LeeSinBuddy
             }
         }
 
+        public static ItemId[] WardIds = {ItemId.Warding_Totem_Trinket, ItemId.Greater_Stealth_Totem_Trinket, ItemId.Greater_Vision_Totem_Trinket, ItemId.Sightstone, ItemId.Ruby_Sightstone, (ItemId) 2301, (ItemId)2302, (ItemId)2303,
+                ItemId.Poachers_Knife, ItemId.Poachers_Knife_Enchantment_Devourer, ItemId.Poachers_Knife_Enchantment_Warrior, ItemId.Poachers_Knife_Enchantment_Magus, ItemId.Poachers_Knife_Enchantment_Juggernaut, ItemId.Stealth_Ward, ItemId.Vision_Ward, ItemId.Farsight_Orb_Trinket};
+
+
         public static InventorySlot GetWardSlot()
         {
-            var wardIds = new[] {ItemId.Warding_Totem_Trinket, ItemId.Greater_Stealth_Totem_Trinket, ItemId.Greater_Vision_Totem_Trinket, ItemId.Sightstone, ItemId.Ruby_Sightstone, ItemId.Stealth_Ward, ItemId.Vision_Ward, ItemId.Farsight_Orb_Trinket};
-            return _Player.InventoryItems.FirstOrDefault(a => wardIds.Contains(a.Id) && a.IsWard && a.CanUseItem());
+            return WardIds.Select(wardId => Player.Instance.InventoryItems.FirstOrDefault(a => a.Id == wardId)).FirstOrDefault(slot => slot != null && slot.CanUseItem());
         }
     }
 }

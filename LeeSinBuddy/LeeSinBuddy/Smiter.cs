@@ -34,8 +34,6 @@ namespace LeeSinBuddy
                 smiteSlot = ObjectManager.Player.GetSpellSlotFromName("s5_summonersmiteplayerganker");
             else if (SmiteRed.Any(x => ObjectManager.Player.InventoryItems.FirstOrDefault(a => a.Id == (ItemId)x) != null))
                 smiteSlot = ObjectManager.Player.GetSpellSlotFromName("s5_summonersmiteduel");
-            else if (SmiteGrey.Any(x => ObjectManager.Player.InventoryItems.FirstOrDefault(a => a.Id == (ItemId)x) != null))
-                smiteSlot = ObjectManager.Player.GetSpellSlotFromName("s5_summonersmitequick");
             else if (SmitePurple.Any(x => ObjectManager.Player.InventoryItems.FirstOrDefault(a => a.Id == (ItemId)x) != null))
                 smiteSlot = ObjectManager.Player.GetSpellSlotFromName("itemsmiteaoe");
             else
@@ -95,13 +93,13 @@ namespace LeeSinBuddy
 
         private static void Game_OnUpdate(EventArgs args)
         {
-            SetSmiteSlot();
-
             if (!SmiteMenu["smiteEnabled"].Cast<KeyBind>().CurrentValue) return;
 
+            SetSmiteSlot();
+            
             var minion = ObjectManager.Get<Obj_AI_Base>().Where(a => SmiteableUnits.Contains(a.BaseSkinName) && SmiteMenu[a.BaseSkinName].Cast<CheckBox>() != null && SmiteMenu[a.BaseSkinName].Cast<CheckBox>().CurrentValue).OrderByDescending(a => a.MaxHealth).FirstOrDefault(a => a.IsValidTarget(1400));
             if (minion == null) return;
-            if (minion.IsValidTarget(Smite.Range) && minion.Health <= GetSmiteDamage() && SmiteMenu["regularSmite"].Cast<CheckBox>().CurrentValue || ForceSmite && Player.Instance.Distance(minion) < 100)
+            if (Smite.IsReady() && minion.IsValidTarget(Smite.Range) && minion.Health <= GetSmiteDamage() && SmiteMenu["regularSmite"].Cast<CheckBox>().CurrentValue || ForceSmite && Player.Instance.Distance(minion) < 100)
             {
                 Smite.Cast(minion);
                 ForceSmite = false;
