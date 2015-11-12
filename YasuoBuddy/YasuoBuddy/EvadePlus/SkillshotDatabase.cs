@@ -1043,6 +1043,40 @@ namespace YasuoBuddy.EvadePlus
                         MissileSpellName = "HecarimUlt"
                     }
                 },
+                new LinearMissileSkillshot
+                {
+                    SpellData = new SpellData
+                    {
+                        DisplayName = "Hextech Micro-Rockets",
+                        ChampionName = "Heimerdinger",
+                        SpellName = "disabled/HeimerdingerW",
+                        Slot = SpellSlot.W,
+                        Delay = 250,
+                        Range = 1500,
+                        Radius = 70,
+                        MissileSpeed = 1800,
+                        DangerValue = 2,
+                        IsDangerous = false,
+                        MissileSpellName = "HeimerdingerWAttack2"
+                    }
+                },
+                new LinearMissileSkillshot
+                {
+                    SpellData = new SpellData
+                    {
+                        DisplayName = "Hextech Micro-Rockets Ult",
+                        ChampionName = "Heimerdinger",
+                        SpellName = "disabled/HeimerdingerW",
+                        Slot = SpellSlot.W,
+                        Delay = 250,
+                        Range = 1500,
+                        Radius = 70,
+                        MissileSpeed = 1800,
+                        DangerValue = 2,
+                        IsDangerous = false,
+                        MissileSpellName = "HeimerdingerWAttack2Ult"
+                    }
+                },
                 new CircularMissileSkillshot
                 {
                     SpellData = new SpellData
@@ -1058,6 +1092,23 @@ namespace YasuoBuddy.EvadePlus
                         DangerValue = 2,
                         IsDangerous = false,
                         MissileSpellName = "HeimerdingerESpell"
+                    }
+                },
+                new CircularMissileSkillshot
+                {
+                    SpellData = new SpellData
+                    {
+                        DisplayName = "CH-2 Electron Storm Grenade Ult",
+                        ChampionName = "Heimerdinger",
+                        SpellName = "disabled/HeimerdingerE",
+                        Slot = SpellSlot.E,
+                        Delay = 325,
+                        Range = 925,
+                        Radius = 135,
+                        MissileSpeed = 1750,
+                        DangerValue = 2,
+                        IsDangerous = false,
+                        MissileSpellName = "heimerdingerespell_ult"
                     }
                 },
                 new LinearMissileSkillshot
@@ -1507,9 +1558,9 @@ namespace YasuoBuddy.EvadePlus
                         ChampionName = "Leona",
                         SpellName = "LeonaSolarFlare",
                         Slot = SpellSlot.R,
-                        Delay = 1000,
+                        Delay = 625,
                         Range = 1200,
-                        Radius = 300,
+                        Radius = 250,
                         MissileSpeed = 0,
                         DangerValue = 5,
                         IsDangerous = true,
@@ -1524,7 +1575,7 @@ namespace YasuoBuddy.EvadePlus
                         ChampionName = "Leona",
                         SpellName = "LeonaZenithBlade",
                         Slot = SpellSlot.E,
-                        Delay = 250,
+                        Delay = 350,
                         Range = 975,
                         Radius = 70,
                         MissileSpeed = 2000,
@@ -2370,8 +2421,8 @@ namespace YasuoBuddy.EvadePlus
                     SpellData = new SpellData
                     {
                         DisplayName = "Wild Cards",
-                        ChampionName = "disabled/TwistedFate",
-                        SpellName = "WildCards",
+                        ChampionName = "TwistedFate",
+                        SpellName = "disabled/WildCards",
                         Slot = SpellSlot.Q,
                         Delay = 250,
                         Range = 1450,
@@ -2744,7 +2795,7 @@ namespace YasuoBuddy.EvadePlus
                         MissileSpellName = "XerathMageSpearMissile"
                     }
                 },
-                new LinearMissileSkillshot
+                new LinearMissileSkillshot()
                 {
                     SpellData = new SpellData
                     {
@@ -2752,7 +2803,7 @@ namespace YasuoBuddy.EvadePlus
                         ChampionName = "Yasuo",
                         SpellName = "yasuoq3w",
                         Slot = SpellSlot.Q,
-                        Delay = 500,
+                        Delay = 400,
                         Range = 1150,
                         Radius = 90,
                         MissileSpeed = 1500,
@@ -2760,7 +2811,7 @@ namespace YasuoBuddy.EvadePlus
                         MissileSpellName = "yasuoq3w"
                     }
                 },
-                new LinearMissileSkillshot
+                new LinearMissileSkillshot()
                 {
                     SpellData = new SpellData
                     {
@@ -2770,14 +2821,14 @@ namespace YasuoBuddy.EvadePlus
                         Slot = SpellSlot.Q,
                         Delay = 400,
                         Range = 550,
-                        Radius = 20,
+                        Radius = 40,
                         MissileSpeed = 0,
                         DangerValue = 2,
                         IsDangerous = true,
                         MissileSpellName = "yasuoq"
                     }
                 },
-                new LinearMissileSkillshot
+                new LinearMissileSkillshot()
                 {
                     SpellData = new SpellData
                     {
@@ -2787,7 +2838,7 @@ namespace YasuoBuddy.EvadePlus
                         Slot = SpellSlot.Q,
                         Delay = 400,
                         Range = 550,
-                        Radius = 20,
+                        Radius = 40,
                         MissileSpeed = 0,
                         DangerValue = 2,
                         IsDangerous = true,
@@ -2800,7 +2851,7 @@ namespace YasuoBuddy.EvadePlus
                     {
                         DisplayName = "Razor Shuriken",
                         ChampionName = "Zed",
-                        SpellName = "ZedShuriken",
+                        SpellName = "ZedQ",
                         Slot = SpellSlot.Q,
                         Delay = 300,
                         Range = 925,
@@ -2808,7 +2859,7 @@ namespace YasuoBuddy.EvadePlus
                         MissileSpeed = 1700,
                         DangerValue = 2,
                         IsDangerous = false,
-                        MissileSpellName = "ZedShuriken"
+                        MissileSpellName = "ZedQMissile"
                     }
                 },
                 //new CircularMissileSkillshot

@@ -54,7 +54,7 @@ namespace YasuoBuddy
         {
             int distance = 250000;
             Obj_AI_Base unit = null;
-            foreach (var source in EntityManager.MinionsAndMonsters.CombinedAttackable.Where(a => a.CanDash() && a.Distance(Player.Instance) < 475))
+            foreach (var source in EntityManager.MinionsAndMonsters.CombinedAttackable.Where(a => a.CanDash() && !a.IsDead && a.Health > 0 && a.Distance(Player.Instance) < 475))
             {
                 int dist = (int) source.GetDashPos().Distance(pos);
                 if (dist < distance)
@@ -70,7 +70,7 @@ namespace YasuoBuddy
         {
             int distance = 250000;
             Obj_AI_Base unit = null;
-            foreach (var source in EntityManager.MinionsAndMonsters.CombinedAttackable.Where(a =>a.CanDash() && a.Distance(Player.Instance) < 475))
+            foreach (var source in EntityManager.MinionsAndMonsters.CombinedAttackable.Where(a =>a.CanDash() && !a.IsDead && a.Health > 0 && a.Distance(Player.Instance) < 475))
             {
                 int dist = (int)source.GetDashPos().Distance(pos);
                 if (dist < distance)

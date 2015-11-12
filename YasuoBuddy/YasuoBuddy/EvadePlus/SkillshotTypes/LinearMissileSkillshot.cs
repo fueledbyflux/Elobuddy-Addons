@@ -20,8 +20,8 @@ namespace YasuoBuddy.EvadePlus.SkillshotTypes
             TimeDetected = Environment.TickCount;
         }
 
-        public Vector3 OverrideCastEndPos;
-        public Vector3 OverrideCastStartPos;
+        internal Vector3 _startPos;
+        internal Vector3 _endPos;
 
         public MissileClient Missile
         {
@@ -34,7 +34,7 @@ namespace YasuoBuddy.EvadePlus.SkillshotTypes
             {
                 if (Missile == null)
                 {
-                    return OverrideCastStartPos != Vector3.Zero ? OverrideCastStartPos : Caster.Position;
+                    return _startPos;
                 }
                 else
                 {
@@ -49,13 +49,11 @@ namespace YasuoBuddy.EvadePlus.SkillshotTypes
             {
                 if (Missile == null)
                 {
-                    return StartPosition.ExtendVector3(CastArgs == null ? OverrideCastEndPos : CastArgs.End,
-                        SpellData.Range);
+                    return _endPos;
                 }
                 else
                 {
                     return Missile.StartPosition.ExtendVector3(Missile.EndPosition, SpellData.Range);
-                        //Missile.EndPosition;
                 }
             }
         }
@@ -79,7 +77,6 @@ namespace YasuoBuddy.EvadePlus.SkillshotTypes
             {
                 if (missile.SData.Name == SpellData.MissileSpellName && missile.SpellCaster.Index == Caster.Index)
                 {
-                    // Force skillshot to be removed
                     IsValid = false;
                 }
             }
@@ -87,40 +84,8 @@ namespace YasuoBuddy.EvadePlus.SkillshotTypes
 
         public override void OnSpellDetection(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
-            //TODO: create new class
-            if (SpellData.ExtraMissiles > 0)
-            {
-                OverrideCastStartPos = CastArgs.Start.ExtendVector3(EndPosition, Caster.BoundingRadius);
-
-                var angle = (float) ((SpellData.Radius*5)/(2*Math.PI*SpellData.Range)*360);
-                angle = (float) (angle/360*2*Math.PI);
-                for (var i = 1; i <= SpellData.ExtraMissiles/2; i++)
-                {
-                    var skillshot = (LinearMissileSkillshot) NewInstance();
-                    skillshot.SkillshotDetector = SkillshotDetector;
-                    skillshot.Caster = sender;
-                    skillshot.OverrideCastEndPos =
-                        (StartPosition - EndPosition).To2D().Normalized().Rotated(angle*i).To3DWorld()*
-                        -SpellData.Range + StartPosition;
-                    skillshot.OverrideCastStartPos = CastArgs.Start.ExtendVector3(skillshot.OverrideCastEndPos,
-                        Caster.BoundingRadius + i*6);
-                    skillshot.SData = args.SData;
-                    skillshot.Team = sender.Team;
-                    SkillshotDetector.DetectedSkillshots.Add(skillshot);
-
-                    skillshot = (LinearMissileSkillshot) NewInstance();
-                    skillshot.SkillshotDetector = SkillshotDetector;
-                    skillshot.Caster = sender;
-                    skillshot.OverrideCastEndPos =
-                        (StartPosition - EndPosition).To2D().Normalized().Rotated(angle*-i).To3DWorld()*-SpellData.Range +
-                        StartPosition;
-                    skillshot.OverrideCastStartPos = CastArgs.Start.ExtendVector3(skillshot.OverrideCastEndPos,
-                        Caster.BoundingRadius + i*6);
-                    skillshot.SData = args.SData;
-                    skillshot.Team = sender.Team;
-                    SkillshotDetector.DetectedSkillshots.Add(skillshot);
-                }
-            }
+            _startPos = Caster.ServerPosition;
+            _endPos = _startPos.ExtendVector3(CastArgs.End, SpellData.Range);
         }
 
         public override void OnTick()
@@ -150,7 +115,7 @@ namespace YasuoBuddy.EvadePlus.SkillshotTypes
         public override Geometry.Polygon ToPolygon(float extrawidth = 0)
         {
             if (SpellData.AddHitbox)
-                extrawidth += Player.Instance.BoundingRadius;
+                extrawidth += Player.Instance.HitBoxRadius();
 
             return new Geometry.Polygon.Rectangle(StartPosition, EndPosition.ExtendVector3(StartPosition, -extrawidth),
                 SpellData.Radius*2 + extrawidth);

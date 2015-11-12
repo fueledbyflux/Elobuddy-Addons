@@ -11,7 +11,7 @@ namespace YasuoBuddy
     {
         public static Spell.Targeted E = new Spell.Targeted(SpellSlot.E, 475);
         public static Spell.Active R = new Spell.Active(SpellSlot.R, 1200);
-        private static readonly Spell.Skillshot Q1 = new Spell.Skillshot(SpellSlot.Q, 475, SkillShotType.Linear, 300, GetNewQSpeed(), 1)
+        private static readonly Spell.Skillshot Q1 = new Spell.Skillshot(SpellSlot.Q, 450, SkillShotType.Linear, 250, GetNewQSpeed(), 1)
         {
             AllowedCollisionCount = int.MaxValue
         };
@@ -24,8 +24,7 @@ namespace YasuoBuddy
         public static void StackQ()
         {
             if (!Q.IsReady() || Player.Instance.HasWhirlwind()) return;
-            var targets =
-                EntityManager.Heroes.Enemies.Where(a => a.Distance(Player.Instance.Position) < 475).Select(a => a as Obj_AI_Base);
+            var targets = EntityManager.Heroes.Enemies.Where(a => a.Distance(Player.Instance.Position) < 475 && !a.IsDead && a.Health > 0).Select(a => a as Obj_AI_Base);
             foreach (var target in targets.ToList())
             {
                 if (target == null) continue;
@@ -39,7 +38,7 @@ namespace YasuoBuddy
                 Player.CastSpell(SpellSlot.Q);
                 break;
             }
-            targets = EntityManager.MinionsAndMonsters.CombinedAttackable.Where(a => a.Distance(Player.Instance.Position) <= 475).Select(a => a as Obj_AI_Base);
+            targets = EntityManager.MinionsAndMonsters.CombinedAttackable.Where(a => a.Distance(Player.Instance.Position) <= 475 && !a.IsDead && a.Health > 0).Select(a => a as Obj_AI_Base);
             foreach (var target in targets.ToList())
             {
                 if (target != null)
@@ -50,8 +49,7 @@ namespace YasuoBuddy
                         break;
                     }
                     if (
-                        DashingManager.GetPlayerPosition(300)
-                            .Distance(Prediction.Position.PredictUnitPosition(target, 300)) < 400)
+                        DashingManager.GetPlayerPosition(300).Distance(Prediction.Position.PredictUnitPosition(target, 300)) < 400)
                     {
                         Player.CastSpell(SpellSlot.Q);
                         break;

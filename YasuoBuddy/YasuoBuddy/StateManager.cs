@@ -45,18 +45,24 @@ namespace YasuoBuddy
                 }
             }
 
-            if (target.GetDashPos().Distance(target) < 400 && target.CanDash())
+            if (Yasuo.ComboMenu["combo.E"].Cast<CheckBox>().CurrentValue && target.GetDashPos().Distance(target) < 400 && target.CanDash() && target.Distance(Player.Instance) > Player.Instance.GetAutoAttackRange(target))
             {
                 SpellManager.E.Cast(target);
             }
 
-            if (Yasuo.ComboMenu["combo.E"].Cast<CheckBox>().CurrentValue && !Player.Instance.IsDashing())
+            if (Yasuo.ComboMenu["combo.E"].Cast<CheckBox>().CurrentValue && target.Distance(Player.Instance) > Player.Instance.GetAutoAttackRange(target) && !Player.Instance.IsDashing())
             {
                 foreach (var unit in EntityManager.MinionsAndMonsters.CombinedAttackable)
                 {
                     if (!(unit.GetDashPos().Distance(target) < Player.Instance.Distance(target)) || (unit.GetDashPos().IsUnderTower() && TargetSelector.SelectedTarget != target)) continue;
                     SpellManager.E.Cast(unit);
-                    break;
+                    return;
+                }
+                foreach (var unit in EntityManager.Heroes.Enemies)
+                {
+                    if (!(unit.GetDashPos().Distance(target) < Player.Instance.Distance(target)) || (unit.GetDashPos().IsUnderTower() && TargetSelector.SelectedTarget != target)) continue;
+                    SpellManager.E.Cast(unit);
+                    return;
                 }
             }
 
@@ -74,7 +80,7 @@ namespace YasuoBuddy
                 if (Player.Instance.IsDashing())
                 {
                     var pos = DashingManager.GetPlayerPosition(300);
-                    if (SpellManager.Q.IsReady() && (target.Distance(pos) < 475))
+                    if (SpellManager.Q.IsReady() && (target.Distance(pos) < 400))
                     {
                         Player.CastSpell(SpellSlot.Q);
                     }
@@ -105,7 +111,7 @@ namespace YasuoBuddy
             if (Yasuo.FleeMenu["Flee.stack"].Cast<CheckBox>().CurrentValue && Player.Instance.HasWhirlwind() && !Player.Instance.IsDashing())
             {
                 var target =
-                    EntityManager.Heroes.Enemies.Where(a => a.IsValidTarget(SpellManager.Q.Range))
+                    EntityManager.Heroes.Enemies.Where(a => a.IsValidTarget(SpellManager.Q.Range) && a.Health > 0 && !a.IsDead)
                         .OrderBy(a => a.Distance(Player.Instance))
                         .FirstOrDefault();
                 if (target == null) return;
@@ -129,7 +135,7 @@ namespace YasuoBuddy
                     Player.CastSpell(SpellSlot.Q);
                 }
             }
-            if (Yasuo.FarmMenu["WC.E"].Cast<CheckBox>().CurrentValue && SpellManager.E.IsReady() && !minion.GetDashPos().IsUnderTower())
+            if (Yasuo.FarmMenu["WC.E"].Cast<CheckBox>().CurrentValue && SpellManager.E.IsReady() && (!minion.GetDashPos().IsUnderTower() || Yasuo.FarmMenu["WC.EUnderTower"].Cast<CheckBox>().CurrentValue))
             {
                 if (DamageHandler.EDamage(minion) > minion.Health)
                 {
@@ -158,16 +164,7 @@ namespace YasuoBuddy
         {
             var minion = EntityManager.MinionsAndMonsters.GetLaneMinions().Where(a => a.Distance(Player.Instance) < 475).OrderBy(a => a.Health).FirstOrDefault();
             if (minion == null) return;
-            if (Yasuo.FarmMenu["LH.Q"].Cast<CheckBox>().CurrentValue && Player.Instance.IsDashing())
-            {
-                var pos = DashingManager.GetPlayerPosition(300);
-                if (SpellManager.Q.IsReady() && (minion.Distance(pos) < 475 &&
-                    DamageHandler.QDamage(minion) > minion.Health) || EntityManager.MinionsAndMonsters.GetLaneMinions().Count(a => a.Distance(pos) < 475) > 1)
-                {
-                    Player.CastSpell(SpellSlot.Q);
-                }
-            }
-            if (Yasuo.FarmMenu["LH.E"].Cast<CheckBox>().CurrentValue && SpellManager.E.IsReady() && DamageHandler.EDamage(minion) > minion.Health && !minion.GetDashPos().IsUnderTower())
+            if (Yasuo.FarmMenu["LH.E"].Cast<CheckBox>().CurrentValue && SpellManager.E.IsReady() && DamageHandler.EDamage(minion) > minion.Health && (!minion.GetDashPos().IsUnderTower() || Yasuo.FarmMenu["LH.EUnderTower"].Cast<CheckBox>().CurrentValue))
             {
                 SpellManager.E.Cast(minion);
                 return;

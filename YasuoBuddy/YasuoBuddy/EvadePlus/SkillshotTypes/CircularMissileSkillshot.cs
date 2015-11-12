@@ -141,7 +141,7 @@ namespace YasuoBuddy.EvadePlus.SkillshotTypes
         public override Geometry.Polygon ToPolygon(float extrawidth = 0)
         {
             if (SpellData.AddHitbox)
-                extrawidth += Player.Instance.BoundingRadius;
+                extrawidth += Player.Instance.HitBoxRadius();
 
             return new Geometry.Polygon.Circle(Position, SpellData.Radius + extrawidth);
         }

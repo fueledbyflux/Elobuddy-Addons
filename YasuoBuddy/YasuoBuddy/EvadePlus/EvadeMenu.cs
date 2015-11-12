@@ -25,7 +25,7 @@ namespace YasuoBuddy.EvadePlus
                 return;
             }
 
-            MainMenu = EloBuddy.SDK.Menu.MainMenu.AddMenu("YasuoEvade", "YasuoEvade");
+            MainMenu = EloBuddy.SDK.Menu.MainMenu.AddMenu("Yasuo Evade", "YassEvade");
 
             // Set up main menu
             MainMenu.AddGroupLabel("General Settings");
@@ -34,7 +34,6 @@ namespace YasuoBuddy.EvadePlus
             MainMenu.Add("limitDetectionRange", new CheckBox("Limit Spell Detection Range"));
             MainMenu.Add("recalculatePosition", new CheckBox("Allow recalculation of evade position", false));
             MainMenu.Add("moveToInitialPosition", new CheckBox("Move to desired position after evade.", false));
-            MainMenu.Add("alwaysEvade", new CheckBox("Evade always, even when not enough time is available", false));
             MainMenu.Add("serverTimeBuffer", new Slider("Server Time Buffer", 30));
             MainMenu.AddSeparator();
             MainMenu.AddSeparator();
@@ -44,8 +43,6 @@ namespace YasuoBuddy.EvadePlus
             MainMenu.AddSeparator(10);
             MainMenu.Add("extraEvadeRange", new Slider("Extra Evade Range", 50, 0, 100));
             MainMenu.Add("randomizeExtraEvadeRange", new CheckBox("Randomize Extra Evade Range", false));
-
-            TargetedSpells.SpellDetectorWindwaller.Init();
 
             // Set up skillshot menu
             var heroes = EntityManager.Heroes.Enemies;
@@ -76,9 +73,9 @@ namespace YasuoBuddy.EvadePlus
                 SkillshotMenu.Add(skillshotString + "/draw", new CheckBox("Draw"));
                 if (c is LinearMissileSkillshot)
                 {
-                    SkillshotMenu.Add(skillshotString + "/wEvade", new CheckBox("W Evade"));
+                    SkillshotMenu.Add(skillshotString + "/w", new CheckBox("Dodge With W"));
                 }
-
+                SkillshotMenu.Add(skillshotString + "/e", new CheckBox("Dodge With E"));
                 var dangerous = new CheckBox("Dangerous", c.SpellData.IsDangerous);
                 dangerous.OnValueChange += delegate(ValueBase<bool> sender, ValueBase<bool>.ValueChangeArgs args)
                 {
@@ -104,6 +101,7 @@ namespace YasuoBuddy.EvadePlus
             // Set up draw menu
             DrawMenu = MainMenu.AddSubMenu("Drawings");
             DrawMenu.AddGroupLabel("Evade Drawings");
+            DrawMenu.Add("disableAllDrawings", new CheckBox("Disable All Drawings", false));
             DrawMenu.Add("drawEvadePoint", new CheckBox("Draw Evade Point"));
             DrawMenu.Add("drawEvadeStatus", new CheckBox("Draw Evade Status"));
             DrawMenu.Add("drawDangerPolygon", new CheckBox("Draw Danger Polygon", false));
@@ -115,6 +113,8 @@ namespace YasuoBuddy.EvadePlus
             ControlsMenu.AddGroupLabel("Controls");
             ControlsMenu.Add("enableEvade", new KeyBind("Enable Evade", true, KeyBind.BindTypes.PressToggle, 'M'));
             ControlsMenu.Add("dodgeOnlyDangerous", new KeyBind("Dodge Only Dangerous", false, KeyBind.BindTypes.HoldActive));
+
+            TargetedSpells.SpellDetectorWindwaller.Init();
         }
 
         private static EvadeSkillshot GetSkillshot(string s)
@@ -122,16 +122,21 @@ namespace YasuoBuddy.EvadePlus
             return MenuSkillshots[s.ToLower().Split('/')[0]];
         }
 
-        public static bool IsSkillshotW(EvadeSkillshot skillshot)
-        {
-            if (!(skillshot is LinearMissileSkillshot)) return false;
-            var valueBase = SkillshotMenu[skillshot + "/wEvade"];
-            return valueBase != null && valueBase.Cast<CheckBox>().CurrentValue;
-        }
-
         public static bool IsSkillshotEnabled(EvadeSkillshot skillshot)
         {
             var valueBase = SkillshotMenu[skillshot + "/enable"];
+            return valueBase != null && valueBase.Cast<CheckBox>().CurrentValue;
+        }
+
+        public static bool IsSkillshotW(EvadeSkillshot skillshot)
+        {
+            var valueBase = SkillshotMenu[skillshot + "/w"];
+            return valueBase != null && valueBase.Cast<CheckBox>().CurrentValue;
+        }
+
+        public static bool IsSkillshotE(EvadeSkillshot skillshot)
+        {
+            var valueBase = SkillshotMenu[skillshot + "/e"];
             return valueBase != null && valueBase.Cast<CheckBox>().CurrentValue;
         }
 

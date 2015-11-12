@@ -17,7 +17,7 @@ namespace YasuoBuddy
         public static int WDelay;
         public static GameObject Wall;
         public static Geometry.Polygon.Rectangle WallPolygon;
-        private static int ResetWall;
+        private static int _resetWall;
 
         public static void Init()
         {
@@ -50,15 +50,14 @@ namespace YasuoBuddy
             if (sender.IsValid && sender.Team == ObjectManager.Player.Team && args.SData.Name == "YasuoWMovingWall")
             {
                 EEvader.YasuoWallCastedPos = sender.ServerPosition.To2D();
-                ResetWall = Environment.TickCount + 4000;
+                _resetWall = Environment.TickCount + 4000;
             }
         }
 
         public static void UpdateTask()
         {
             if (Program.Evade == null) return;
-            Program.Evade.CacheSkillshots();
-            if (ResetWall - Environment.TickCount > 3400 && Wall != null)
+            if (_resetWall - Environment.TickCount > 3400 && Wall != null)
             {
                 var level = Player.GetSpell(SpellSlot.W).Level;
                 var wallWidth = (300 + 50 * level);
@@ -67,14 +66,14 @@ namespace YasuoBuddy
                 var wallEnd = wallStart - wallWidth * wallDirection;
                 WallPolygon = new Geometry.Polygon.Rectangle(wallStart, wallEnd, 75);
             }
-            if (ResetWall < Environment.TickCount)
+            if (_resetWall < Environment.TickCount)
             {
                 Wall = null;
                 WallPolygon = null;
             }
             if (Wall != null && YasuoWallCastedPos.IsValid() && WallPolygon != null)
             {
-                foreach (var activeSkillshot in Program.Evade.SkillshotDetector.ActiveSkillshots.Where(a => (a is LinearMissileSkillshot) && EvadeMenu.IsSkillshotW(a)))
+                foreach (var activeSkillshot in Program.Evade.SkillshotDetector.ActiveSkillshots.Where(EvadeMenu.IsSkillshotW))
                 {
                     if (WallPolygon.IsInside(activeSkillshot.GetPosition()))
                     {
@@ -89,7 +88,7 @@ namespace YasuoBuddy
             {
                 if (Yasuo.FleeMenu["Evade.W"].Cast<CheckBox>().CurrentValue && Player.GetSpell(SpellSlot.W).State == SpellState.Ready)
                 {
-                    foreach (var activeSkillshot in Program.Evade.SkillshotDetector.ActiveSkillshots.Where(a => a is LinearMissileSkillshot && EvadePlus.EvadeMenu.IsSkillshotW(a)))
+                    foreach (var activeSkillshot in Program.Evade.SkillshotDetector.ActiveSkillshots.Where(a => EvadeMenu.IsSkillshotW(a) && Environment.TickCount - a.TimeDetected >= Yasuo.FleeMenu["Evade.WDelay"].Cast<Slider>().CurrentValue))
                     {
                         if (activeSkillshot.ToPolygon().IsInside(Player.Instance))
                         {
@@ -101,7 +100,9 @@ namespace YasuoBuddy
                 }
 
                 if (WDelay > Environment.TickCount) return;
-                
+
+                var poly = Program.Evade.CustomPoly();
+
                 if (Yasuo.FleeMenu["Evade.E"].Cast<CheckBox>().CurrentValue && Player.GetSpell(SpellSlot.E).State == SpellState.Ready)
                 {
                     foreach (
@@ -110,12 +111,12 @@ namespace YasuoBuddy
                                 a => a.Team != Player.Instance.Team && a.Distance(Player.Instance) < 475 && a.CanDash()))
                     {
                         if(source.GetDashPos().IsUnderTower()) continue;
-                        if (EvadePlus.Program.Evade.IsPointSafe(source.GetDashPos().To2D()))
+                        if (Program.Evade.IsPointSafe(poly, source.GetDashPos().To2D()))
                         {
                             int count = 0;
                             for (int i = 0; i < 10; i += 47)
                             {
-                                if(!EvadePlus.Program.Evade.IsPointSafe(Player.Instance.Position.Extend(source.GetDashPos(), i)))
+                                if(!Program.Evade.IsPointSafe(poly, Player.Instance.Position.Extend(source.GetDashPos(), i)))
                                 {
                                     count ++;
                                 }
@@ -131,12 +132,12 @@ namespace YasuoBuddy
                                 a => a.IsEnemy && a.Distance(Player.Instance) < 475 && a.CanDash()))
                     {
                         if (source.GetDashPos().IsUnderTower()) continue;
-                        if (EvadePlus.Program.Evade.IsPointSafe(source.GetDashPos().To2D()))
+                        if (Program.Evade.IsPointSafe(poly, source.GetDashPos().To2D()))
                         {
                             int count = 0;
                             for (int i = 0; i < 10; i += 47)
                             {
-                                if(!EvadePlus.Program.Evade.IsPointSafe(Player.Instance.Position.Extend(source.GetDashPos(), i)))
+                                if(!Program.Evade.IsPointSafe(poly, Player.Instance.Position.Extend(source.GetDashPos(), i)))
                                 {
                                     count ++;
                                 }

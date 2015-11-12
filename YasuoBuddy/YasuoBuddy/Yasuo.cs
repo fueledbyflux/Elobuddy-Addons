@@ -1,20 +1,18 @@
 ﻿using System;
-using System.Drawing;
-using System.Linq;
-using System.Security.AccessControl;
 using EloBuddy;
 using EloBuddy.SDK;
-using EloBuddy.SDK.Constants;
 using EloBuddy.SDK.Events;
 using EloBuddy.SDK.Menu;
 using EloBuddy.SDK.Menu.Values;
 using EloBuddy.SDK.Rendering;
+using YasuoBuddy.EvadePlus;
 
 namespace YasuoBuddy
 {
     internal class Yasuo
     {
         public static Menu Menu, ComboMenu, HarassMenu, FarmMenu, FleeMenu, DrawMenu, MiscSettings;
+        private static int _cleanUpTime;
 
         private static void Main(string[] args)
         {
@@ -51,10 +49,12 @@ namespace YasuoBuddy
             FarmMenu.AddLabel("Last Hit");
             FarmMenu.Add("LH.Q", new CheckBox("Use Q"));
             FarmMenu.Add("LH.E", new CheckBox("Use E"));
+            FarmMenu.Add("LH.EUnderTower", new CheckBox("Use E Under Tower", false));
 
             FarmMenu.AddLabel("WaveClear");
             FarmMenu.Add("WC.Q", new CheckBox("Use Q"));
             FarmMenu.Add("WC.E", new CheckBox("Use E"));
+            FarmMenu.Add("WC.EUnderTower", new CheckBox("Use E Under Tower", false));
 
             FarmMenu.AddLabel("Jungle");
             FarmMenu.Add("JNG.Q", new CheckBox("Use Q"));
@@ -67,6 +67,7 @@ namespace YasuoBuddy
             FleeMenu.AddGroupLabel("Evade Settings");
             FleeMenu.Add("Evade.E", new CheckBox("Use E to Evade"));
             FleeMenu.Add("Evade.W", new CheckBox("Use W to Evade"));
+            FleeMenu.Add("Evade.WDelay", new Slider("Humanizer Delay (ms)", 0, 0, 1000));
 
             MiscSettings = Menu.AddSubMenu("Misc Settings");
             MiscSettings.AddGroupLabel("KillSteal Settings");
@@ -76,7 +77,7 @@ namespace YasuoBuddy
             MiscSettings.Add("Auto.Q3", new CheckBox("Use Q3"));
             MiscSettings.Add("Auto.Active", new KeyBind("Auto Q Enemy", false, KeyBind.BindTypes.PressToggle, 'M'));
 
-            EvadePlus.Program.Main(null);
+            Program.Main(null);
 
             DrawMenu = Menu.AddSubMenu("Draw", "yasuoDraw");
             DrawMenu.AddGroupLabel("Draw Settings");
@@ -96,8 +97,6 @@ namespace YasuoBuddy
             DrawMenu.AddLabel("When Spell is Down Colour = ");
             DrawMenu.AddColourItem("Draw.Down", 7);
             
-
-            EventManager.Init();
             Game.OnTick += Game_OnTick;
             Drawing.OnDraw += Drawing_OnDraw;
             EEvader.Init();
@@ -107,23 +106,31 @@ namespace YasuoBuddy
         {
             if (DrawMenu["Draw.Q"].Cast<CheckBox>().CurrentValue)
             {
-                Circle.Draw(SpellManager.Q.IsReady() ? DrawMenu.GetColour("Draw.Q.Colour") : DrawMenu.GetColour("Draw.Down"),
+                Circle.Draw(
+                    SpellManager.Q.IsReady() ? DrawMenu.GetColour("Draw.Q.Colour") : DrawMenu.GetColour("Draw.Down"),
                     SpellManager.Q.Range, Player.Instance.Position);
             }
             if (DrawMenu["Draw.R"].Cast<CheckBox>().CurrentValue)
             {
-                Circle.Draw(SpellManager.R.IsReady() ? DrawMenu.GetColour("Draw.R.Colour") : DrawMenu.GetColour("Draw.Down"),
+                Circle.Draw(
+                    SpellManager.R.IsReady() ? DrawMenu.GetColour("Draw.R.Colour") : DrawMenu.GetColour("Draw.Down"),
                     SpellManager.R.Range, Player.Instance.Position);
             }
             if (DrawMenu["Draw.E"].Cast<CheckBox>().CurrentValue)
             {
-                Circle.Draw(SpellManager.E.IsReady() ? DrawMenu.GetColour("Draw.E.Colour") : DrawMenu.GetColour("Draw.Down"),
+                Circle.Draw(
+                    SpellManager.E.IsReady() ? DrawMenu.GetColour("Draw.E.Colour") : DrawMenu.GetColour("Draw.Down"),
                     SpellManager.E.Range, Player.Instance.Position);
             }
         }
 
         private static void Game_OnTick(EventArgs args)
         {
+            if (_cleanUpTime < Environment.TickCount)
+            {
+                GC.Collect();
+                _cleanUpTime = Environment.TickCount + 1000000;
+            }
             StateManager.KillSteal();
             if (MiscSettings["Auto.Active"].Cast<KeyBind>().CurrentValue)
             {

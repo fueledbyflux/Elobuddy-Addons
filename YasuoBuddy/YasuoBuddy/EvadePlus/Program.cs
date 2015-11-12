@@ -2,7 +2,7 @@
 
 namespace YasuoBuddy.EvadePlus
 {
-    internal class Program
+    internal static class Program
     {
         private static SkillshotDetector _skillshotDetector;
         public static EvadePlus Evade;
@@ -15,6 +15,7 @@ namespace YasuoBuddy.EvadePlus
                 Evade = new EvadePlus(_skillshotDetector);
                 EvadeMenu.CreateMenu();
             };
+
         }
     }
 }
