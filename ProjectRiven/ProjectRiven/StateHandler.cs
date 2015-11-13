@@ -23,13 +23,13 @@ namespace ProjectRiven
 
             if (target == null) return;
 
-            if (target.Distance(Player.Instance) > Riven.W.Range)
+            if ((target.Distance(Player.Instance) > Riven.W.Range || Riven.IsRActive && Riven.R.IsReady()) && Riven.E.IsReady())
             {
                 Player.CastSpell(SpellSlot.E, target.Position);
                 return;
             }
 
-            if (target.Distance(Player.Instance) <= Riven.W.Range)
+            if (target.Distance(Player.Instance) <= Riven.W.Range && Riven.W.IsReady())
             {
                 Player.CastSpell(SpellSlot.W);
             }
