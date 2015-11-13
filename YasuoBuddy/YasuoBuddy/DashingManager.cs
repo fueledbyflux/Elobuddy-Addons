@@ -57,11 +57,20 @@ namespace YasuoBuddy
             foreach (var source in EntityManager.MinionsAndMonsters.CombinedAttackable.Where(a => a.CanDash() && !a.IsDead && a.Health > 0 && a.Distance(Player.Instance) < 475))
             {
                 int dist = (int) source.GetDashPos().Distance(pos);
-                if (dist < distance)
-                {
-                    distance = dist;
-                    unit = source;
-                }
+                if (dist >= distance) continue;
+                distance = dist;
+                unit = source;
+            }
+            if (unit != null) return unit;
+            foreach (
+                var source in
+                    EntityManager.Heroes.Enemies.Where(
+                        a => a.CanDash() && !a.IsDead && a.Health > 0 && a.Distance(Player.Instance) < 475))
+            {
+                int dist = (int) source.GetDashPos().Distance(pos);
+                if (dist >= distance) continue;
+                distance = dist;
+                unit = source;
             }
             return unit;
         }
@@ -73,11 +82,20 @@ namespace YasuoBuddy
             foreach (var source in EntityManager.MinionsAndMonsters.CombinedAttackable.Where(a =>a.CanDash() && !a.IsDead && a.Health > 0 && a.Distance(Player.Instance) < 475))
             {
                 int dist = (int)source.GetDashPos().Distance(pos);
-                if (dist < distance)
-                {
-                    distance = dist;
-                    unit = source;
-                }
+                if (dist >= distance) continue;
+                distance = dist;
+                unit = source;
+            }
+            if (unit != null) return unit;
+            foreach (
+                var source in
+                    EntityManager.Heroes.Enemies.Where(
+                        a => a.CanDash() && !a.IsDead && a.Health > 0 && a.Distance(Player.Instance) < 475))
+            {
+                int dist = (int)source.GetDashPos().Distance(pos);
+                if (dist >= distance) continue;
+                distance = dist;
+                unit = source;
             }
             return unit;
         }

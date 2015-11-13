@@ -22,7 +22,7 @@ namespace YasuoBuddy.TargetedSpells
                 _targetedMenu.AddSeparator();
                 _targetedMenu.AddLabel(enemy.ChampionName);
                 var enemy1 = enemy;
-                foreach (var spell in TargetSpellDatabase.Spells.Where(a => a.ChampionName == enemy1.ChampionName.ToLower()))
+                foreach (var spell in TargetSpellDatabase.Spells.Where(a => a.ChampionName.Equals(enemy1.ChampionName, StringComparison.CurrentCultureIgnoreCase)))
                 {
                     _targetedMenu.Add(spell.Name + "/eyas", new CheckBox(spell.Name + ": " + spell.Spellslot));
                 }

@@ -65,6 +65,7 @@ namespace YasuoBuddy
                     return;
                 }
             }
+            if (Player.Instance.HasWhirlwind()) return;
 
             if (Yasuo.ComboMenu["combo.stack"].Cast<CheckBox>().CurrentValue) SpellManager.StackQ();
         }
@@ -97,6 +98,7 @@ namespace YasuoBuddy
             {
                 SpellManager.E.Cast(unit);
             }
+            if (Player.Instance.HasWhirlwind()) return;
             if (Yasuo.HarassMenu["harass.stack"].Cast<CheckBox>().CurrentValue) SpellManager.StackQ();
         }
 
