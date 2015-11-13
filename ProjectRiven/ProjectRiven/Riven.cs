@@ -15,7 +15,7 @@ namespace ProjectRiven
         }
 
         public static Spell.Active Q = new Spell.Active(SpellSlot.Q);
-        public static Spell.Active E = new Spell.Active(SpellSlot.E);
+        public static Spell.Active E = new Spell.Active(SpellSlot.E, 325);
 
         public static Spell.Active W
         {

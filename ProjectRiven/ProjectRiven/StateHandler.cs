@@ -9,7 +9,6 @@ namespace ProjectRiven
         public static void Combo()
         {
             var target = TargetSelector.GetTarget(Riven.E.Range + Riven.W.Range, DamageType.Physical);
-            if (target == null || Orbwalker.IsAutoAttacking) return;
 
             if (Riven.R.IsReady() && Player.Instance.HasBuff("RivenFengShuiEngine"))
             {
@@ -19,6 +18,8 @@ namespace ProjectRiven
                     if(Riven.R.Cast(enemy)) return;
                 }
             }
+
+            if (target == null || Orbwalker.IsAutoAttacking) return;
 
             if (target.Distance(Player.Instance) > Riven.W.Range)
             {
