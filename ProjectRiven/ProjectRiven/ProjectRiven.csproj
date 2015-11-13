@@ -62,9 +62,13 @@
     <Compile Include="MiscMethods.cs" />
     <Compile Include="Riven.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="StateHandler.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="States\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

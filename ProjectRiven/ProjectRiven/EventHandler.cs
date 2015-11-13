@@ -81,7 +81,7 @@ namespace ProjectRiven
                 if (Riven.W.IsReady())
                 {
                     var target2 = TargetSelector.GetTarget(Riven.W.Range, DamageType.Physical);
-                    if (target2 != null || Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.JungleClear))
+                    if (target2 != null || Orbwalker.ActiveModesFlags != Orbwalker.ActiveModes.None)
                     {
                         Player.CastSpell(SpellSlot.W);
                     }
@@ -102,13 +102,25 @@ namespace ProjectRiven
                         }
                     }
                     target = TargetSelector.GetTarget(Riven.W.Range, DamageType.Physical);
-                    if (Riven.Q.IsReady())
+                    if (Riven.Q.IsReady() && target != null)
                     {
                         Player.CastSpell(SpellSlot.Q, target.Position);
                         return;
                     }
                 }
                 return;
+            }
+            if (args.SData.Name.ToLower().Contains(Riven.E.Name.ToLower()))
+            {
+                if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
+                {
+                    target = TargetSelector.GetTarget(Riven.W.Range, DamageType.Physical);
+                    if (target != null && Player.Instance.Distance(target) < Riven.W.Range)
+                    {
+                        Player.CastSpell(SpellSlot.W);
+                        return;
+                    }
+                }
             }
             if (args.SData.Name.ToLower().Contains(Riven.Q.Name.ToLower()))
             {
@@ -158,6 +170,7 @@ namespace ProjectRiven
                         return;
                     }
                 }
+
                 if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.JungleClear) && target.IsJungleMinion())
                 {
                     if (Riven.W.IsReady() && Riven.W.IsInRange(target))
@@ -181,6 +194,46 @@ namespace ProjectRiven
                         return;
                     }
                 }
+
+                if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LastHit) && target.IsLaneMinion())
+                {
+                    var unitHp = target.Health - Player.Instance.GetAutoAttackDamage(target, true);
+                    if (unitHp > 0)
+                    {
+                        if (Riven.Q.IsReady() &&
+                            Player.Instance.CalculateDamageOnUnit(target, DamageType.Physical, DamageHandler.QDamage()) >
+                            unitHp)
+                        {
+                            Player.CastSpell(SpellSlot.Q, target.Position);
+                            return;
+                        }
+                        if (Riven.W.IsReady() && Riven.W.IsInRange(target) &&
+                            Player.Instance.CalculateDamageOnUnit(target, DamageType.Physical, DamageHandler.WDamage()) >
+                            unitHp)
+                        {
+                            Player.CastSpell(SpellSlot.W);
+                            return;
+                        }
+                    }
+                }
+
+                if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear) && target.IsLaneMinion())
+                {
+                    var unitHp = target.Health - Player.Instance.GetAutoAttackDamage(target, true);
+                    if (unitHp > 0)
+                    {
+                        if (Riven.Q.IsReady())
+                        {
+                            Player.CastSpell(SpellSlot.Q, target.Position);
+                        }
+                        if (Riven.W.IsReady() && Riven.W.IsInRange(target))
+                        {
+                            Player.CastSpell(SpellSlot.W);
+                            return;
+                        }
+                    }
+                }
+
             }
         }
     }
