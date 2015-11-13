@@ -75,6 +75,8 @@ namespace ProjectRiven
         {
             if (!sender.IsMe) return;
             var target = args.Target as Obj_AI_Base;
+
+            // Hydra
             if (args.SData.Name.ToLower().Contains("itemtiamatcleave") )
             {
                 Orbwalker.ResetAutoAttack();
@@ -88,6 +90,8 @@ namespace ProjectRiven
                 }
                 return;
             }
+
+            //W
             if (args.SData.Name.ToLower().Contains(Riven.W.Name.ToLower()))
             {
                 if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
@@ -110,10 +114,16 @@ namespace ProjectRiven
                 }
                 return;
             }
+
+            //E
             if (args.SData.Name.ToLower().Contains(Riven.E.Name.ToLower()))
             {
                 if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
                 {
+                    if (Riven.IsRActive && Riven.R.IsReady() && !Player.Instance.HasBuff("RivenFengShuiEngine"))
+                    {
+                        Player.CastSpell(SpellSlot.R);
+                    }
                     target = TargetSelector.GetTarget(Riven.W.Range, DamageType.Physical);
                     if (target != null && Player.Instance.Distance(target) < Riven.W.Range)
                     {
@@ -122,6 +132,8 @@ namespace ProjectRiven
                     }
                 }
             }
+
+            //Q
             if (args.SData.Name.ToLower().Contains(Riven.Q.Name.ToLower()))
             {
                 if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
@@ -137,101 +149,27 @@ namespace ProjectRiven
                 }
                 return;
             }
+
             if (args.SData.IsAutoAttack() && target != null)
             {
                 if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
                 {
-                    if (Player.Instance.HasBuff("RivenFengShuiEngine") && Riven.R.IsReady())
-                    {
-                        if (Player.Instance.CalculateDamageOnUnit(target, DamageType.Physical, (float)(DamageHandler.RDamage(target))) + Player.Instance.GetAutoAttackDamage(target, true) > target.Health)
-                        {
-                            Riven.R.Cast(target);
-                            return;
-                        }
-                    }
-                    if (Riven.W.IsReady() && Riven.W.IsInRange(target))
-                    {
-                        if (ItemHandler.Hydra != null && ItemHandler.Hydra.IsReady())
-                        {
-                            ItemHandler.Hydra.Cast();
-                            return;
-                        }
-                        Player.CastSpell(SpellSlot.W);
-                        return;
-                    }
-                    if (Riven.Q.IsReady())
-                    {
-                        Player.CastSpell(SpellSlot.Q, target.Position);
-                        return;
-                    }
-                    if (ItemHandler.Hydra != null && ItemHandler.Hydra.IsReady())
-                    {
-                        ItemHandler.Hydra.Cast();
-                        return;
-                    }
+                    StateHandler.ComboAfterAa(target);
                 }
 
                 if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.JungleClear) && target.IsJungleMinion())
                 {
-                    if (Riven.W.IsReady() && Riven.W.IsInRange(target))
-                    {
-                        if (ItemHandler.Hydra != null && ItemHandler.Hydra.IsReady())
-                        {
-                            ItemHandler.Hydra.Cast();
-                            return;
-                        }
-                        Player.CastSpell(SpellSlot.W);
-                        return;
-                    }
-                    if (Riven.Q.IsReady())
-                    {
-                        Player.CastSpell(SpellSlot.Q, target.Position);
-                        return;
-                    }
-                    if (ItemHandler.Hydra != null && ItemHandler.Hydra.IsReady())
-                    {
-                        ItemHandler.Hydra.Cast();
-                        return;
-                    }
+                    StateHandler.JungleAfterAa(target);
                 }
 
                 if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LastHit) && target.IsLaneMinion())
                 {
-                    var unitHp = target.Health - Player.Instance.GetAutoAttackDamage(target, true);
-                    if (unitHp > 0)
-                    {
-                        if (Riven.Q.IsReady() &&
-                            Player.Instance.CalculateDamageOnUnit(target, DamageType.Physical, DamageHandler.QDamage()) >
-                            unitHp)
-                        {
-                            Player.CastSpell(SpellSlot.Q, target.Position);
-                            return;
-                        }
-                        if (Riven.W.IsReady() && Riven.W.IsInRange(target) &&
-                            Player.Instance.CalculateDamageOnUnit(target, DamageType.Physical, DamageHandler.WDamage()) >
-                            unitHp)
-                        {
-                            Player.CastSpell(SpellSlot.W);
-                            return;
-                        }
-                    }
+                    StateHandler.LastHitAfterAa(target);
                 }
 
                 if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear) && target.IsLaneMinion())
                 {
-                    var unitHp = target.Health - Player.Instance.GetAutoAttackDamage(target, true);
-                    if (unitHp > 0)
-                    {
-                        if (Riven.Q.IsReady())
-                        {
-                            Player.CastSpell(SpellSlot.Q, target.Position);
-                        }
-                        if (Riven.W.IsReady() && Riven.W.IsInRange(target))
-                        {
-                            Player.CastSpell(SpellSlot.W);
-                            return;
-                        }
-                    }
+                    StateHandler.LaneClearAfterAa(target);
                 }
 
             }

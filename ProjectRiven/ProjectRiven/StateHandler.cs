@@ -34,5 +34,105 @@ namespace ProjectRiven
                 Player.CastSpell(SpellSlot.W);
             }
         }
+
+        public static void ComboAfterAa(Obj_AI_Base target)
+        {
+            if (Player.Instance.HasBuff("RivenFengShuiEngine") && Riven.R.IsReady())
+            {
+                if (Player.Instance.CalculateDamageOnUnit(target, DamageType.Physical, (float)(DamageHandler.RDamage(target))) + Player.Instance.GetAutoAttackDamage(target, true) > target.Health)
+                {
+                    Riven.R.Cast(target);
+                    return;
+                }
+            }
+            if (Riven.W.IsReady() && Riven.W.IsInRange(target))
+            {
+                if (ItemHandler.Hydra != null && ItemHandler.Hydra.IsReady())
+                {
+                    ItemHandler.Hydra.Cast();
+                    return;
+                }
+                Player.CastSpell(SpellSlot.W);
+                return;
+            }
+            if (Riven.Q.IsReady())
+            {
+                Player.CastSpell(SpellSlot.Q, target.Position);
+                return;
+            }
+            if (ItemHandler.Hydra != null && ItemHandler.Hydra.IsReady())
+            {
+                ItemHandler.Hydra.Cast();
+                return;
+            }
+        }
+
+        public static void HarassAfterAa(Obj_AI_Base target)
+        {
+
+        }
+
+        public static void LastHitAfterAa(Obj_AI_Base target)
+        {
+            var unitHp = target.Health - Player.Instance.GetAutoAttackDamage(target, true);
+            if (unitHp > 0)
+            {
+                if (Riven.Q.IsReady() &&
+                    Player.Instance.CalculateDamageOnUnit(target, DamageType.Physical, DamageHandler.QDamage()) >
+                    unitHp)
+                {
+                    Player.CastSpell(SpellSlot.Q, target.Position);
+                    return;
+                }
+                if (Riven.W.IsReady() && Riven.W.IsInRange(target) &&
+                    Player.Instance.CalculateDamageOnUnit(target, DamageType.Physical, DamageHandler.WDamage()) >
+                    unitHp)
+                {
+                    Player.CastSpell(SpellSlot.W);
+                    return;
+                }
+            }
+        }
+
+        public static void LaneClearAfterAa(Obj_AI_Base target)
+        {
+            var unitHp = target.Health - Player.Instance.GetAutoAttackDamage(target, true);
+            if (unitHp > 0)
+            {
+                if (Riven.Q.IsReady())
+                {
+                    Player.CastSpell(SpellSlot.Q, target.Position);
+                }
+                if (Riven.W.IsReady() && Riven.W.IsInRange(target))
+                {
+                    Player.CastSpell(SpellSlot.W);
+                    return;
+                }
+            }
+        }
+
+        public static void JungleAfterAa(Obj_AI_Base target)
+        {
+            if (Riven.W.IsReady() && Riven.W.IsInRange(target))
+            {
+                if (ItemHandler.Hydra != null && ItemHandler.Hydra.IsReady())
+                {
+                    ItemHandler.Hydra.Cast();
+                    return;
+                }
+                Player.CastSpell(SpellSlot.W);
+                return;
+            }
+            if (Riven.Q.IsReady())
+            {
+                Player.CastSpell(SpellSlot.Q, target.Position);
+                return;
+            }
+            if (ItemHandler.Hydra != null && ItemHandler.Hydra.IsReady())
+            {
+                ItemHandler.Hydra.Cast();
+                return;
+            }
+        }
     }
 }
