@@ -88,6 +88,28 @@ namespace ProjectRiven
                 }
                 return;
             }
+            if (args.SData.Name.ToLower().Contains(Riven.W.Name.ToLower()))
+            {
+                if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
+                {
+                    if (Player.Instance.HasBuff("RivenFengShuiEngine") && Riven.R.IsReady())
+                    {
+                        var target2 = TargetSelector.GetTarget(Riven.R.Range, DamageType.Physical);
+                        if (target2 != null && Player.Instance.CalculateDamageOnUnit(target2, DamageType.Physical, (float)(DamageHandler.RDamage(target2) + DamageHandler.WDamage())) > target2.Health)
+                        {
+                            Riven.R.Cast(target2);
+                            return;
+                        }
+                    }
+                    target = TargetSelector.GetTarget(Riven.W.Range, DamageType.Physical);
+                    if (Riven.Q.IsReady())
+                    {
+                        Player.CastSpell(SpellSlot.Q, target.Position);
+                        return;
+                    }
+                }
+                return;
+            }
             if (args.SData.Name.ToLower().Contains(Riven.Q.Name.ToLower()))
             {
                 if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
