@@ -105,12 +105,13 @@ namespace ProjectRiven
                             return;
                         }
                     }
-                    target = TargetSelector.GetTarget(Riven.W.Range, DamageType.Physical);
-                    if (Riven.Q.IsReady() && target != null)
-                    {
-                        Player.CastSpell(SpellSlot.Q, target.Position);
-                        return;
-                    }
+                }
+
+                target = (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo) || Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Harass)) ? TargetSelector.GetTarget(Riven.E.Range + Riven.W.Range, DamageType.Physical) : (Obj_AI_Base)Orbwalker.LastTarget;
+                if (Riven.Q.IsReady() && Orbwalker.ActiveModesFlags != Orbwalker.ActiveModes.None && target != null)
+                {
+                    Player.CastSpell(SpellSlot.Q, target.Position);
+                    return;
                 }
                 return;
             }
@@ -171,7 +172,6 @@ namespace ProjectRiven
                 {
                     StateHandler.LaneClearAfterAa(target);
                 }
-
             }
         }
     }
