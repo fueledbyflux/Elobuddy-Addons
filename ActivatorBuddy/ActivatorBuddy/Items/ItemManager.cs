@@ -39,10 +39,16 @@ namespace ActivatorBuddy.Items
             new Item("hydra", 250, CastType.SelfCast, ItemId.Ravenous_Hydra_Melee_Only, ItemType.Offensive, true),
             new Item("gunblade", 700, CastType.Targeted, ItemId.Hextech_Gunblade, ItemType.Offensive),
             new Item("ghostblade", 1500, CastType.SelfCast, ItemId.Youmuus_Ghostblade, ItemType.Offensive),
-            new Item("flaskPotion", int.MaxValue, CastType.SelfCast, ItemId.Crystalline_Flask, ItemType.Healing, false,
+            new Item("refillpot", int.MaxValue, CastType.SelfCast, (ItemId) 2031, ItemType.Healing, false,
                 "ItemCrystalFlask"),
-            new Item("flaskPotion", int.MaxValue, CastType.SelfCast, ItemId.Crystalline_Flask, ItemType.ManaRestore,
-                false, "ItemCrystalFlask"),
+            new Item("corruptpot", int.MaxValue, CastType.SelfCast, (ItemId) 2033, ItemType.Healing, false,
+                "ItemDarkCrystalFlask"),
+            new Item("corruptpot", int.MaxValue, CastType.SelfCast, (ItemId) 2033, ItemType.ManaRestore, false,
+                "ItemDarkCrystalFlask"),
+            new Item("huntersPot", int.MaxValue, CastType.SelfCast, (ItemId) 2032, ItemType.Healing, false,
+                "ItemCrystalFlaskJungle"),
+            new Item("huntersPot", int.MaxValue, CastType.SelfCast, (ItemId) 2032, ItemType.ManaRestore, false,
+                "ItemCrystalFlaskJungle"),
             new Item("healthPotion", int.MaxValue, CastType.SelfCast, ItemId.Health_Potion, ItemType.Healing, false,
                 "RegenerationPotion"),
             new Item("manaPotion", int.MaxValue, CastType.SelfCast, ItemId.Mana_Potion, ItemType.ManaRestore, false,
@@ -98,14 +104,19 @@ namespace ActivatorBuddy.Items
             PotionsMenu = menu.AddSubMenu("Potions", "potions");
             PotionsMenu.AddGroupLabel("Potion Items");
             PotionsMenu.Add("healthPotionManager", new CheckBox("Health Potion"));
-            PotionsMenu.Add("healthPotionManagerMinMeHP", new Slider("Min HP %", 20));
+            PotionsMenu.Add("healthPotionManagerMinMeHP", new Slider("Min HP %", 40));
             PotionsMenu.AddSeparator();
             PotionsMenu.Add("manaPotionManager", new CheckBox("Mana Potion"));
-            PotionsMenu.Add("manaPotionManagerMinMeMana", new Slider("Min Mana %", 20));
+            PotionsMenu.Add("manaPotionManagerMinMeMana", new Slider("Min Mana %", 40));
             PotionsMenu.AddSeparator();
-            PotionsMenu.Add("flaskPotionManager", new CheckBox("Flask"));
-            PotionsMenu.Add("flaskPotionManagerMinMeHP", new Slider("Min HP %", 20));
-            PotionsMenu.Add("flaskPotionManagerMinMeMana", new Slider("Min Mana %", 20));
+            PotionsMenu.Add("corruptpotManager", new CheckBox("Corrupt Potion"));
+            PotionsMenu.Add("corruptpotManagerMinMeHP", new Slider("Min HP %", 40));
+            PotionsMenu.Add("corruptpotManagerMinMeMana", new Slider("Min Mana %", 40));
+            PotionsMenu.AddSeparator();
+            PotionsMenu.Add("huntersPotManager", new CheckBox("Hunter's Potion"));
+            PotionsMenu.Add("huntersPotManagerMinMeHP", new Slider("Min HP %", 40));
+            PotionsMenu.Add("huntersPotManagerMinMeMana", new Slider("Min Mana %", 40));
+
             OffensiveMenu.AddSeparator();
 
             Cleansers = menu.AddSubMenu("Cleansers", "cleansers");
