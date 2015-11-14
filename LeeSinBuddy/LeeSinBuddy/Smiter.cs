@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using EloBuddy;
 using EloBuddy.SDK;
 using EloBuddy.SDK.Menu;
@@ -18,11 +15,9 @@ namespace LeeSinBuddy
         {
             "SRU_Red", "SRU_Blue", "SRU_Dragon", "SRU_Baron"
         };
-
-        private static readonly int[] SmitePurple = { 3713, 3726, 3725, 3724, 3723, 3933 };
-        private static readonly int[] SmiteGrey = { 3711, 3722, 3721, 3720, 3719, 3932 };
-        private static readonly int[] SmiteRed = { 3715, 3718, 3717, 3716, 3714, 3931 };
-        private static readonly int[] SmiteBlue = { 3706, 3710, 3709, 3708, 3707, 3930 };
+        
+        private static readonly int[] SmiteRed = { 3715, 1415, 1414, 1413, 1412 };
+        private static readonly int[] SmiteBlue = { 3706, 1403, 1402, 1401, 1400 };
 
         public static Spell.Targeted Smite;
         public static Menu SmiteMenu;
@@ -34,8 +29,6 @@ namespace LeeSinBuddy
                 smiteSlot = ObjectManager.Player.GetSpellSlotFromName("s5_summonersmiteplayerganker");
             else if (SmiteRed.Any(x => ObjectManager.Player.InventoryItems.FirstOrDefault(a => a.Id == (ItemId)x) != null))
                 smiteSlot = ObjectManager.Player.GetSpellSlotFromName("s5_summonersmiteduel");
-            else if (SmitePurple.Any(x => ObjectManager.Player.InventoryItems.FirstOrDefault(a => a.Id == (ItemId)x) != null))
-                smiteSlot = ObjectManager.Player.GetSpellSlotFromName("itemsmiteaoe");
             else
                 smiteSlot = ObjectManager.Player.GetSpellSlotFromName("summonersmite");
             Smite = new Spell.Targeted(smiteSlot, 500);
@@ -93,7 +86,7 @@ namespace LeeSinBuddy
 
         private static void Game_OnUpdate(EventArgs args)
         {
-            if (!SmiteMenu["smiteEnabled"].Cast<KeyBind>().CurrentValue) return;
+            if (!SmiteMenu["smiteEnabled"].Cast<KeyBind>().CurrentValue || Smite == null) return;
 
             SetSmiteSlot();
             
