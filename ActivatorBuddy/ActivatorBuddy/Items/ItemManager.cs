@@ -51,8 +51,6 @@ namespace ActivatorBuddy.Items
                 "ItemCrystalFlaskJungle"),
             new Item("healthPotion", int.MaxValue, CastType.SelfCast, ItemId.Health_Potion, ItemType.Healing, false,
                 "RegenerationPotion"),
-            new Item("manaPotion", int.MaxValue, CastType.SelfCast, ItemId.Mana_Potion, ItemType.ManaRestore, false,
-                "FlaskOfCrystalWater"),
             new Item("mikaelsCleanse", int.MaxValue, CastType.SelfCast, ItemId.Mikaels_Crucible, ItemType.Cleanse),
             new Item("mercurialScimitarCleanse", int.MaxValue, CastType.SelfCast, ItemId.Mercurial_Scimitar,
                 ItemType.Cleanse),
@@ -105,9 +103,6 @@ namespace ActivatorBuddy.Items
             PotionsMenu.AddGroupLabel("Potion Items");
             PotionsMenu.Add("healthPotionManager", new CheckBox("Health Potion"));
             PotionsMenu.Add("healthPotionManagerMinMeHP", new Slider("Min HP %", 40));
-            PotionsMenu.AddSeparator();
-            PotionsMenu.Add("manaPotionManager", new CheckBox("Mana Potion"));
-            PotionsMenu.Add("manaPotionManagerMinMeMana", new Slider("Min Mana %", 40));
             PotionsMenu.AddSeparator();
             PotionsMenu.Add("corruptpotManager", new CheckBox("Corrupt Potion"));
             PotionsMenu.Add("corruptpotManagerMinMeHP", new Slider("Min HP %", 40));
