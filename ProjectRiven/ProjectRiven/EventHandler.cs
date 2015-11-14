@@ -99,7 +99,7 @@ namespace ProjectRiven
 
         private static void Obj_AI_Base_OnSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
-            if (!sender.IsMe) return;
+            if (!sender.IsMe || Riven.BurstActive && !BurstHandler.ComboFinished) return;
             var target = args.Target as Obj_AI_Base;
 
             // Hydra

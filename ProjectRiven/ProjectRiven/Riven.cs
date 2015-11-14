@@ -38,6 +38,10 @@ namespace ProjectRiven
         {
             get { return Menu["forcedRKeybind"].Cast<KeyBind>().CurrentValue; }
         }
+        public static bool BurstActive
+        {
+            get { return false; }
+        }
 
         private static void Main(string[] args)
         {
@@ -50,9 +54,11 @@ namespace ProjectRiven
             Menu.AddLabel("a simpler riven");
             Menu.AddLabel("VERY BETA, USE AT YOUR OWN RISK");
             Menu.Add("forcedRKeybind", new KeyBind("Forced R", false, KeyBind.BindTypes.PressToggle, 'T'));
+            //Menu.Add("burstActive", new KeyBind("Burst", false, KeyBind.BindTypes.HoldActive, 'Y'));
 
             ItemHandler.Init();
             EventHandler.Init();
+            BurstHandler.Init();
 
             Drawing.OnDraw += Drawing_OnDraw;
             Game.OnTick += Game_OnTick;
