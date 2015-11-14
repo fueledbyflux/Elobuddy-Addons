@@ -23,11 +23,6 @@ namespace ProjectRiven
 
         public static void UpdateItems()
         {
-            foreach (var item in Player.Instance.InventoryItems)
-            {
-                break;
-                Chat.Print(item.Id + " : Name: " + item.DisplayName);
-            }
             var id = Player.Instance.InventoryItems.FirstOrDefault(a => a.Id == ItemId.Ravenous_Hydra_Melee_Only || a.Id == ItemId.Tiamat_Melee_Only);
             if (id == null)
             {

@@ -12,6 +12,9 @@ namespace ProjectRiven
 {
     class EventHandler
     {
+
+        public static int LastCastW;
+
         public static void Init()
         {
             Obj_AI_Base.OnSpellCast += Obj_AI_Base_OnSpellCast;
@@ -22,13 +25,36 @@ namespace ProjectRiven
         private static void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
             if (!sender.IsMe) return;
-            if (args.SData.Name.ToLower().Contains("itemtiamatcleave") && Riven.W.IsReady())
+
+            if (args.SData.Name.ToLower().Contains(Riven.E.Name.ToLower()))
             {
-                var target = TargetSelector.GetTarget(Riven.W.Range, DamageType.Physical);
-                if (target != null)
+                LastCastW = Environment.TickCount;
+                return;
+            }
+            if (args.SData.Name.ToLower().Contains(Riven.Q.Name.ToLower()))
+            {
+                Core.DelayAction(() =>
                 {
-                    Core.DelayAction(() => Player.CastSpell(SpellSlot.W), 100);
-                }
+                    if (!Player.Instance.IsRecalling())
+                    {
+                        Player.CastSpell(SpellSlot.Q,
+                            Orbwalker.LastTarget != null && Orbwalker.LastAutoAttack - Environment.TickCount < 3000
+                                ? Orbwalker.LastTarget.Position
+                                : Game.CursorPos);
+                    }
+                }, 3480);
+                return;
+            }
+            if (args.SData.Name.ToLower().Contains(Riven.R.Name.ToLower()))
+            {
+                Core.DelayAction(() =>
+                {
+                    if (Player.Instance.IsRecalling() || !Riven.R.IsReady() || !Player.Instance.HasBuff("RivenFengShuiEngine")) return;
+                    foreach (var enemy in EntityManager.Heroes.Enemies.Where(enemy => enemy.IsValidTarget(Riven.R.Range)).Where(enemy => Riven.R.Cast(enemy)))
+                    {
+                        break;
+                    }
+                }, 14800);
             }
         }
 
@@ -121,6 +147,15 @@ namespace ProjectRiven
             {
                 if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
                 {
+                    if (Player.Instance.HasBuff("RivenFengShuiEngine") && Riven.R.IsReady())
+                    {
+                        var target2 = TargetSelector.GetTarget(Riven.R.Range, DamageType.Physical);
+                        if (target2 != null && Player.Instance.CalculateDamageOnUnit(target2, DamageType.Physical, (float)(DamageHandler.RDamage(target2) + DamageHandler.WDamage())) > target2.Health)
+                        {
+                            Riven.R.Cast(target2);
+                            return;
+                        }
+                    }
                     if (Riven.IsRActive && Riven.R.IsReady() && !Player.Instance.HasBuff("RivenFengShuiEngine"))
                     {
                         Player.CastSpell(SpellSlot.R);
