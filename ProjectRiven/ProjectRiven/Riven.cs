@@ -21,7 +21,7 @@ namespace ProjectRiven
             AllowedCollisionCount = int.MaxValue
         };
 
-        public static Menu Menu;
+        public static Menu Menu, ComboMenu, HarassMenu, FarmMenu, MiscMenu;
 
         public static Spell.Active W
         {
@@ -36,11 +36,11 @@ namespace ProjectRiven
 
         public static bool IsRActive
         {
-            get { return Menu["forcedRKeybind"].Cast<KeyBind>().CurrentValue; }
-        }
-        public static bool BurstActive
-        {
-            get { return false; }
+            get
+            {
+                return ComboMenu["forcedRKeybind"].Cast<KeyBind>().CurrentValue &&
+                       ComboMenu["Combo.R"].Cast<CheckBox>().CurrentValue;
+            }
         }
 
         private static void Main(string[] args)
@@ -52,13 +52,46 @@ namespace ProjectRiven
         {
             Menu = MainMenu.AddMenu("Project:Riven", "projRiven");
             Menu.AddLabel("a simpler riven");
-            Menu.AddLabel("VERY BETA, USE AT YOUR OWN RISK");
-            Menu.Add("forcedRKeybind", new KeyBind("Forced R", false, KeyBind.BindTypes.PressToggle, 'T'));
-            //Menu.Add("burstActive", new KeyBind("Burst", false, KeyBind.BindTypes.HoldActive, 'Y'));
+
+            ComboMenu = Menu.AddSubMenu("Combo Settings", "comboSettings");
+            ComboMenu.Add("Combo.Q", new CheckBox("Use Q"));
+            ComboMenu.Add("Combo.W", new CheckBox("Use W"));
+            ComboMenu.Add("Combo.E", new CheckBox("Use E"));
+            ComboMenu.Add("Combo.R2", new CheckBox("Use R Wave (Killable)"));
+            ComboMenu.AddLabel("R1 Settings");
+            ComboMenu.Add("Combo.R", new CheckBox("Use R"));
+            ComboMenu.Add("forcedRKeybind", new KeyBind("Forced R", false, KeyBind.BindTypes.PressToggle, 'T'));
+            ComboMenu.AddLabel("When To use R");
+            ComboMenu.Add("Combo.RCombo", new CheckBox("Cant Kill with Combo"));
+            ComboMenu.Add("Combo.RPeople", new CheckBox("Have more than 1 person near"));
+
+            HarassMenu = Menu.AddSubMenu("Harass Settings", "harassSettings");
+            HarassMenu.Add("Harass.Q", new CheckBox("Use Q"));
+            HarassMenu.Add("Harass.W", new CheckBox("Use W"));
+            HarassMenu.Add("Harass.E", new CheckBox("Use E"));
+
+            FarmMenu = Menu.AddSubMenu("Farm Settings", "farmSettings");
+            FarmMenu.AddLabel("Last Hit");
+            FarmMenu.Add("LastHit.Q", new CheckBox("Use Q"));
+            FarmMenu.Add("LastHit.W", new CheckBox("Use W"));
+            FarmMenu.AddLabel("Wave Clear");
+            FarmMenu.Add("WaveClear.Q", new CheckBox("Use Q"));
+            FarmMenu.Add("WaveClear.W", new CheckBox("Use W"));
+            FarmMenu.AddLabel("Jungle");
+            FarmMenu.Add("Jungle.Q", new CheckBox("Use Q"));
+            FarmMenu.Add("Jungle.W", new CheckBox("Use W"));
+            FarmMenu.Add("Jungle.E", new CheckBox("Use E"));
+
+            MiscMenu = Menu.AddSubMenu("Misc Settings", "miscSettings");
+            MiscMenu.AddLabel("Keep Alive Settings");
+            MiscMenu.Add("Alive.Q", new CheckBox("Keep Q Alive"));
+            MiscMenu.Add("Alive.R", new CheckBox("Use R2 Before Expire"));
+            MiscMenu.AddLabel("Humanizer Settings");
+            MiscMenu.Add("HumanizerDelay", new Slider("Humanizer Delay (ms)", 0, 0, 300));
+
 
             ItemHandler.Init();
             EventHandler.Init();
-            BurstHandler.Init();
 
             Drawing.OnDraw += Drawing_OnDraw;
             Game.OnTick += Game_OnTick;
@@ -66,9 +99,12 @@ namespace ProjectRiven
 
         private static void Drawing_OnDraw(EventArgs args)
         {
-            var pos = Drawing.WorldToScreen(Player.Instance.Position);
-            Text.Draw("Forced R: " + IsRActive, Color.AliceBlue, (int) pos.X - 45,
-                (int) pos.Y + 40);
+            if (ComboMenu["Combo.R"].Cast<CheckBox>().CurrentValue)
+            {
+                var pos = Drawing.WorldToScreen(Player.Instance.Position);
+                Text.Draw("Forced R: " + IsRActive, Color.AliceBlue, (int) pos.X - 45,
+                    (int) pos.Y + 40);
+            }
         }
 
         private static void Game_OnTick(EventArgs args)

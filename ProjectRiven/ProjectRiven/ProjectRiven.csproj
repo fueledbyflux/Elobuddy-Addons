@@ -56,7 +56,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BurstHandler.cs" />
     <Compile Include="DamageHandler.cs" />
     <Compile Include="EventHandler.cs" />
     <Compile Include="ItemHandler.cs" />

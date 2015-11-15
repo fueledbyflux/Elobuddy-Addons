@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using EloBuddy;
 using EloBuddy.SDK;
 using EloBuddy.SDK.Constants;
@@ -10,32 +7,44 @@ using EloBuddy.SDK.Menu.Values;
 
 namespace ProjectRiven
 {
-    class EventHandler
+    internal class EventHandler
     {
-
+        public static int LastCastQ;
         public static int LastCastW;
+        public static int QCount;
 
         public static void Init()
         {
             Obj_AI_Base.OnSpellCast += Obj_AI_Base_OnSpellCast;
             Obj_AI_Base.OnPlayAnimation += Obj_AI_Base_OnPlayAnimation;
             Obj_AI_Base.OnProcessSpellCast += Obj_AI_Base_OnProcessSpellCast;
+            Game.OnTick += Game_OnTick;
+        }
+
+        private static void Game_OnTick(EventArgs args)
+        {
+            if (LastCastQ + 3500 < Environment.TickCount)
+            {
+                QCount = 0;
+            }
         }
 
         private static void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
             if (!sender.IsMe) return;
 
-            if (args.SData.Name.ToLower().Contains(Riven.E.Name.ToLower()))
+            if (args.SData.Name.ToLower().Contains(Riven.W.Name.ToLower()))
             {
                 LastCastW = Environment.TickCount;
                 return;
             }
             if (args.SData.Name.ToLower().Contains(Riven.Q.Name.ToLower()))
             {
+                LastCastQ = Environment.TickCount;
+                if (!Riven.MiscMenu["Alive.Q"].Cast<CheckBox>().CurrentValue) return;
                 Core.DelayAction(() =>
                 {
-                    if (!Player.Instance.IsRecalling())
+                    if (!Player.Instance.IsRecalling() && QCount < 2)
                     {
                         Player.CastSpell(SpellSlot.Q,
                             Orbwalker.LastTarget != null && Orbwalker.LastAutoAttack - Environment.TickCount < 3000
@@ -47,12 +56,16 @@ namespace ProjectRiven
             }
             if (args.SData.Name.ToLower().Contains(Riven.R.Name.ToLower()))
             {
+                if (!Riven.MiscMenu["Alive.R"].Cast<CheckBox>().CurrentValue) return;
                 Core.DelayAction(() =>
                 {
-                    if (Player.Instance.IsRecalling() || !Riven.R.IsReady() || !Player.Instance.HasBuff("RivenFengShuiEngine")) return;
-                    foreach (var enemy in EntityManager.Heroes.Enemies.Where(enemy => enemy.IsValidTarget(Riven.R.Range)).Where(enemy => Riven.R.Cast(enemy)))
+                    if (Player.Instance.IsRecalling() || !Riven.R.IsReady() ||
+                        !Player.Instance.HasBuff("RivenFengShuiEngine")) return;
+                    foreach (
+                        var enemy in
+                            EntityManager.Heroes.Enemies.Where(enemy => enemy.IsValidTarget(Riven.R.Range))
+                                .Where(enemy => Riven.R.Cast(enemy)))
                     {
-                        break;
                     }
                 }, 14800);
             }
@@ -66,12 +79,15 @@ namespace ProjectRiven
             {
                 case "Spell1a":
                     t = 291;
+                    QCount = 1;
                     break;
                 case "Spell1b":
                     t = 291;
+                    QCount = 2;
                     break;
                 case "Spell1c":
                     t = 393;
+                    QCount = 0;
                     break;
                 case "Spell2":
                     t = 170;
@@ -99,11 +115,11 @@ namespace ProjectRiven
 
         private static void Obj_AI_Base_OnSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
-            if (!sender.IsMe || Riven.BurstActive && !BurstHandler.ComboFinished) return;
+            if (!sender.IsMe) return;
             var target = args.Target as Obj_AI_Base;
 
             // Hydra
-            if (args.SData.Name.ToLower().Contains("itemtiamatcleave") )
+            if (args.SData.Name.ToLower().Contains("itemtiamatcleave"))
             {
                 Orbwalker.ResetAutoAttack();
                 if (Riven.W.IsReady())
@@ -122,18 +138,27 @@ namespace ProjectRiven
             {
                 if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
                 {
-                    if (Player.Instance.HasBuff("RivenFengShuiEngine") && Riven.R.IsReady())
+                    if (Player.Instance.HasBuff("RivenFengShuiEngine") && Riven.R.IsReady() &&
+                        Riven.ComboMenu["Combo.R2"].Cast<CheckBox>().CurrentValue)
                     {
                         var target2 = TargetSelector.GetTarget(Riven.R.Range, DamageType.Physical);
-                        if (target2 != null && Player.Instance.CalculateDamageOnUnit(target2, DamageType.Physical, (float)(DamageHandler.RDamage(target2) + DamageHandler.WDamage())) > target2.Health)
+                        if (target2 != null &&
+                            (target2.Distance(Player.Instance) < Riven.W.Range &&
+                             target2.Health >
+                             Player.Instance.CalculateDamageOnUnit(target2, DamageType.Physical, DamageHandler.WDamage()) ||
+                             target2.Distance(Player.Instance) > Riven.W.Range) &&
+                            Player.Instance.CalculateDamageOnUnit(target2, DamageType.Physical,
+                                DamageHandler.RDamage(target2) + DamageHandler.WDamage()) > target2.Health)
                         {
                             Riven.R.Cast(target2);
-                            return;
                         }
                     }
                 }
 
-                target = (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo) || Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Harass)) ? TargetSelector.GetTarget(Riven.E.Range + Riven.W.Range, DamageType.Physical) : (Obj_AI_Base)Orbwalker.LastTarget;
+                target = (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo) ||
+                          Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Harass))
+                    ? TargetSelector.GetTarget(Riven.E.Range + Riven.W.Range, DamageType.Physical)
+                    : (Obj_AI_Base) Orbwalker.LastTarget;
                 if (Riven.Q.IsReady() && Orbwalker.ActiveModesFlags != Orbwalker.ActiveModes.None && target != null)
                 {
                     Player.CastSpell(SpellSlot.Q, target.Position);
@@ -147,16 +172,21 @@ namespace ProjectRiven
             {
                 if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
                 {
-                    if (Player.Instance.HasBuff("RivenFengShuiEngine") && Riven.R.IsReady())
+                    if (Player.Instance.HasBuff("RivenFengShuiEngine") && Riven.R.IsReady() &&
+                        Riven.ComboMenu["Combo.R2"].Cast<CheckBox>().CurrentValue)
                     {
                         var target2 = TargetSelector.GetTarget(Riven.R.Range, DamageType.Physical);
-                        if (target2 != null && Player.Instance.CalculateDamageOnUnit(target2, DamageType.Physical, (float)(DamageHandler.RDamage(target2) + DamageHandler.WDamage())) > target2.Health)
+                        if (target2 != null &&
+                            Player.Instance.CalculateDamageOnUnit(target2, DamageType.Physical,
+                                (DamageHandler.RDamage(target2))) > target2.Health)
                         {
                             Riven.R.Cast(target2);
                             return;
                         }
                     }
-                    if (Riven.IsRActive && Riven.R.IsReady() && !Player.Instance.HasBuff("RivenFengShuiEngine"))
+                    if ((Riven.IsRActive || StateHandler.EnableR) && Riven.R.IsReady() &&
+                        !Player.Instance.HasBuff("RivenFengShuiEngine") &&
+                        Riven.ComboMenu["Combo.R"].Cast<CheckBox>().CurrentValue)
                     {
                         Player.CastSpell(SpellSlot.R);
                     }
@@ -174,10 +204,17 @@ namespace ProjectRiven
             {
                 if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
                 {
-                    if (Player.Instance.HasBuff("RivenFengShuiEngine") && Riven.R.IsReady())
+                    if (Player.Instance.HasBuff("RivenFengShuiEngine") && Riven.R.IsReady() &&
+                        Riven.ComboMenu["Combo.R2"].Cast<CheckBox>().CurrentValue)
                     {
                         var target2 = TargetSelector.GetTarget(Riven.R.Range, DamageType.Physical);
-                        if (target2 != null && Player.Instance.CalculateDamageOnUnit(target2, DamageType.Physical, (float) (DamageHandler.RDamage(target2) + DamageHandler.QDamage())) > target2.Health)
+                        if (target2 != null &&
+                            (target2.Distance(Player.Instance) < 300 &&
+                             target2.Health >
+                             Player.Instance.CalculateDamageOnUnit(target2, DamageType.Physical, DamageHandler.QDamage()) ||
+                             target2.Distance(Player.Instance) > 300) &&
+                            Player.Instance.CalculateDamageOnUnit(target2, DamageType.Physical,
+                                DamageHandler.RDamage(target2) + DamageHandler.QDamage()) > target2.Health)
                         {
                             Riven.R.Cast(target2);
                         }
@@ -188,24 +225,53 @@ namespace ProjectRiven
 
             if (args.SData.IsAutoAttack() && target != null)
             {
-                if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
+                if (Riven.MiscMenu["HumanizerDelay"].Cast<Slider>().CurrentValue == 0)
                 {
-                    StateHandler.ComboAfterAa(target);
-                }
+                    if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
+                    {
+                        StateHandler.ComboAfterAa(target);
+                    }
 
-                if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.JungleClear) && target.IsJungleMinion())
-                {
-                    StateHandler.JungleAfterAa(target);
-                }
+                    if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.JungleClear) && target.IsJungleMinion())
+                    {
+                        StateHandler.JungleAfterAa(target);
+                    }
 
-                if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LastHit) && target.IsLaneMinion())
-                {
-                    StateHandler.LastHitAfterAa(target);
-                }
+                    if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LastHit) && target.IsLaneMinion())
+                    {
+                        StateHandler.LastHitAfterAa(target);
+                    }
 
-                if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear) && target.IsLaneMinion())
+                    if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear) && target.IsLaneMinion())
+                    {
+                        StateHandler.LaneClearAfterAa(target);
+                    }
+                }
+                else
                 {
-                    StateHandler.LaneClearAfterAa(target);
+                    Core.DelayAction(() =>
+                    {
+                        if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
+                        {
+                            StateHandler.ComboAfterAa(target);
+                        }
+
+                        if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.JungleClear) &&
+                            target.IsJungleMinion())
+                        {
+                            StateHandler.JungleAfterAa(target);
+                        }
+
+                        if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LastHit) && target.IsLaneMinion())
+                        {
+                            StateHandler.LastHitAfterAa(target);
+                        }
+
+                        if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear) && target.IsLaneMinion())
+                        {
+                            StateHandler.LaneClearAfterAa(target);
+                        }
+                    }, Riven.MiscMenu["HumanizerDelay"].Cast<Slider>().CurrentValue);
                 }
             }
         }
