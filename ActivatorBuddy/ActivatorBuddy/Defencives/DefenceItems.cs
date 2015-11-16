@@ -22,9 +22,9 @@ namespace ActivatorBuddy.Defencives
 
         public static void Init()
         {
-            Shop.OnBuyItem += delegate { UpdateItems(); };
-            Shop.OnSellItem += delegate { UpdateItems(); };
-            Shop.OnUndo += delegate { UpdateItems(); };
+            Shop.OnBuyItem += delegate { Core.DelayAction(UpdateItems, 200); };
+            Shop.OnSellItem += delegate { Core.DelayAction(UpdateItems, 200); };
+            Shop.OnUndo += delegate { Core.DelayAction(UpdateItems, 200); };
             Player.OnSwapItem += delegate { UpdateItems(); };
         }
 
