@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Globalization;
 using System.Linq;
 using EloBuddy;
 using EloBuddy.SDK;
@@ -12,7 +13,7 @@ using EloBuddy.SDK.Rendering;
 using EloBuddy.SDK.Utils;
 using SharpDX;
 using TrackerBuddy.Properties;
-using Color = SharpDX.Color;
+using Color = System.Drawing.Color;
 using Font = System.Drawing.Font;
 using Sprite = EloBuddy.SDK.Rendering.Sprite;
 
@@ -91,13 +92,19 @@ namespace TrackerBuddy
             TextureLoader.Load("hud2", Resources.hud2);
 
             // Initialize main drawings
-            Text = new Text("", new Font(FontFamily.GenericSansSerif, 8, FontStyle.Bold)) { Color = System.Drawing.Color.AntiqueWhite };
+            Text = new Text("", new Font(FontFamily.GenericSansSerif, 8, FontStyle.Bold)) { Color = Color.AntiqueWhite };
             MainBar = new Sprite(() => Mode == 1 ? TextureLoader["hud2"] : TextureLoader["hud"]);
+
+            TextureLoader.Load("summonersmite", Resources.summonersmite);
+            TextureLoader.Load("s5_summonersmiteduel", Resources.s5_summonersmiteduel);
+            TextureLoader.Load("s5_summonersmiteplayerganker", Resources.s5_summonersmiteplayerganker);
+            SummonerSpells.Add("summonersmite", new Sprite(() => TextureLoader["summonersmite"]));
+            SummonerSpells.Add("s5_summonersmiteduel", new Sprite(() => TextureLoader["s5_summonersmiteduel"]));
+            SummonerSpells.Add("s5_summonersmiteplayerganker", new Sprite(() => TextureLoader["s5_summonersmiteplayerganker"]));
 
             // Load summoner spells dynamically
             foreach (var summoner in EntityManager.Heroes.AllHeroes.SelectMany(o => o.Spellbook.Spells.Where(s => Summoners.Contains(s.Slot))).Select(o => o.Name.ToLower()))
             {
-
                 var summonerName = summoner;
                 if (SummonerSpells.ContainsKey(summonerName))
                 {
@@ -175,31 +182,31 @@ namespace TrackerBuddy
             Drawing.OnEndScene += OnDraw;
             AppDomain.CurrentDomain.DomainUnload += OnDomainUnload;
             AppDomain.CurrentDomain.ProcessExit += OnDomainUnload;
+            WardTracker.Init();
         }
 
         //private static bool draw;
         private static void OnDraw(EventArgs args)
         {
-            foreach (var unit in HeroManager.AllHeroes.Where(o => !o.IsMe && o.IsHPBarRendered).Where(o => o.IsAlly ? DrawAllies : DrawEnemies))
+            foreach (var unit in EntityManager.Heroes.AllHeroes.Where(o => o.IsHPBarRendered).Where(o => o.IsAlly ? DrawAllies : DrawEnemies))
             {
-                var HPBarPos = new Vector2(unit.HPBarPosition.X, unit.HPBarPosition.Y + (Mode == 1 ? -1 : 0));
+                var hpBarPos = new Vector2(unit.HPBarPosition.X, unit.HPBarPosition.Y + (Mode == 1 ? -1 : 0));
                 // Summoner spells
                 foreach (var summonerSpell in Summoners)
                 {
                     var spell = unit.Spellbook.GetSpell(summonerSpell);
                     var cooldown = spell.CooldownExpires - Game.Time;
-                    var percent = (cooldown > 0 && Math.Abs(spell.Cooldown) > float.Epsilon) ? 1f - (cooldown / spell.Cooldown) : 1f;
                     var spellPos = unit.GetSummonerOffset(spell.Slot);
-                    if (SummonerSpells.ContainsKey(spell.Name) || spell.Name.Contains("smite"))
+                    if (SummonerSpells.ContainsKey(spell.Name.ToLower()))
                     {
-                        var sprite = spell.Name.Contains("smite") ? SummonerSpells["summonersmite"] : SummonerSpells[spell.Name];
-                        sprite.Color = GetDrawColor(percent);
+                        var sprite = SummonerSpells[spell.Name.ToLower()];
+                        sprite.Color = cooldown < 0 ? Color.White : Color.FromArgb(255, Color.Red);
                         sprite.Draw(new Vector2(spellPos.X, spellPos.Y));
                     }
 
                     if (DrawText && cooldown > 0)
                     {
-                        Text.TextValue = Math.Floor(cooldown).ToString();
+                        Text.TextValue = Math.Floor(cooldown).ToString(CultureInfo.InvariantCulture);
                         Text.Position = new Vector2((int) spellPos.X - 30 + Text.TextValue.Length, (int) spellPos.Y - 1);
                         Text.Draw();
                     }
@@ -215,11 +222,11 @@ namespace TrackerBuddy
                     
                         Drawing.DrawLine(new Vector2(spellPos.X, spellPos.Y + 2),
                             new Vector2(spellPos.X + (int) (percent*22), spellPos.Y + 2),
-                            Mode == 1 ? 5 : 11, spell.IsLearned ? GetDrawColor(percent) : System.Drawing.Color.SlateGray);
+                            Mode == 1 ? 5 : 11, spell.IsLearned ? GetDrawColor(percent) : Color.SlateGray);
 
                     if (DrawText && spell.IsLearned && cooldown > 0)
                     {
-                        Text.TextValue = Math.Floor(cooldown).ToString();
+                        Text.TextValue = Math.Floor(cooldown).ToString(CultureInfo.InvariantCulture);
                         Text.Position = new Vector2((int) spellPos.X + 10 - Text.TextValue.Length * 2, (int) spellPos.Y + 28);
                         Text.Draw();
                     }
@@ -228,17 +235,17 @@ namespace TrackerBuddy
                 //Cooldowns
                 if (Exp)
                 {
-                    Drawing.DrawLine(new Vector2(HPBarPos.X - OffsetXpX, HPBarPos.Y - OffsetXpY),
-                           new Vector2(HPBarPos.X - OffsetXpX + 104,
-                               HPBarPos.Y - OffsetXpY), 3, System.Drawing.Color.DarkGray);
-                    Drawing.DrawLine(new Vector2(HPBarPos.X - OffsetXpX, HPBarPos.Y - OffsetXpY),
-                        new Vector2(HPBarPos.X - OffsetXpX + 104*(unit.Experience.XPPercentage/100),
-                            HPBarPos.Y - OffsetXpY), 3, System.Drawing.Color.DarkOrange);
+                    Drawing.DrawLine(new Vector2(hpBarPos.X - OffsetXpX, hpBarPos.Y - OffsetXpY),
+                           new Vector2(hpBarPos.X - OffsetXpX + 104,
+                               hpBarPos.Y - OffsetXpY), 3, Color.DarkGray);
+                    Drawing.DrawLine(new Vector2(hpBarPos.X - OffsetXpX, hpBarPos.Y - OffsetXpY),
+                        new Vector2(hpBarPos.X - OffsetXpX + 104*(unit.Experience.XPPercentage/100),
+                            hpBarPos.Y - OffsetXpY), 3, Color.DarkOrange);
                     
                 }
 
                 // Draw the main hud
-                MainBar.Draw(new Vector2((HPBarPos.X + OffsetHudX), (HPBarPos.Y + OffsetHudY - (Exp ? 0 : 1))));
+                MainBar.Draw(new Vector2((hpBarPos.X + OffsetHudX), (hpBarPos.Y + OffsetHudY - (Exp ? 0 : 1))));
             }
         }
 
@@ -263,17 +270,17 @@ namespace TrackerBuddy
             return slot == SpellSlot.Summoner2 ? new Vector2(normalPos.X, normalPos.Y + 17) : normalPos;
         }
 
-        public static System.Drawing.Color GetDrawColor(float percent)
+        public static Color GetDrawColor(float percent)
         {
             if (percent < 0.3)
             {
-                return System.Drawing.Color.Red;
+                return Color.Red;
             }
             if (percent < 0.6)
             {
-                return System.Drawing.Color.Orange;
+                return Color.Orange;
             }
-            return percent < 1 ? System.Drawing.Color.Green : System.Drawing.Color.LawnGreen;
+            return percent < 1 ? Color.Green : Color.LawnGreen;
         }
 
         private static void OnDomainUnload(object sender, EventArgs e)
