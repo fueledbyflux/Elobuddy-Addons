@@ -23,9 +23,16 @@ namespace ProjectRiven
 
         private static void Game_OnTick(EventArgs args)
         {
-            if (LastCastQ + 3500 < Environment.TickCount)
+            if (LastCastQ + 3600 < Environment.TickCount)
             {
                 QCount = 0;
+            }
+            if (Riven.MiscMenu["Alive.Q"].Cast<CheckBox>().CurrentValue && !Player.Instance.IsRecalling() && QCount < 3 && LastCastQ + 3480 < Environment.TickCount && Player.Instance.HasBuff("RivenTriCleaveBuff"))
+            {
+                Player.CastSpell(SpellSlot.Q,
+                    Orbwalker.LastTarget != null && Orbwalker.LastAutoAttack - Environment.TickCount < 3000
+                        ? Orbwalker.LastTarget.Position
+                        : Game.CursorPos);
             }
         }
 
@@ -53,21 +60,6 @@ namespace ProjectRiven
                     }
                 }, 3480);
                 return;
-            }
-            if (args.SData.Name.ToLower().Contains(Riven.R.Name.ToLower()))
-            {
-                if (!Riven.MiscMenu["Alive.R"].Cast<CheckBox>().CurrentValue) return;
-                Core.DelayAction(() =>
-                {
-                    if (Player.Instance.IsRecalling() || !Riven.R.IsReady() ||
-                        !Player.Instance.HasBuff("RivenFengShuiEngine")) return;
-                    foreach (
-                        var enemy in
-                            EntityManager.Heroes.Enemies.Where(enemy => enemy.IsValidTarget(Riven.R.Range))
-                                .Where(enemy => Riven.R.Cast(enemy)))
-                    {
-                    }
-                }, 14800);
             }
         }
 
@@ -232,6 +224,11 @@ namespace ProjectRiven
                         StateHandler.ComboAfterAa(target);
                     }
 
+                    if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Harass))
+                    {
+                        StateHandler.HarassAfterAa(target);
+                    }
+
                     if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.JungleClear) && target.IsJungleMinion())
                     {
                         StateHandler.JungleAfterAa(target);
@@ -254,6 +251,11 @@ namespace ProjectRiven
                         if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
                         {
                             StateHandler.ComboAfterAa(target);
+                        }
+
+                        if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Harass))
+                        {
+                            StateHandler.HarassAfterAa(target);
                         }
 
                         if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.JungleClear) &&

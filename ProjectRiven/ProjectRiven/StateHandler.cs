@@ -34,7 +34,7 @@ namespace ProjectRiven
 
             if (target == null) return;
 
-            if (Riven.ComboMenu["Combo.R"].Cast<CheckBox>().CurrentValue)
+            if (Riven.ComboMenu["Combo.R"].Cast<CheckBox>().CurrentValue && Riven.R.IsReady() && !Player.Instance.HasBuff("RivenFengShuiEngine"))
             {
                 if (Riven.ComboMenu["Combo.RCombo"].Cast<CheckBox>().CurrentValue &&
                     target.Health > DamageHandler.ComboDamage(target, true)
@@ -49,14 +49,12 @@ namespace ProjectRiven
                     }
                     else
                     {
-                        Riven.R.Cast();
+                        Player.CastSpell(SpellSlot.R);
                     }
                 }
             }
 
-            if (Riven.ComboMenu["Combo.E"].Cast<CheckBox>().CurrentValue &&
-                (target.Distance(Player.Instance) > Riven.W.Range || Riven.IsRActive && Riven.R.IsReady()) &&
-                Riven.E.IsReady())
+            if (Riven.ComboMenu["Combo.E"].Cast<CheckBox>().CurrentValue && (target.Distance(Player.Instance) > Riven.W.Range || Riven.IsRActive && Riven.R.IsReady()) && Riven.E.IsReady())
             {
                 Player.CastSpell(SpellSlot.E, target.Position);
                 return;
@@ -65,6 +63,11 @@ namespace ProjectRiven
             if (Riven.ComboMenu["Combo.W"].Cast<CheckBox>().CurrentValue &&
                 target.Distance(Player.Instance) <= Riven.W.Range && Riven.W.IsReady())
             {
+                if (ItemHandler.Hydra != null && ItemHandler.Hydra.IsReady())
+                {
+                    ItemHandler.Hydra.Cast();
+                    return;
+                }
                 Player.CastSpell(SpellSlot.W);
             }
         }
@@ -91,6 +94,11 @@ namespace ProjectRiven
             if (Riven.HarassMenu["Harass.W"].Cast<CheckBox>().CurrentValue &&
                 target.Distance(Player.Instance) <= Riven.W.Range && Riven.W.IsReady())
             {
+                if (ItemHandler.Hydra != null && ItemHandler.Hydra.IsReady())
+                {
+                    ItemHandler.Hydra.Cast();
+                    return;
+                }
                 Player.CastSpell(SpellSlot.W);
             }
         }
@@ -153,7 +161,7 @@ namespace ProjectRiven
 
             if (minion == null) return;
 
-            if (Riven.FarmMenu["Jungle.E"].Cast<CheckBox>().CurrentValue && !Riven.W.IsReady() && Riven.E.IsReady() &&
+            if (Riven.FarmMenu["Jungle.E"].Cast<CheckBox>().CurrentValue && (!Riven.W.IsReady() && !Riven.Q.IsReady() || Player.Instance.HealthPercent < 20) && Riven.E.IsReady() &&
                 EventHandler.LastCastW + 750 < Environment.TickCount)
             {
                 Player.CastSpell(SpellSlot.E, minion.Position);
@@ -165,8 +173,7 @@ namespace ProjectRiven
             if (Player.Instance.HasBuff("RivenFengShuiEngine") && Riven.R.IsReady() &&
                 Riven.ComboMenu["Combo.R2"].Cast<CheckBox>().CurrentValue)
             {
-                if (Player.Instance.CalculateDamageOnUnit(target, DamageType.Physical, DamageHandler.RDamage(target)) +
-                    Player.Instance.GetAutoAttackDamage(target, true) > target.Health)
+                if (Player.Instance.CalculateDamageOnUnit(target, DamageType.Physical, DamageHandler.RDamage(target)) + Player.Instance.GetAutoAttackDamage(target, true) > target.Health)
                 {
                     Riven.R.Cast(target);
                     return;

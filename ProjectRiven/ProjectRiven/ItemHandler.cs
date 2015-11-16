@@ -23,13 +23,18 @@ namespace ProjectRiven
 
         public static void UpdateItems()
         {
-            var id = Player.Instance.InventoryItems.FirstOrDefault(a => a.Id == ItemId.Ravenous_Hydra_Melee_Only || a.Id == ItemId.Tiamat_Melee_Only);
-            if (id == null)
+            Core.DelayAction(() =>
             {
-                Hydra = null;
-                return;
-            }
-            Hydra = new Item(id.Id, 300);
+                var id =
+                    Player.Instance.InventoryItems.FirstOrDefault(
+                        a => a.Id == ItemId.Ravenous_Hydra_Melee_Only || a.Id == ItemId.Tiamat_Melee_Only);
+                if (id == null)
+                {
+                    Hydra = null;
+                    return;
+                }
+                Hydra = new Item(id.Id, 300);
+            }, 200);
         }
     }
 }
