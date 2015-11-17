@@ -50,6 +50,7 @@ namespace ProjectRiven
 
         private static void Loading_OnLoadingComplete(EventArgs args)
         {
+            if (Player.Instance.Hero != Champion.Riven) return;
             Menu = MainMenu.AddMenu("Project:Riven", "projRiven");
             Menu.AddLabel("a simpler riven");
 

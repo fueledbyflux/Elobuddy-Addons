@@ -15,7 +15,7 @@ namespace ProjectRiven
             EnableR = false;
             if (Orbwalker.IsAutoAttacking) return;
 
-            var target = TargetSelector.GetTarget(Riven.E.Range + Riven.W.Range, DamageType.Physical);
+            var target = TargetSelector.GetTarget(Riven.E.Range + Riven.W.Range + 200, DamageType.Physical);
 
             if (Riven.R.IsReady() && Player.Instance.HasBuff("RivenFengShuiEngine") &&
                 Riven.ComboMenu["Combo.R2"].Cast<CheckBox>().CurrentValue)
