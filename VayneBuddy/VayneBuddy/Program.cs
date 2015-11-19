@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using EloBuddy;
@@ -260,7 +260,8 @@ namespace VayneBuddy
             {
                 foreach (var point in Points)
                 {
-                    new Circle() {Color = (point.To3D().ToNavMeshCell().CollFlags.HasFlag(CollisionFlags.Wall) || point.To3D().ToNavMeshCell().CollFlags.HasFlag(CollisionFlags.Building)) ? Color.Blue : Color.Red, Radius = 10}.Draw(point.To3D());
+                    new Circle() {Color = (NavMesh.GetCollisionFlags(point.To3D()).HasFlag(CollisionFlags.Wall) ||
+                            NavMesh.GetCollisionFlags(point.To3D()).HasFlag(CollisionFlags.Building)) ? Color.Blue : Color.Red, Radius = 10}.Draw(point.To3D());
                 }
             }
         }
