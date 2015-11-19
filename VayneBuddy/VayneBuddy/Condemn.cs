@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using EloBuddy;
@@ -40,7 +40,8 @@ namespace VayneBuddy
                 {
                     var cPos = _Player.Position.Extend(position, _Player.Distance(position) + i).To3D();
                     Program.Points.Add(cPos.To2D());
-                    if (cPos.ToNavMeshCell().CollFlags.HasFlag(CollisionFlags.Wall) || cPos.ToNavMeshCell().CollFlags.HasFlag(CollisionFlags.Building))
+                    if (NavMesh.GetCollisionFlags(cPos).HasFlag(CollisionFlags.Wall) ||
+                            NavMesh.GetCollisionFlags(cPos).HasFlag(CollisionFlags.Building))
                     {
                         wallsFound++;
                         break;
@@ -60,8 +61,9 @@ namespace VayneBuddy
             int distance = 0;
             for (int i = 0; i < Program.CondemnMenu["pushDistance"].Cast<Slider>().CurrentValue; i += 20)
             {
-                var cell = startPos.Extend(endPos, endPos.Distance(startPos) + i).ToNavMeshCell().CollFlags;
-                if (cell.HasFlag(CollisionFlags.Wall) || cell.HasFlag(CollisionFlags.Building))
+                var cell = startPos.Extend(endPos, endPos.Distance(startPos) + i);
+                if (NavMesh.GetCollisionFlags(cell).HasFlag(CollisionFlags.Wall) ||
+                            NavMesh.GetCollisionFlags(cell).HasFlag(CollisionFlags.Building))
                 {
                     distance = i - 20;
                 }

@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using EloBuddy;
 using EloBuddy.SDK;
 using EloBuddy.SDK.Menu.Values;
@@ -37,7 +37,7 @@ namespace VayneBuddy
                         if (Program.CondemnMenu["condemnComboTrinket"].Cast<CheckBox>().CurrentValue)
                         {
                             var pos = Condemn.GetFirstNonWallPos(_Player.Position.To2D(), target.Position.To2D());
-                            if (pos.ToNavMeshCell().CollFlags.HasFlag(CollisionFlags.Grass))
+                            if (NavMesh.GetCollisionFlags(pos).HasFlag(CollisionFlags.Grass))
                             {
                                 Player.CastSpell(SpellSlot.Trinket,
                                     pos.To3D());
