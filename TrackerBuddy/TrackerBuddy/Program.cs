@@ -188,7 +188,7 @@ namespace TrackerBuddy
         //private static bool draw;
         private static void OnDraw(EventArgs args)
         {
-            foreach (var unit in EntityManager.Heroes.AllHeroes.Where(o => o.IsHPBarRendered).Where(o => o.IsAlly ? DrawAllies : DrawEnemies))
+            foreach (var unit in EntityManager.Heroes.AllHeroes.Where(o => o.IsHPBarRendered && !o.IsMe).Where(o => o.IsAlly ? DrawAllies : DrawEnemies))
             {
                 var hpBarPos = new Vector2(unit.HPBarPosition.X, unit.HPBarPosition.Y + (Mode == 1 ? -1 : 0));
                 // Summoner spells
