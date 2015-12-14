@@ -24,9 +24,9 @@ namespace MrMundo.States
         public override void Activate()
         {
             if (!SpellHandler.Q.IsReady() || !Program.FarmMenu["useQLH"].Cast<CheckBox>().CurrentValue) return;
-
+            
             if (EntityManager.MinionsAndMonsters.EnemyMinions.OrderByDescending(a => a.MaxHealth).Any(
-                    a => a.Health <= Player.Instance.GetSpellDamage(a, SpellSlot.Q) && SpellHandler.Q.Cast(a)))
+                    a => a.Health <= Program.QDamage(a) && SpellHandler.Q.Cast(a)))
             {
                 return;
             }

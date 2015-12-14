@@ -1,22 +1,27 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using EloBuddy;
+using EloBuddy.SDK;
 using EloBuddy.SDK.Events;
 using EloBuddy.SDK.Menu;
 using EloBuddy.SDK.Menu.Values;
+using EloBuddy.SDK.Rendering;
 using MrMundo.States;
+using SharpDX;
 
 namespace MrMundo
 {
-    class Program
+    internal class Program
     {
-        public static Menu Menu, ComboMenu, HarassMenu, FarmMenu;
+        public static Menu Menu, ComboMenu, HarassMenu, FarmMenu, DrawMenu;
         public static int ResetTime;
 
-        static void Main(string[] args)
+        public static bool HasW
+        {
+            get { return Player.HasBuff("BurningAgony") || ResetTime > Environment.TickCount; }
+        }
+
+        private static void Main(string[] args)
         {
             Loading.OnLoadingComplete += Loading_OnLoadingComplete;
         }
@@ -48,19 +53,66 @@ namespace MrMundo
             FarmMenu.AddLabel("Jungle");
             FarmMenu.Add("useQJNG", new CheckBox("Use Q"));
 
+
+            DrawMenu = Menu.AddSubMenu("Drawing", "mrmundoDrawing", "Mr Mundo - Drawing");
+            DrawMenu.Add("drawQ", new CheckBox("Draw Q", false));
+            DrawMenu.Add("drawW", new CheckBox("Draw W", false));
+            DrawMenu.Add("drawE", new CheckBox("Draw E", false));
+
             StateHandler.Init();
             Obj_AI_Base.OnProcessSpellCast += Obj_AI_Base_OnProcessSpellCast;
+            Drawing.OnDraw += Drawing_OnDraw;
         }
 
-        public static bool HasW { get { return Player.HasBuff("BurningAgony") || ResetTime > Environment.TickCount; } }
+        private static void Drawing_OnDraw(EventArgs args)
+        {
+            if (DrawMenu["drawQ"].Cast<CheckBox>().CurrentValue)
+            {
+                Circle.Draw(Color.LawnGreen, SpellHandler.Q.Range, Player.Instance.Position);
+            }
+            if (DrawMenu["drawW"].Cast<CheckBox>().CurrentValue)
+            {
+                Circle.Draw(Color.LimeGreen, SpellHandler.W.Range, Player.Instance.Position);
+            }
+            if (DrawMenu["drawE"].Cast<CheckBox>().CurrentValue)
+            {
+                Circle.Draw(Color.LightBlue, SpellHandler.E.Range, Player.Instance.Position);
+            }
+        }
 
         private static void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
-            if (!sender.IsMe || args.SData.Name != Player.GetSpell(SpellSlot.W).Name) return;
-            if (!Player.HasBuff("BurningAgony"))
+            if (!sender.IsMe) return;
+
+            if (args.SData.Name == Player.GetSpell(SpellSlot.E).Name)
+            {
+                Console.WriteLine(Player.GetSpell(SpellSlot.E).Name);
+                Orbwalker.ResetAutoAttack();
+            }
+            if (args.SData.Name == Player.GetSpell(SpellSlot.W).Name && !Player.HasBuff("BurningAgony"))
             {
                 ResetTime = Environment.TickCount + 500;
             }
+        }
+
+        public static float QDamage(Obj_AI_Base target)
+        {
+            var level = Player.GetSpell(SpellSlot.Q).Level;
+            if (level < 1) return 0;
+            var value = new[]
+            {
+                (new[] {80, 130, 180, 230, 280}[level - 1]),
+                (int) (new[] {0.15, 0.175, 0.21, 0.225, 0.25}[level - 1]*target.Health)
+            }.Max();
+            if (EntityManager.Heroes.Enemies.Any(a => a.NetworkId == target.NetworkId))
+                return Player.Instance.CalculateDamageOnUnit(target, DamageType.Magical, value);
+
+            var maxMonsters = new[] {300, 350, 400, 450, 500}[level - 1];
+            if (maxMonsters < value)
+            {
+                value = maxMonsters;
+            }
+            return Player.Instance.CalculateDamageOnUnit(target, DamageType.Magical, value);
         }
     }
 }

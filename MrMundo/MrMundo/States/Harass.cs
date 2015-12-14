@@ -18,7 +18,7 @@ namespace MrMundo.States
 
         private void Orbwalker_OnPostAttack(AttackableUnit target, EventArgs args)
         {
-            if (SpellHandler.E.IsReady() && Program.HarassMenu["useEHarass"].Cast<CheckBox>().CurrentValue && EntityManager.Heroes.Enemies.Any(a => a.Name == target.Name && Player.Instance.IsInAutoAttackRange(a)))
+            if (target != null && SpellHandler.E.IsReady() && Program.HarassMenu["useEHarass"].Cast<CheckBox>().CurrentValue && EntityManager.Heroes.Enemies.Any(a => a.Name == target.Name && Player.Instance.IsInAutoAttackRange(a)))
             {
                 SpellHandler.E.Cast();
             }
