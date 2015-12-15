@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using EloBuddy;
 using EloBuddy.SDK;
@@ -46,10 +47,6 @@ namespace ProjectRiven
                     if (Riven.E.IsReady())
                     {
                         EnableR = true;
-                    }
-                    else
-                    {
-                        Player.CastSpell(SpellSlot.R);
                     }
                 }
             }
@@ -106,23 +103,22 @@ namespace ProjectRiven
         public static void LaneClear()
         {
             Orbwalker.ForcedTarget = null;
-            if (Orbwalker.IsAutoAttacking) return;
+            if (Orbwalker.IsAutoAttacking || EventHandler.LastCastQ + 260 > Environment.TickCount) return;
             foreach (
                 var minion in EntityManager.MinionsAndMonsters.EnemyMinions.Where(a => a.IsValidTarget(Riven.W.Range)))
             {
-                if (Riven.FarmMenu["WaveClear.Q"].Cast<CheckBox>().CurrentValue && Riven.Q.IsReady() && minion.Health <=
-                    Player.Instance.GetAutoAttackDamage(minion, true) +
+                if (Riven.FarmMenu["WaveClear.Q"].Cast<CheckBox>().CurrentValue && Riven.Q.IsReady() &&
+                    minion.Health <=
                     Player.Instance.CalculateDamageOnUnit(minion, DamageType.Physical, DamageHandler.QDamage()))
                 {
-                    Orbwalker.ForcedTarget = minion;
+                    Player.CastSpell(SpellSlot.Q, minion.Position);
                     return;
                 }
                 if (Riven.FarmMenu["WaveClear.W"].Cast<CheckBox>().CurrentValue && Riven.W.IsReady() &&
-                    !Riven.Q.IsReady() && minion.Health <=
-                    Player.Instance.GetAutoAttackDamage(minion, true) +
+                    minion.Health <=
                     Player.Instance.CalculateDamageOnUnit(minion, DamageType.Physical, DamageHandler.WDamage()))
                 {
-                    Orbwalker.ForcedTarget = minion;
+                    Player.CastSpell(SpellSlot.W);
                     return;
                 }
             }
@@ -255,11 +251,30 @@ namespace ProjectRiven
                 if (Riven.FarmMenu["WaveClear.Q"].Cast<CheckBox>().CurrentValue && Riven.Q.IsReady())
                 {
                     Player.CastSpell(SpellSlot.Q, target.Position);
+                    return;
                 }
                 if (Riven.FarmMenu["WaveClear.W"].Cast<CheckBox>().CurrentValue && Riven.W.IsReady() &&
                     Riven.W.IsInRange(target))
                 {
                     Player.CastSpell(SpellSlot.W);
+                    return;
+                }
+            }
+            else
+            {
+                List<Obj_AI_Minion> minions = EntityManager.MinionsAndMonsters.GetLaneMinions(EntityManager.UnitTeam.Enemy,
+                    Player.Instance.Position, Riven.Q.Range).Where(a => a.NetworkId != target.NetworkId).ToList();
+                if (Riven.FarmMenu["WaveClear.Q"].Cast<CheckBox>().CurrentValue && Riven.Q.IsReady() && minions.Any())
+                {
+                    Player.CastSpell(SpellSlot.Q, minions[0].Position);
+                    return;
+                }
+                minions = minions.Where(a => a.Distance(Player.Instance) < Riven.W.Range).ToList();
+                if (Riven.FarmMenu["WaveClear.W"].Cast<CheckBox>().CurrentValue && Riven.W.IsReady() &&
+                    Riven.W.IsInRange(target) && minions.Any())
+                {
+                    Player.CastSpell(SpellSlot.W);
+                    return;
                 }
             }
         }

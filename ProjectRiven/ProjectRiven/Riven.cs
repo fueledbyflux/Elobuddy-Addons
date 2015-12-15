@@ -13,7 +13,7 @@ namespace ProjectRiven
     internal class Riven
     {
         public static Text Text = new Text("", new Font(FontFamily.GenericSansSerif, 9, FontStyle.Bold));
-        public static Spell.Active Q = new Spell.Active(SpellSlot.Q);
+        public static Spell.Active Q = new Spell.Active(SpellSlot.Q, 300);
         public static Spell.Active E = new Spell.Active(SpellSlot.E, 325);
 
         public static Spell.Skillshot R = new Spell.Skillshot(SpellSlot.R, 900, SkillShotType.Cone, 250, 1600, 45)

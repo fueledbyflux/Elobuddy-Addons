@@ -95,6 +95,7 @@ namespace ProjectRiven
             }
             if (t != 0 && (Orbwalker.ActiveModesFlags != Orbwalker.ActiveModes.None))
             {
+                Orbwalker.ResetAutoAttack();
                 Core.DelayAction(CancelAnimation, t - Game.Ping);
             }
         }
