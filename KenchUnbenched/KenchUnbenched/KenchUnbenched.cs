@@ -23,14 +23,19 @@ namespace KenchUnbenched
 
         public static Menu Menu, ComboMenu, HarassMenu, FarmingMenu, DrawMenu, KillStealMenu, SaveMenu;
 
-        public static Spell.Skillshot QSpell = new Spell.Skillshot(SpellSlot.Q, 800, SkillShotType.Linear, 100, 2000, 75);
-        public static Spell.Targeted WSpellSwallow = new Spell.Targeted(SpellSlot.W, 250);
-        public static Spell.Skillshot WSpellSpit = new Spell.Skillshot(SpellSlot.W, 900, SkillShotType.Linear, 100, 900, 75);
-        public static Spell.Active ESpell = new Spell.Active(SpellSlot.E);
+        public static Spell.Skillshot QSpell;
+        public static Spell.Targeted WSpellSwallow;
+        public static Spell.Skillshot WSpellSpit;
+        public static Spell.Active ESpell;
 
         private static void Loading_OnLoadingComplete(EventArgs args)
         {
             if (Player.Instance.Hero != Champion.TahmKench) return;
+			
+			QSpell = new Spell.Skillshot(SpellSlot.Q, 800, SkillShotType.Linear, 100, 2000, 75);
+			WSpellSwallow = new Spell.Targeted(SpellSlot.W, 250);
+			WSpellSpit = new Spell.Skillshot(SpellSlot.W, 900, SkillShotType.Linear, 100, 900, 75);
+			ESpell = new Spell.Active(SpellSlot.E);
 
             Menu = MainMenu.AddMenu("Kench Unbenched", "kbswag");
             Menu.AddGroupLabel("Kench Unbenched");
