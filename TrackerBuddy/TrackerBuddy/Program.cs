@@ -25,10 +25,10 @@ namespace TrackerBuddy
         private const int OffsetHudY = 2; //11
 
         private const int OffsetSpellsX = OffsetHudX + 22;
-        private const int OffsetSpellsY = OffsetHudY + 11;
+        private const int OffsetSpellsY = OffsetHudY + 11 + 15 + 2;
 
         private const int OffsetSummonersX = OffsetHudX + 4; //9
-        private const int OffsetSummonersY = OffsetHudY + 2; //5
+        private const int OffsetSummonersY = OffsetHudY + 2 + 3; //5
 
         private const int OffsetXpX = 0; //44
         private const int OffsetXpY = -6; //53
@@ -227,7 +227,7 @@ namespace TrackerBuddy
                     if (DrawText && spell.IsLearned && cooldown > 0)
                     {
                         Text.TextValue = Math.Floor(cooldown).ToString(CultureInfo.InvariantCulture);
-                        Text.Position = new Vector2((int) spellPos.X + 10 - Text.TextValue.Length * 2, (int) spellPos.Y + 28);
+                        Text.Position = new Vector2((int) spellPos.X + 10 - Text.TextValue.Length * 2, (int) spellPos.Y + 28 - 15);
                         Text.Draw();
                     }
                 }
@@ -267,7 +267,7 @@ namespace TrackerBuddy
         private static Vector2 GetSummonerOffset(this Obj_AI_Base hero, SpellSlot slot)
         {
             var normalPos = new Vector2(hero.HPBarPosition.X + OffsetSummonersX, hero.HPBarPosition.Y + OffsetSummonersY + (Mode == 1 ? -4 : 0) - (Exp ? 0 : 3));
-            return slot == SpellSlot.Summoner2 ? new Vector2(normalPos.X, normalPos.Y + 17) : normalPos;
+            return slot == SpellSlot.Summoner2 ? new Vector2(normalPos.X, normalPos.Y + 17 - 1) : normalPos;
         }
 
         public static Color GetDrawColor(float percent)
